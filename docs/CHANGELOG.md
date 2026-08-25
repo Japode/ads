@@ -17,6 +17,8 @@
 
 ## Block C — Embed snippet and JavaScript loader
 
+- ✅ **RK8** **There is no HTML snippet a site owner can paste** — site/v1/ads.js discovers [data-japode-ads] containers and reads data-ad-format, slot, theme, lang, tags and exclude; an unknown attribute is ignored so a pasted snippet never breaks.
+
 ## Block D — Banner rendering in HTML
 
 ## Block E — Random rotation and delivery control

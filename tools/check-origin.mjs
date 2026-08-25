@@ -16,6 +16,7 @@ const origin = (process.argv[2] ?? 'https://ads.japode.com').replace(/\/$/, '');
 // including the version it is required to answer — writing the version twice would let
 // the check agree with itself while the origin disagreed with both.
 const CATALOGUE_PATH = '/v1/catalogue.json';
+const LOADER_PATH = '/v1/ads.js';
 const PATH_VERSION = Number(/\/v(\d+)\//.exec(CATALOGUE_PATH)[1]);
 
 const failures = [];
@@ -86,7 +87,18 @@ async function main() {
     logo.headers.get('access-control-allow-origin') ?? '(absent)'
   );
 
-  // 5. A snippet lands on an https page, so a plain-http origin would be blocked as mixed
+  // 5. The other half of the snippet. Every pasted <script src> points here, so this URL
+  // is as permanent as the catalogue's. The content type matters on its own: a script
+  // served as text/plain is refused outright by a browser that was sent nosniff.
+  const loader = await fetch(origin + LOADER_PATH);
+  ok(loader.status === 200, 'the loader responds 200', `got ${loader.status}`);
+  ok(
+    /javascript|ecmascript/i.test(loader.headers.get('content-type') ?? ''),
+    'the loader is served as JavaScript',
+    loader.headers.get('content-type') ?? '(no content-type)'
+  );
+
+  // 6. A snippet lands on an https page, so a plain-http origin would be blocked as mixed
   // content. The redirect is what makes an http URL in someone's copy-paste harmless.
   const plain = await fetch(origin.replace('https://', 'http://') + CATALOGUE_PATH, {
     redirect: 'manual',
@@ -97,7 +109,7 @@ async function main() {
     `${plain.status} → ${plain.headers.get('location') ?? '(no location)'}`
   );
 
-  // 6. A missing path must be a clean 404, so the loader can tell "no such campaign file"
+  // 7. A missing path must be a clean 404, so the loader can tell "no such campaign file"
   // from "the origin is broken" and collapse the slot rather than draw an error.
   const missing = await fetch(`${origin}/v1/does-not-exist.json`);
   ok(missing.status === 404, 'a missing path is a clean 404', `got ${missing.status}`);

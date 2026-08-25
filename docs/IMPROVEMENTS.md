@@ -2,13 +2,6 @@
 
 ## Block C — Embed snippet and JavaScript loader
 
-### §RK8 The paste-in snippet
-
-A container element carrying data attributes for slot, format and options, plus one
-script tag. Nothing else. The attributes are the only configuration surface a host site
-touches, so their names and defaults are as much a public contract as the catalogue
-schema is.
-
 ### §RK9 Loader isolation
 
 The script loads async and defers its work until the container is in the document. The

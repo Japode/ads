@@ -2,9 +2,8 @@
 
 ## Block C — Embed snippet and JavaScript loader
 
-- 📋 **RK8** (deps: RK5 ✅) **There is no HTML snippet a site owner can paste** — The whole product is one copy-paste block, the way an ad network ships one. → §RK8
-- 📋 **RK9** (deps: RK8) **The loader would block rendering and inherit host page CSS** — An ad unit must never delay the page it sits on, nor let a host stylesheet distort the banner it draws. → §RK9
-- 📋 **RK10** (deps: RK8) **No page documents the snippet or generates one** — Each site owner needs the slot formats, sizes and options without reading the loader source. → §RK10
+- 📋 **RK9** (deps: RK8 ✅) **The loader would block rendering and inherit host page CSS** — An ad unit must never delay the page it sits on, nor let a host stylesheet distort the banner it draws. → §RK9
+- 📋 **RK10** (deps: RK8 ✅) **No page documents the snippet or generates one** — Each site owner needs the slot formats, sizes and options without reading the loader source. → §RK10
 
 ## Block D — Banner rendering in HTML
 
