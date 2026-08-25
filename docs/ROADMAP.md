@@ -4,7 +4,6 @@
 
 - 📋 **RK6** (deps: RK5 ✅) **GitHub Pages serves headers we cannot configure** — Pages fixes its own CORS and cache lifetime, so freshness has to come from the URL rather than from a policy we choose. → §RK6
 - 📋 **RK7** (deps: RK5 ✅, RK1 ✅) **The endpoint has no version path and no fallback payload** — A later schema change would break every snippet already pasted into a site we do not control. → §RK7
-- 📋 **RK21** (deps: RK5 ✅, RK4 ✅) **Nothing builds and publishes the site to Pages** — The catalogue, the loader and the assets have to reach the published site by a workflow rather than by hand. → §RK21
 
 ## Block C — Embed snippet and JavaScript loader
 

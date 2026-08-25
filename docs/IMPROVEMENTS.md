@@ -19,14 +19,6 @@ of replacing it. Pair it with a defined empty response: when the catalogue canno
 read, the slot must collapse silently rather than leave a broken frame on someone else's
 page.
 
-### §RK21 Deploy workflow
-
-A GitHub Actions workflow validates the catalogue, assembles the publishable files and
-deploys them to Pages on every push to the default branch. It publishes from its own
-site directory, not from the repository root and not from docs, which holds the governed
-roadmap and changelog and must never be served. The schema gate runs inside this
-workflow, so a catalogue that fails validation never reaches the domain.
-
 ## Block C — Embed snippet and JavaScript loader
 
 ### §RK8 The paste-in snippet

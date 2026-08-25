@@ -11,6 +11,7 @@
 ## Block B — Static API on ads.japode.com
 
 - ✅ **RK5** **ads.japode.com serves nothing** — Pages on Japode/ads serves ads.japode.com over enforced HTTPS with source Actions, and site/CNAME claims the domain in the artifact; the DNS CNAME to japode.github.io was already in place.
+- ✅ **RK21** **Nothing builds and publishes the site to Pages** — .github/workflows/deploy.yml tests the gate, validates the catalogue and uploads site/ to Pages on every push to main; a docs-only commit is skipped since docs are never served.
 
 ## Block C — Embed snippet and JavaScript loader
 

@@ -1,0 +1,63 @@
+name: Deploy to Pages
+
+# Everything ads.japode.com serves comes from here. The gate runs before the upload and
+# not after it, because Pages has no rollback: a bad catalogue is undone only by another
+# push, and by then it is already on someone else's page.
+
+on:
+  push:
+    branches: [main]
+    # docs/ holds the governed roadmap, changelog and rationale. It is never served, so
+    # a commit that only touches it should not spend a deploy.
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time, and never cancel one midway: a half-applied Pages deploy is a
+# site serving a mix of two commits.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - run: npm ci
+
+      # The gate itself is tested first: a validator that stopped refusing would let
+      # everything through while still reporting success.
+      - name: Test the gate
+        run: npm test
+
+      - name: Validate the catalogue
+        run: npm run validate
+
+      # site/ and nothing else. The repository root holds package.json, tools/ and the
+      # governed docs, none of which belong on the domain.
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
