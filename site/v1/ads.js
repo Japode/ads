@@ -387,7 +387,12 @@
       '}',
       '.unit:hover { border-color: ' + t.accent + '; }',
       '.unit:focus-visible { outline: 2px solid ' + t.accent + '; outline-offset: 2px; }',
-      '.logo { flex: 0 0 auto; width: 40px; height: auto; border-radius: 8px; }',
+      // No border-radius on the mark. border-radius clips an <img>, and a logo already
+      // carries whatever shape its owner gave it: Shio ships a rounded red tile with
+      // lettering that reaches the corner, so rounding it again cut the corner off.
+      // Restyling an advertiser's mark is not ours to do, and the failure is invisible
+      // for the marks that happen to have empty corners.
+      '.logo { flex: 0 0 auto; width: 40px; height: auto; }',
       '.body { display: flex; flex-direction: column; gap: .2rem; min-width: 0; }',
       '.product { font-size: .75rem; font-weight: 600; letter-spacing: .04em;',
       '  text-transform: uppercase; color: ' + t.accent + '; }',
@@ -424,7 +429,7 @@
       // link, and drops the supporting sentence rather than shrink type until nothing is
       // readable — a strip that has to be squinted at is worse than a shorter one.
       '.unit.strip { align-items: center; gap: .625rem; padding: .5rem .75rem; border-radius: 8px; }',
-      '.unit.strip .logo { width: 24px; border-radius: 5px; }',
+      '.unit.strip .logo { width: 24px; }',
       '.unit.strip .body { flex: 1 1 auto; flex-direction: row; align-items: baseline; gap: .5rem; }',
       '.unit.strip .support { display: none; }',
       '.unit.strip .product { font-size: .7rem; flex: 0 0 auto; }',

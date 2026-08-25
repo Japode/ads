@@ -26,6 +26,7 @@
 - ✅ **RK11** **No HTML template turns a catalogue entry into a banner** — The renderer builds logo, product, headline, support, CTA and an Ad mark from JSON alone, as one labelled link inside the shadow root, with every string set as text.
 - ✅ **RK12** **Only one banner size is imagined** — Four layouts over one entry: sidebar column, in-content rectangle, footer leaderboard and a compact strip, each fluid against its own slot with container queries and never the viewport.
 - ✅ **RK13** **Colours, type and dark mode are hardcoded instead of declared** — Gradient, cta treatment and font are declared per entry from named options; theme is now optional with neutral defaults, and the gate refuses any pair below WCAG AA.
+- ✅ **RK31** **The renderer clips any logo whose artwork reaches its corners** — border-radius is gone from the logo in every format, and a test refuses any rule that would clip or crop a mark.
 
 ## Block E — Random rotation and delivery control
 

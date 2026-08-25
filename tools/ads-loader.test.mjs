@@ -395,6 +395,19 @@ test('the whole unit is one link, labelled by what it does', async () => {
   assert.equal(container.shadowRoot.find('logo').getAttribute('alt'), '');
 });
 
+test('the mark is never reshaped by the renderer', async () => {
+  // border-radius clips an <img>. A logo carries the shape its owner chose, and the
+  // ones with empty corners hide the damage for the ones that do not.
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(campaign()) });
+  await h.settled();
+  const logoRules = styleOf(container).match(/\.logo \{[^}]*\}/g) ?? [];
+  assert.ok(logoRules.length, 'the logo is styled at all');
+  for (const rule of logoRules) {
+    assert.doesNotMatch(rule, /border-radius|clip-path|object-fit: cover/, rule);
+  }
+});
+
 test('the logo reserves its box before the file arrives', async () => {
   // The declared size is the whole reason the catalogue carries width and height.
   const container = el({ 'data-japode-ads': '' });
