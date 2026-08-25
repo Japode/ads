@@ -1,9 +1,5 @@
 # Roadmap (active backlog)
 
-## Block C — Embed snippet and JavaScript loader
-
-- 📋 **RK10** (deps: RK8 ✅) **No page documents the snippet or generates one** — Each site owner needs the slot formats, sizes and options without reading the loader source. → §RK10
-
 ## Block D — Banner rendering in HTML
 
 - 📋 **RK11** (deps: RK1 ✅, RK9 ✅) **No HTML template turns a catalogue entry into a banner** — Logo, headline, supporting line and call to action all have to be assembled from JSON fields. → §RK11

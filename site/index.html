@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Japode Ads — one block to paste</title>
+<meta name="description" content="A static ad network for the Japode and Viglet projects. One container, one script tag, no tracking.">
+<link rel="icon" href="/logos/roadkeep.svg">
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #ffffff;
+    --surface: #f8fafc;
+    --text: #0f172a;
+    --muted: #57637a;
+    --border: #e2e8f0;
+    --accent: #0f766e;
+    --on-accent: #ffffff;
+    --code-bg: #f1f5f9;
+    --warn: #b45309;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b1120;
+      --surface: #131c2e;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --border: #24304a;
+      --accent: #5eead4;
+      --on-accent: #042f2e;
+      --code-bg: #0f172a;
+      --warn: #fbbf24;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.65 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrap { max-width: 60rem; margin: 0 auto; padding: 3rem 1.25rem 5rem; }
+  header { border-bottom: 1px solid var(--border); padding-bottom: 2rem; margin-bottom: 2.5rem; }
+  h1 { font-size: clamp(1.75rem, 4vw, 2.5rem); line-height: 1.15; margin: 0 0 .5rem; letter-spacing: -.02em; }
+  h2 { font-size: 1.3rem; margin: 3rem 0 .75rem; letter-spacing: -.01em; }
+  h3 { font-size: 1rem; margin: 1.5rem 0 .5rem; }
+  p { margin: 0 0 1rem; }
+  .lede { font-size: 1.1rem; color: var(--muted); max-width: 46rem; }
+  a { color: var(--accent); }
+  code, pre { font-family: ui-monospace, SFMono-Regular, "Cascadia Code", Consolas, monospace; }
+  code { background: var(--code-bg); padding: .1em .35em; border-radius: 4px; font-size: .9em; }
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    overflow-x: auto;
+    margin: 0;
+    font-size: .875rem;
+    line-height: 1.6;
+  }
+  pre code { background: none; padding: 0; font-size: inherit; }
+  .snippet { position: relative; }
+  .copy {
+    position: absolute; top: .5rem; right: .5rem;
+    background: var(--accent); color: var(--on-accent);
+    border: 0; border-radius: 6px; padding: .35rem .7rem;
+    font: inherit; font-size: .8rem; cursor: pointer;
+  }
+  .copy:hover { opacity: .9; }
+  .grid { display: grid; gap: 1.5rem; grid-template-columns: 1fr; }
+  @media (min-width: 56rem) { .grid { grid-template-columns: 1fr 1fr; } }
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
+  label { display: block; font-size: .8rem; font-weight: 600; margin: 0 0 .25rem; letter-spacing: .01em; }
+  .field { margin-bottom: .9rem; }
+  .field small { display: block; color: var(--muted); font-size: .78rem; margin-top: .2rem; }
+  select, input {
+    width: 100%; padding: .45rem .6rem; font: inherit; font-size: .9rem;
+    background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px;
+  }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; display: block; overflow-x: auto; }
+  th, td { text-align: left; padding: .6rem .75rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  td:first-child { white-space: nowrap; }
+  .note { border-left: 3px solid var(--warn); padding: .25rem 0 .25rem 1rem; color: var(--muted); margin: 1rem 0; }
+  .state { font-size: .8rem; color: var(--muted); margin-top: .75rem; }
+  .state pre { font-size: .78rem; max-height: 16rem; overflow: auto; }
+  footer { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--border); color: var(--muted); font-size: .875rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Japode Ads</h1>
+  <p class="lede">
+    A house ad network for the Japode and Viglet projects. Everything is static files on
+    this domain: a catalogue, a loader and the logos. No ad server, no bidding, no
+    third-party advertisers, and nothing about the reader is collected or stored.
+  </p>
+</header>
+
+<h2>Paste this</h2>
+<p>Two lines. The container marks where the banner goes; the script tag can sit anywhere.</p>
+
+<div class="snippet">
+  <button class="copy" data-copy="#minimal">Copy</button>
+  <pre id="minimal"><code>&lt;div data-japode-ads&gt;&lt;/div&gt;
+&lt;script src="https://ads.japode.com/v1/ads.js" async&gt;&lt;/script&gt;</code></pre>
+</div>
+
+<p>
+  That is a working slot. Every attribute below is optional and exists to narrow what it
+  shows.
+</p>
+
+<h2>Build a snippet</h2>
+
+<div class="grid">
+  <div class="panel">
+    <div class="field">
+      <label for="g-format">Format</label>
+      <select id="g-format">
+        <option value="">in-content (default)</option>
+        <option value="sidebar">sidebar</option>
+        <option value="in-content">in-content</option>
+        <option value="footer">footer</option>
+      </select>
+      <small>Which layout family to draw. The catalogue names the same three.</small>
+    </div>
+    <div class="field">
+      <label for="g-slot">Slot name</label>
+      <input id="g-slot" placeholder="rail-top" autocomplete="off">
+      <small>Your own label for this placement. Defaults to the format plus its position.</small>
+    </div>
+    <div class="field">
+      <label for="g-theme">Theme</label>
+      <select id="g-theme">
+        <option value="">auto (default)</option>
+        <option value="light">light</option>
+        <option value="dark">dark</option>
+      </select>
+      <small>Which half of a campaign's brand tokens to use. <code>auto</code> follows the reader.</small>
+    </div>
+    <div class="field">
+      <label for="g-lang">Language</label>
+      <input id="g-lang" placeholder="inherits your &lt;html lang&gt;" autocomplete="off">
+      <small>Leave blank to inherit the page's own language.</small>
+    </div>
+    <div class="field">
+      <label for="g-tags">Only these tags</label>
+      <input id="g-tags" placeholder="devtools, cms" autocomplete="off">
+      <small>Comma separated. Blank means no filter.</small>
+    </div>
+    <div class="field">
+      <label for="g-exclude">Never show</label>
+      <input id="g-exclude" placeholder="roadkeep, shio" autocomplete="off">
+      <small>Campaign ids to keep out of this slot — how a project avoids advertising itself.</small>
+    </div>
+  </div>
+
+  <div>
+    <div class="snippet">
+      <button class="copy" data-copy="#generated">Copy</button>
+      <pre id="generated"><code></code></pre>
+    </div>
+
+    <h3>Live slot</h3>
+    <p style="font-size:.875rem;color:var(--muted)">
+      A real container on this page, driven by the same loader you would paste.
+    </p>
+    <div id="preview" data-japode-ads></div>
+    <div class="state">
+      <p>What the loader made of this page:</p>
+      <pre id="diagnostic"><code>reading…</code></pre>
+    </div>
+  </div>
+</div>
+
+<div class="note">
+  <strong>The renderer is not shipped yet.</strong> The loader finds the slot, isolates it
+  and reads the catalogue — the diagnostic above is real output — but nothing draws a
+  banner into it so far. This page will show one without changing.
+</div>
+
+<h2>Attributes</h2>
+
+<table>
+  <thead>
+    <tr><th>Attribute</th><th>Values</th><th>Default</th><th>What it does</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>data-japode-ads</code></td><td>—</td><td>required</td>
+      <td>Marks the element as a slot. Its presence is the only thing required.</td>
+    </tr>
+    <tr>
+      <td><code>data-ad-format</code></td>
+      <td><code>sidebar</code>, <code>in-content</code>, <code>footer</code></td>
+      <td><code>in-content</code></td>
+      <td>The layout family. An unrecognised value warns in the console and falls back rather than leaving your reader with nothing.</td>
+    </tr>
+    <tr>
+      <td><code>data-ad-slot</code></td><td>any label</td><td>format + position</td>
+      <td>Names this placement so you can tell two slots apart.</td>
+    </tr>
+    <tr>
+      <td><code>data-ad-theme</code></td>
+      <td><code>auto</code>, <code>light</code>, <code>dark</code></td><td><code>auto</code></td>
+      <td>Which half of the campaign's brand tokens to draw with.</td>
+    </tr>
+    <tr>
+      <td><code>data-ad-lang</code></td><td>a BCP 47 tag</td><td>your <code>&lt;html lang&gt;</code></td>
+      <td>Only campaigns written in this language. Set it to an empty value to accept any.</td>
+    </tr>
+    <tr>
+      <td><code>data-ad-tags</code></td><td>comma separated</td><td>no filter</td>
+      <td>Only campaigns carrying one of these tags.</td>
+    </tr>
+    <tr>
+      <td><code>data-ad-exclude</code></td><td>comma separated ids</td><td>none</td>
+      <td>Campaign ids this slot must never show.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>What you are agreeing to</h2>
+<p>
+  The loader makes <strong>one</strong> request per page however many slots you place, and
+  it never blocks rendering. The banner is drawn inside a shadow root, so your stylesheet
+  cannot reach it and it cannot leak into your page. If the catalogue cannot be read for
+  any reason, every slot collapses silently rather than leaving a broken frame.
+</p>
+<p>
+  Nothing about your reader is read, stored or sent anywhere. There are no cookies, no
+  identifiers and no third parties: the whole network is this domain serving static files.
+</p>
+
+<h2>Versioning</h2>
+<p>
+  <code>/v1/ads.js</code> and <code>/v1/catalogue.json</code> answer v1 for as long as any
+  snippet points at them. An incompatible change ships at <code>/v2/</code> beside them and
+  never in place — these snippets live in pages we cannot edit, so a v1 URL that stopped
+  answering v1 is the one failure nothing here could repair.
+</p>
+
+<footer>
+  <p>
+    Served from <a href="https://github.com/Japode/ads">github.com/Japode/ads</a> ·
+    <a href="/v1/catalogue.json">catalogue</a> ·
+    <a href="/v1/ads.js">loader</a>
+  </p>
+</footer>
+
+</div>
+
+<script src="/v1/ads.js" async></script>
+<script>
+(function () {
+  'use strict';
+
+  var ORIGIN = 'https://ads.japode.com';
+  var fields = {
+    format: document.getElementById('g-format'),
+    slot: document.getElementById('g-slot'),
+    theme: document.getElementById('g-theme'),
+    lang: document.getElementById('g-lang'),
+    tags: document.getElementById('g-tags'),
+    exclude: document.getElementById('g-exclude'),
+  };
+  var out = document.querySelector('#generated code');
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // Only emit what the site owner actually chose. A snippet padded with every default
+  // is a snippet whose reader cannot tell which parts matter.
+  function build() {
+    var attrs = ['data-japode-ads'];
+    var order = ['format', 'slot', 'theme', 'lang', 'tags', 'exclude'];
+    for (var i = 0; i < order.length; i++) {
+      var key = order[i];
+      var value = fields[key].value.trim();
+      if (!value) continue;
+      if (key === 'tags' || key === 'exclude') {
+        value = value.split(',').map(function (s) { return s.trim(); }).filter(Boolean).join(',');
+        if (!value) continue;
+      }
+      attrs.push('data-ad-' + key + '="' + value + '"');
+    }
+    var open = attrs.length > 2
+      ? '<div ' + attrs.join('\n     ') + '></div>'
+      : '<div ' + attrs.join(' ') + '></div>';
+    return open + '\n<script src="' + ORIGIN + '/v1/ads.js" async><\/script>';
+  }
+
+  function refresh() { out.innerHTML = esc(build()); }
+  for (var key in fields) {
+    if (Object.prototype.hasOwnProperty.call(fields, key)) {
+      fields[key].addEventListener('input', refresh);
+      fields[key].addEventListener('change', refresh);
+    }
+  }
+  refresh();
+
+  // Copy buttons.
+  var buttons = document.querySelectorAll('.copy');
+  for (var b = 0; b < buttons.length; b++) {
+    buttons[b].addEventListener('click', function () {
+      var text = document.querySelector(this.getAttribute('data-copy')).textContent;
+      var button = this;
+      var done = function () {
+        button.textContent = 'Copied';
+        setTimeout(function () { button.textContent = 'Copy'; }, 1500);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function () { button.textContent = 'Press Ctrl+C'; });
+      } else {
+        button.textContent = 'Press Ctrl+C';
+      }
+    });
+  }
+
+  // The loader's own view of this page. It is the only way to see why a slot is empty,
+  // since a slot that cannot render collapses without leaving anything to inspect.
+  var diagnostic = document.querySelector('#diagnostic code');
+  var tries = 0;
+  function showState() {
+    tries++;
+    if (window.japodeAds) {
+      diagnostic.textContent = JSON.stringify(window.japodeAds, null, 2);
+      if (window.japodeAds.campaigns === null && tries < 40) setTimeout(showState, 250);
+      return;
+    }
+    if (tries < 40) setTimeout(showState, 250);
+    else diagnostic.textContent = 'the loader did not run — check that /v1/ads.js loaded';
+  }
+  showState();
+})();
+</script>
+</body>
+</html>

@@ -1,13 +1,5 @@
 # Improvements
 
-## Block C — Embed snippet and JavaScript loader
-
-### §RK10 Snippet documentation
-
-A single page on the domain: what to paste, which formats exist, what each data
-attribute does, and a small generator that emits the exact snippet for a chosen format
-with a live preview beside it.
-
 ## Block D — Banner rendering in HTML
 
 ### §RK11 Banner template

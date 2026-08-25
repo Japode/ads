@@ -19,6 +19,7 @@
 
 - ✅ **RK8** **There is no HTML snippet a site owner can paste** — site/v1/ads.js discovers [data-japode-ads] containers and reads data-ad-format, slot, theme, lang, tags and exclude; an unknown attribute is ignored so a pasted snippet never breaks.
 - ✅ **RK9** **The loader would block rendering and inherit host page CSS** — One catalogue request per page, bucketed to the 600s Pages serves and fetched from the loader's own origin; each slot gets an open shadow root, and any failure resolves to the empty response.
+- ✅ **RK10** **No page documents the snippet or generates one** — site/index.html is the tutorial at the domain root: the paste-in block, a generator for every attribute, a real slot driven by the published loader, and its diagnostic view.
 
 ## Block D — Banner rendering in HTML
 
