@@ -214,6 +214,170 @@
     return el.shadowRoot || el.attachShadow({ mode: 'open' });
   }
 
+  // ---------------------------------------------------------------------------------
+  // The banner
+  // ---------------------------------------------------------------------------------
+
+  /**
+   * Which half of a campaign's tokens to draw with.
+   *
+   * "auto" asks the reader's own browser rather than the host page, because a host page
+   * that is dark has no way to tell us so — and matchMedia is the only signal that
+   * crosses the shadow boundary without the host having to cooperate.
+   */
+  function pickTheme(win, slot, campaign) {
+    var wanted = slot.theme;
+    if (wanted === 'auto') {
+      var dark = win.matchMedia && win.matchMedia('(prefers-color-scheme: dark)').matches;
+      wanted = dark ? 'dark' : 'light';
+    }
+    // A campaign need only declare light; dark falls back to it rather than to a guess,
+    // since a brand's own light palette on a dark card is wrong but legible, and an
+    // inverted one we invented is neither.
+    return campaign.theme[wanted] || campaign.theme.light;
+  }
+
+  /** The logo file for this theme, falling back when the mark needs no dark variant. */
+  function pickLogo(campaign, wantDark) {
+    return (wantDark && campaign.logo.srcDark) || campaign.logo.src;
+  }
+
+  /**
+   * Every string here comes from the catalogue, and every one of them is set with
+   * textContent rather than markup. A campaign is data, and data that can introduce
+   * markup into someone else's page is an injection whether or not we wrote it.
+   */
+  function build(doc, campaign, tokens, logoSrc, origin, format) {
+    var link = doc.createElement('a');
+    link.className = 'unit ' + format;
+    link.setAttribute('href', campaign.cta.href);
+    link.setAttribute('rel', 'sponsored noopener');
+    link.setAttribute('target', '_blank');
+    // One focusable link for the whole unit, labelled with what it actually does, so a
+    // screen reader is not handed "logo, heading, link" three times over.
+    link.setAttribute('aria-label', campaign.cta.label + ' — ' + campaign.product + ': ' + campaign.headline);
+
+    var img = doc.createElement('img');
+    img.className = 'logo';
+    img.setAttribute('src', origin + logoSrc);
+    img.setAttribute('alt', '');
+    // Declared in the catalogue and set as attributes: the box is reserved before the
+    // file arrives, so the host page does not jump when it does.
+    img.setAttribute('width', String(campaign.logo.width));
+    img.setAttribute('height', String(campaign.logo.height));
+    img.setAttribute('loading', 'lazy');
+    img.setAttribute('decoding', 'async');
+
+    var body = doc.createElement('div');
+    body.className = 'body';
+
+    var product = doc.createElement('span');
+    product.className = 'product';
+    product.textContent = campaign.product;
+
+    var headline = doc.createElement('strong');
+    headline.className = 'headline';
+    headline.textContent = campaign.headline;
+
+    var support = doc.createElement('span');
+    support.className = 'support';
+    support.textContent = campaign.support;
+
+    var cta = doc.createElement('span');
+    cta.className = 'cta';
+    cta.textContent = campaign.cta.label;
+
+    // The one piece of text that is ours rather than the advertiser's. A reader is
+    // entitled to know a banner is a banner without having to infer it.
+    var mark = doc.createElement('span');
+    mark.className = 'mark';
+    mark.textContent = 'Ad';
+
+    body.appendChild(product);
+    body.appendChild(headline);
+    body.appendChild(support);
+    body.appendChild(cta);
+
+    link.appendChild(img);
+    link.appendChild(body);
+    link.appendChild(mark);
+
+    var style = doc.createElement('style');
+    style.textContent = css(tokens);
+
+    return { style: style, link: link };
+  }
+
+  /**
+   * The unit's own stylesheet, scoped by the shadow root it is inserted into.
+   *
+   * Written out rather than assembled from the tokens by string interpolation of
+   * arbitrary values: every substitution below is a colour the schema already
+   * constrained to a hex literal, so none of it can close the declaration it sits in.
+   */
+  function css(t) {
+    return [
+      ':host { display: block; container-type: inline-size; }',
+      '* { box-sizing: border-box; }',
+      '.unit {',
+      '  display: flex; gap: .875rem; align-items: flex-start;',
+      '  position: relative; text-decoration: none;',
+      '  padding: 1rem; border-radius: 12px;',
+      '  border: 1px solid ' + (t.border || t.accent) + ';',
+      '  background: ' + t.surface + '; color: ' + t.text + ';',
+      '  font: 400 15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;',
+      '  transition: border-color .15s ease;',
+      '}',
+      '.unit:hover { border-color: ' + t.accent + '; }',
+      '.unit:focus-visible { outline: 2px solid ' + t.accent + '; outline-offset: 2px; }',
+      '.logo { flex: 0 0 auto; width: 40px; height: auto; border-radius: 8px; }',
+      '.body { display: flex; flex-direction: column; gap: .2rem; min-width: 0; }',
+      '.product { font-size: .75rem; font-weight: 600; letter-spacing: .04em;',
+      '  text-transform: uppercase; color: ' + t.accent + '; }',
+      '.headline { font-size: 1rem; font-weight: 650; line-height: 1.3; letter-spacing: -.01em; }',
+      '.support { font-size: .875rem; color: ' + (t.muted || t.text) + '; }',
+      '.cta { margin-top: .4rem; align-self: flex-start;',
+      '  padding: .35rem .75rem; border-radius: 999px; font-size: .8rem; font-weight: 600;',
+      '  background: ' + t.accent + '; color: ' + (t.onAccent || t.surface) + '; }',
+      // The disclosure never competes with the content and never disappears.
+      '.mark { position: absolute; top: .5rem; right: .625rem;',
+      '  font-size: .625rem; letter-spacing: .08em; text-transform: uppercase;',
+      '  color: ' + (t.muted || t.text) + '; opacity: .75; }',
+      // Narrow slots stack; the query is on the slot, not the viewport, because a
+      // sidebar is narrow on a wide screen too.
+      '@container (max-width: 22rem) {',
+      '  .unit { flex-direction: column; gap: .625rem; }',
+      '  .logo { width: 32px; }',
+      '}',
+      '.unit.sidebar { flex-direction: column; gap: .625rem; }',
+      '.unit.footer { align-items: center; }',
+      '@media (prefers-reduced-motion: reduce) { .unit { transition: none; } }',
+    ].join('\n');
+  }
+
+  /** Campaigns a slot may draw at all: withdrawn and zero-weighted entries are out. */
+  function eligible(campaigns) {
+    var out = [];
+    for (var i = 0; i < campaigns.length; i++) {
+      var c = campaigns[i];
+      if (!c || c.enabled === false || c.weight === 0) continue;
+      if (!c.cta || !c.cta.href || !c.logo || !c.theme || !c.theme.light) continue;
+      out.push(c);
+    }
+    return out;
+  }
+
+  /** Draw one campaign into one slot, replacing whatever was there. */
+  function draw(win, doc, slot, campaign, origin) {
+    var wantDark = slot.theme === 'dark' ||
+      (slot.theme === 'auto' && !!(win.matchMedia && win.matchMedia('(prefers-color-scheme: dark)').matches));
+    var parts = build(doc, campaign, pickTheme(win, slot, campaign), pickLogo(campaign, wantDark), origin, slot.format);
+    slot.root.textContent = '';
+    slot.root.appendChild(parts.style);
+    slot.root.appendChild(parts.link);
+    return campaign.id;
+  }
+
   function start(win, doc, now) {
     var slots = findSlots(doc);
 
@@ -250,6 +414,8 @@
           tags: s.tags.slice(),
           exclude: s.exclude.slice(),
           isolated: !!s.root,
+          // The campaign id this slot ended up drawing, or null if it drew nothing.
+          showing: null,
           warnings: s.warnings.slice(),
         };
       }),
@@ -258,11 +424,26 @@
     // One request for the whole page, however many slots asked. Started only when there
     // is a slot to fill: a page carrying the script and no container must cost nothing.
     if (slots.length) {
+      var origin = selfOrigin();
       loadCatalogue(win, now).then(function (catalogue) {
         win.japodeAds.campaigns = catalogue.campaigns.length;
-        // Drawing belongs to the renderer and it is not here yet. Until then a slot that
-        // got this far stays empty — which is also exactly what it must do when the
-        // catalogue could not be read.
+
+        for (var s = 0; s < slots.length; s++) {
+          var slot = slots[s];
+          if (!slot.root) continue;
+
+          // Which campaign a slot gets is not this task's: weighting and per-slot
+          // filtering arrive with rotation and delivery control. Taking the first
+          // eligible entry is a seam, not a policy, and it is deliberately the least
+          // interesting choice so that replacing it changes nothing about the template.
+          var campaign = eligible(catalogue.campaigns)[0];
+
+          // No campaign is not an error. The slot collapses, exactly as it does when the
+          // catalogue could not be read at all, and nothing is drawn into the host page.
+          if (!campaign) continue;
+
+          win.japodeAds.slots[s].showing = draw(win, doc, slot, campaign, origin);
+        }
       });
     }
 
@@ -297,6 +478,10 @@
       bucket: bucket,
       loadCatalogue: loadCatalogue,
       isolate: isolate,
+      eligible: eligible,
+      pickTheme: pickTheme,
+      pickLogo: pickLogo,
+      draw: draw,
       start: start,
     };
   }

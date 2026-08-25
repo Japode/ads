@@ -2,14 +2,6 @@
 
 ## Block D — Banner rendering in HTML
 
-### §RK11 Banner template
-
-The renderer walks the campaign entry and builds the markup: logo image, product name,
-headline, one supporting line, a call-to-action button and the wrapping link. Every
-string and every asset comes from the JSON, so a new campaign is a data edit and never a
-code change. The template is written to look designed rather than served: real spacing,
-a considered type scale, a visible hierarchy between headline and claim.
-
 ### §RK12 Formats and sizes
 
 Several named formats over one campaign entry: a wide leaderboard, a rectangle, a tall

@@ -31,11 +31,43 @@ function el(attrs, { shadow = true } = {}) {
   if (shadow) {
     node.attachShadow = function (init) {
       assert.equal(init.mode, 'open', 'the slot root is open so a site owner can inspect it');
-      this.shadowRoot = { mode: init.mode, host: this, children: [] };
-      return this.shadowRoot;
+      const root = fakeNode('#shadow-root');
+      root.mode = init.mode;
+      root.host = this;
+      this.shadowRoot = root;
+      return root;
     };
   }
   return node;
+}
+
+/**
+ * The smallest node the renderer can build a banner out of: children, attributes and
+ * textContent. Enough to assert what got drawn without pulling in a DOM library, and
+ * small enough that a test failure points at the loader rather than at the fake.
+ */
+function fakeNode(tag) {
+  return {
+    tagName: tag.toUpperCase(),
+    className: '',
+    children: [],
+    attributes: {},
+    _text: '',
+    setAttribute(n, v) { this.attributes[n] = v; },
+    getAttribute(n) { return Object.prototype.hasOwnProperty.call(this.attributes, n) ? this.attributes[n] : null; },
+    appendChild(c) { this.children.push(c); return c; },
+    set textContent(v) { this._text = v; this.children = []; },
+    get textContent() { return this._text; },
+    /** Depth-first search for the first descendant with this class. */
+    find(cls) {
+      for (const c of this.children) {
+        if (typeof c.className === 'string' && c.className.split(' ').includes(cls)) return c;
+        const deeper = c.find && c.find(cls);
+        if (deeper) return deeper;
+      }
+      return null;
+    },
+  };
 }
 
 /** A fetch that answers the catalogue, or fails, without touching the network. */
@@ -58,12 +90,13 @@ const jsonResponse = body => Promise.resolve({ ok: true, status: 200, json: () =
  * `pageLang` is what <html lang> says; `containers` are the elements a real
  * querySelectorAll would return for the marker.
  */
-function run(containers, { pageLang, fetch, scriptSrc = 'https://ads.japode.com/v1/ads.js' } = {}) {
+function run(containers, { pageLang, fetch, scriptSrc = 'https://ads.japode.com/v1/ads.js', dark = false } = {}) {
   const warnings = [];
   const fetchFn = fetch ?? fakeFetch(() => jsonResponse({ version: 1, campaigns: [] }));
   const document = {
     readyState: 'complete',
     currentScript: { src: scriptSrc },
+    createElement: fakeNode,
     documentElement: el(pageLang === undefined ? {} : { lang: pageLang }),
     querySelectorAll(selector) {
       assert.equal(selector, '[data-japode-ads]', 'the marker selector is part of the contract');
@@ -73,7 +106,13 @@ function run(containers, { pageLang, fetch, scriptSrc = 'https://ads.japode.com/
       assert.fail('a complete document must not wait for DOMContentLoaded');
     },
   };
-  const context = { document, console: { warn: m => warnings.push(m) }, fetch: fetchFn, URL };
+  const context = {
+    document,
+    console: { warn: m => warnings.push(m) },
+    fetch: fetchFn,
+    URL,
+    matchMedia: q => ({ matches: dark && q.includes('dark') }),
+  };
   context.window = context;
   vm.createContext(context);
   vm.runInContext(source, context, { filename: 'ads.js' });
@@ -108,6 +147,7 @@ test('the minimal paste is a working slot', () => {
     tags: [],
     exclude: [],
     isolated: true,
+    showing: null,
     warnings: [],
   });
   assert.deepEqual(warnings, [], 'a bare paste must not warn');
@@ -133,6 +173,7 @@ test('every documented attribute is read', () => {
     tags: ['devtools', 'cms'],
     exclude: ['roadkeep', 'shio'],
     isolated: true,
+    showing: null,
     warnings: [],
   });
 });
@@ -300,6 +341,162 @@ test('without shadow DOM the slot stays empty rather than draw unprotected', () 
   const h = run([el({ 'data-japode-ads': '' }, { shadow: false })]);
   assert.equal(h.exposed.slots[0].isolated, false);
   assert.match(h.warnings[0], /no shadow DOM, so the slot stays empty/);
+});
+
+// ------------------------------------------------------------------------------------
+// The banner
+// ------------------------------------------------------------------------------------
+
+/** A campaign shaped exactly as the catalogue is, overridable per test. */
+function campaign(over = {}) {
+  return {
+    id: 'roadkeep',
+    product: 'roadkeep',
+    logo: { src: '/logos/roadkeep.svg', srcDark: '/logos/roadkeep-dark.svg', alt: 'roadkeep', width: 160, height: 160 },
+    headline: 'Your roadmap stops drifting',
+    support: 'A CLI owns the roadmap, the changelog and the rationale.',
+    cta: { label: 'Get roadkeep', href: 'https://github.com/alegauss/roadkeep' },
+    theme: {
+      light: { accent: '#b45309', onAccent: '#ffffff', surface: '#f8fafc', text: '#0f172a', muted: '#475569', border: '#e2e8f0' },
+      dark: { accent: '#f59e0b', onAccent: '#1c1917', surface: '#0f172a', text: '#e2e8f0', muted: '#94a3b8', border: '#1e293b' },
+    },
+    ...over,
+  };
+}
+
+const withCampaigns = (...cs) => fakeFetch(() => jsonResponse({ version: 1, campaigns: cs }));
+
+test('a banner is assembled entirely from catalogue fields', async () => {
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(campaign()) });
+  await h.settled();
+
+  const root = container.shadowRoot;
+  const link = root.find('unit');
+  assert.ok(link, 'the unit is drawn inside the shadow root');
+  assert.equal(link.tagName, 'A');
+  assert.equal(link.getAttribute('href'), 'https://github.com/alegauss/roadkeep');
+  assert.equal(root.find('product').textContent, 'roadkeep');
+  assert.equal(root.find('headline').textContent, 'Your roadmap stops drifting');
+  assert.equal(root.find('support').textContent, 'A CLI owns the roadmap, the changelog and the rationale.');
+  assert.equal(root.find('cta').textContent, 'Get roadkeep');
+  assert.equal(h.exposed.slots[0].showing, 'roadkeep');
+});
+
+test('the whole unit is one link, labelled by what it does', async () => {
+  // Not logo-link, heading-link, button-link: a screen reader should meet the offer once.
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(campaign()) });
+  await h.settled();
+  const link = container.shadowRoot.find('unit');
+  assert.match(link.getAttribute('aria-label'), /Get roadkeep — roadkeep: Your roadmap stops drifting/);
+  assert.equal(link.getAttribute('rel'), 'sponsored noopener');
+  // The logo is decorative once the link is labelled; announcing it repeats the product.
+  assert.equal(container.shadowRoot.find('logo').getAttribute('alt'), '');
+});
+
+test('the logo reserves its box before the file arrives', async () => {
+  // The declared size is the whole reason the catalogue carries width and height.
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(campaign()) });
+  await h.settled();
+  const img = container.shadowRoot.find('logo');
+  assert.equal(img.getAttribute('width'), '160');
+  assert.equal(img.getAttribute('height'), '160');
+  assert.equal(img.getAttribute('src'), 'https://ads.japode.com/logos/roadkeep.svg');
+});
+
+test('a dark slot draws the dark tokens and the dark logo', async () => {
+  const container = el({ 'data-japode-ads': '', 'data-ad-theme': 'dark' });
+  const h = run([container], { fetch: withCampaigns(campaign()) });
+  await h.settled();
+  const root = container.shadowRoot;
+  assert.equal(root.find('logo').getAttribute('src'), 'https://ads.japode.com/logos/roadkeep-dark.svg');
+  assert.match(root.children[0].textContent, /#0f172a/, 'the dark surface token reaches the stylesheet');
+});
+
+test('auto follows the reader, not the host page', async () => {
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(campaign()), dark: true });
+  await h.settled();
+  assert.equal(container.shadowRoot.find('logo').getAttribute('src'), 'https://ads.japode.com/logos/roadkeep-dark.svg');
+});
+
+test('a campaign with no dark half falls back to its own light tokens', async () => {
+  // Its light palette on a dark card is wrong but legible; a palette we inverted is not.
+  const only = campaign();
+  delete only.theme.dark;
+  delete only.logo.srcDark;
+  const container = el({ 'data-japode-ads': '', 'data-ad-theme': 'dark' });
+  const h = run([container], { fetch: withCampaigns(only) });
+  await h.settled();
+  const root = container.shadowRoot;
+  assert.equal(root.find('logo').getAttribute('src'), 'https://ads.japode.com/logos/roadkeep.svg');
+  assert.match(root.children[0].textContent, /#f8fafc/, 'the light surface token is used rather than a guess');
+});
+
+test('the banner discloses that it is one', async () => {
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(campaign()) });
+  await h.settled();
+  assert.equal(container.shadowRoot.find('mark').textContent, 'Ad');
+});
+
+test('catalogue text is set as text, never as markup', async () => {
+  // A campaign is data. Data that can introduce markup into a host page is an injection
+  // whether or not we are the ones who wrote it.
+  const container = el({ 'data-japode-ads': '' });
+  const nasty = campaign({ headline: '<img src=x onerror=alert(1)>' });
+  const h = run([container], { fetch: withCampaigns(nasty) });
+  await h.settled();
+  const headline = container.shadowRoot.find('headline');
+  assert.equal(headline.textContent, '<img src=x onerror=alert(1)>');
+  assert.equal(headline.children.length, 0, 'the string stayed a string');
+});
+
+test('a withdrawn campaign is never drawn', async () => {
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], {
+    fetch: withCampaigns(campaign({ id: 'cursarei', enabled: false }), campaign({ id: 'shio' })),
+  });
+  await h.settled();
+  assert.equal(h.exposed.slots[0].showing, 'shio');
+});
+
+test('a catalogue with nothing eligible leaves the slot empty', async () => {
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(campaign({ enabled: false })) });
+  await h.settled();
+  assert.equal(h.exposed.slots[0].showing, null);
+  assert.equal(container.shadowRoot.children.length, 0, 'nothing is drawn into the host page');
+});
+
+test('every slot on the page draws from the one response', async () => {
+  const a = el({ 'data-japode-ads': '' });
+  const b = el({ 'data-japode-ads': '', 'data-ad-format': 'sidebar' });
+  const h = run([a, b], { fetch: withCampaigns(campaign()) });
+  await h.settled();
+  assert.equal(h.fetches.length, 1);
+  assert.ok(a.shadowRoot.find('unit'), 'the first slot drew');
+  assert.ok(b.shadowRoot.find('unit'), 'the second slot drew');
+  assert.equal(b.shadowRoot.find('unit').className, 'unit sidebar', 'the format reaches the markup');
+});
+
+test('the real catalogue renders every campaign it carries', async () => {
+  // The template is only done when it survives the data that actually ships: eight
+  // brands, two languages, four logo shapes, one of them withdrawn.
+  const live = JSON.parse(readFileSync(join(root, 'site/v1/catalogue.json'), 'utf8'));
+  for (const c of live.campaigns.filter(x => x.enabled !== false)) {
+    const container = el({ 'data-japode-ads': '' });
+    const h = run([container], { fetch: withCampaigns(c) });
+    await h.settled();
+    const shadow = container.shadowRoot;
+    assert.equal(h.exposed.slots[0].showing, c.id, `${c.id} should have drawn`);
+    assert.equal(shadow.find('headline').textContent, c.headline);
+    assert.equal(shadow.find('cta').textContent, c.cta.label);
+    assert.equal(shadow.find('unit').getAttribute('href'), c.cta.href);
+    assert.ok(shadow.find('logo').getAttribute('src').endsWith(c.logo.src));
+  }
 });
 
 test('the three formats match the catalogue schema exactly', () => {

@@ -2,22 +2,21 @@
 
 ## Block D — Banner rendering in HTML
 
-- 📋 **RK11** (deps: RK1 ✅, RK9 ✅) **No HTML template turns a catalogue entry into a banner** — Logo, headline, supporting line and call to action all have to be assembled from JSON fields. → §RK11
-- 📋 **RK12** (deps: RK11) **Only one banner size is imagined** — Sidebar, in-content and footer slots on host pages each need their own layout from the same entry. → §RK12
-- 📋 **RK13** (deps: RK11) **Colours, type and dark mode are hardcoded instead of declared** — Each product carries its own brand, so the visual theme has to travel inside the campaign entry. → §RK13
-- 📋 **RK14** (deps: RK11) **Banners have no accessibility or layout-shift budget** — An ad that shifts the page or hides its link text costs the host site more than it earns. → §RK14
+- 📋 **RK12** (deps: RK11 ✅) **Only one banner size is imagined** — Sidebar, in-content and footer slots on host pages each need their own layout from the same entry. → §RK12
+- 📋 **RK13** (deps: RK11 ✅) **Colours, type and dark mode are hardcoded instead of declared** — Each product carries its own brand, so the visual theme has to travel inside the campaign entry. → §RK13
+- 📋 **RK14** (deps: RK11 ✅) **Banners have no accessibility or layout-shift budget** — An ad that shifts the page or hides its link text costs the host site more than it earns. → §RK14
 
 ## Block E — Random rotation and delivery control
 
-- 📋 **RK15** (deps: RK2 ✅, RK11) **Every visitor would see the same campaign** — The pick has to be random per page view, and weighted so one product can be pushed harder than another. → §RK15
+- 📋 **RK15** (deps: RK2 ✅, RK11 ✅) **Every visitor would see the same campaign** — The pick has to be random per page view, and weighted so one product can be pushed harder than another. → §RK15
 - 📋 **RK16** (deps: RK15) **A site can advertise itself** — Turing pages should never render a Turing banner, and a slot may want to filter by tag or language. → §RK16
 - 📋 **RK17** (deps: RK15) **A returning reader keeps seeing the same pick** — Without a short memory of what was already shown, rotation reads as a bug rather than as variety. → §RK17
 
 ## Block F — Metrics, quality and operations
 
-- 📋 **RK18** (deps: RK11) **Impressions and clicks are not counted** — Nothing shows which product the network is actually sending readers to. → §RK18
-- 📋 **RK19** (deps: RK11) **There is no local preview of the catalogue** — Reviewing how a banner looks should not require publishing it to production first. → §RK19
-- 📋 **RK20** (deps: RK11, RK4 ✅) **Nothing tests the renderer against the catalogue** — A field renamed in the JSON would silently blank a banner on every host site. → §RK20
+- 📋 **RK18** (deps: RK11 ✅) **Impressions and clicks are not counted** — Nothing shows which product the network is actually sending readers to. → §RK18
+- 📋 **RK19** (deps: RK11 ✅) **There is no local preview of the catalogue** — Reviewing how a banner looks should not require publishing it to production first. → §RK19
+- 📋 **RK20** (deps: RK11 ✅, RK4 ✅) **Nothing tests the renderer against the catalogue** — A field renamed in the JSON would silently blank a banner on every host site. → §RK20
 - 📋 **RK23** (deps: RK4 ✅) **The gate never checks that a campaign destination resolves** — It validates shape and assets offline, so a dead link passes and keeps passing until a reader reports it. → §RK23
 - 📋 **RK27** (deps: RK6 ✅) **Nothing runs the origin check unless someone remembers to** — Pages could drop the cross-origin header and every banner would stop rendering at once, with no error anyone here can see. → §RK27
 - 📋 **RK28** (deps: RK10 ✅) **The network uses an advertiser's logo as its own icon** — ads.japode.com declares roadkeep's mark as its favicon, so every tab carries one campaign's branding on a site that claims to treat eight evenly. → §RK28

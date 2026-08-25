@@ -23,6 +23,8 @@
 
 ## Block D — Banner rendering in HTML
 
+- ✅ **RK11** **No HTML template turns a catalogue entry into a banner** — The renderer builds logo, product, headline, support, CTA and an Ad mark from JSON alone, as one labelled link inside the shadow root, with every string set as text.
+
 ## Block E — Random rotation and delivery control
 
 ## Block F — Metrics, quality and operations
