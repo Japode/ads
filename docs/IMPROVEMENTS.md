@@ -148,3 +148,9 @@ where a flaky network would block a deploy that changed nothing about the links.
 that requests every href, follows redirects and reports what stopped answering turns a
 silent 404 into a message, and a redirect that has become permanent into a catalogue
 edit worth making.
+
+What it must not do is trust a status code on its own. cursarei.com.br answers 403 to a
+plain fetcher and 200 to a browser user agent, so a naive checker would have reported
+the one destination that was working. Send a browser user agent, treat 403 and 429 as
+inconclusive rather than dead, and require a failure to repeat on a second run before it
+is reported at all.
