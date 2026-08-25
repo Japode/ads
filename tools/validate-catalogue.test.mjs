@@ -154,6 +154,19 @@ test('the shipped catalogue meets AA on every declared pair', () => {
   assert.equal(code, 0);
 });
 
+test('a renamed field is refused before the renderer can blank a banner', () => {
+  // The other half of §RK20: the loader, asked for a field that is gone, draws an empty
+  // one and says nothing. Only the gate can stop that, and only before the push.
+  for (const field of ['headline', 'support', 'product', 'logo', 'cta']) {
+    const { code, out } = gate(`renamed-${field}`, broken(c => {
+      c.campaigns[0][field === 'cta' ? 'call' : field + 'Text'] = c.campaigns[0][field];
+      delete c.campaigns[0][field];
+    }));
+    assert.equal(code, 1, `a renamed ${field} reached production`);
+    assert.match(out, new RegExp(`required property '${field}'`), field);
+  }
+});
+
 test('every error is reported at once, not one per run', () => {
   const { out } = gate('many', broken(c => {
     c.campaigns[0].tagline = 'x';

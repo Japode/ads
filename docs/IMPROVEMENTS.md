@@ -8,13 +8,6 @@ A local page renders every campaign in every format against light and dark backg
 reading the working catalogue file. It is how a theme edit gets judged, and it doubles
 as the screenshot source for the documentation page.
 
-### §RK20 Renderer tests
-
-Tests render each catalogue entry in each format and assert the parts that must exist: a
-resolving logo, a non-empty headline, a destination link, applied theme tokens. Paired
-with the schema gate, a catalogue edit then cannot reach production in a state the
-renderer cannot draw.
-
 ### §RK23 Destination link checking
 
 The publish gate reads the catalogue and the files beside it and never leaves the

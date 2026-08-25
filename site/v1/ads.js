@@ -368,6 +368,18 @@
    * markup into someone else's page is an injection whether or not we wrote it.
    */
   function build(doc, campaign, tokens, logoSrc, origin, format, treatment) {
+    /**
+     * Copy for one part of the banner.
+     *
+     * The gate refuses a catalogue missing any of these, so this only fires if one ever
+     * reaches a browser anyway — and assigning a missing field to textContent puts the
+     * literal word "undefined" on someone else's page. Blank is a hole; "undefined" is
+     * a hole with our name on it.
+     */
+    var text = function (value) {
+      return value === null || value === undefined ? '' : String(value);
+    };
+
     var link = doc.createElement('a');
     link.className = 'unit ' + format;
     link.setAttribute('href', attributed(campaign.cta.href, campaign.id, format));
@@ -393,19 +405,19 @@
 
     var product = doc.createElement('span');
     product.className = 'product';
-    product.textContent = campaign.product;
+    product.textContent = text(campaign.product);
 
     var headline = doc.createElement('strong');
     headline.className = 'headline';
-    headline.textContent = campaign.headline;
+    headline.textContent = text(campaign.headline);
 
     var support = doc.createElement('span');
     support.className = 'support';
-    support.textContent = campaign.support;
+    support.textContent = text(campaign.support);
 
     var cta = doc.createElement('span');
     cta.className = 'cta';
-    cta.textContent = campaign.cta.label;
+    cta.textContent = text(campaign.cta.label);
 
     // The one piece of text that is ours rather than the advertiser's. A reader is
     // entitled to know a banner is a banner without having to infer it.

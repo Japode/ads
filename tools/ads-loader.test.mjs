@@ -7,7 +7,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -57,7 +57,9 @@ function fakeNode(tag) {
     setAttribute(n, v) { this.attributes[n] = v; },
     getAttribute(n) { return Object.prototype.hasOwnProperty.call(this.attributes, n) ? this.attributes[n] : null; },
     appendChild(c) { this.children.push(c); return c; },
-    set textContent(v) { this._text = v; this.children = []; },
+    // Faithful to the spec: null becomes empty, anything else is stringified — which is
+    // why assigning a missing field puts the word "undefined" on the page, not nothing.
+    set textContent(v) { this._text = v === null ? '' : String(v); this.children = []; },
     get textContent() { return this._text; },
     /** Depth-first search for the first descendant with this class. */
     find(cls) {
@@ -529,21 +531,73 @@ test('every slot on the page draws from the one response', async () => {
   assert.equal(b.shadowRoot.find('unit').className, 'unit sidebar', 'the format reaches the markup');
 });
 
-test('the real catalogue renders every campaign it carries', async () => {
-  // The template is only done when it survives the data that actually ships: eight
-  // brands, two languages, four logo shapes, one of them withdrawn.
-  const live = JSON.parse(readFileSync(join(root, 'site/v1/catalogue.json'), 'utf8'));
-  for (const c of live.campaigns.filter(x => x.enabled !== false)) {
-    const container = el({ 'data-japode-ads': '' });
-    const h = run([container], { fetch: withCampaigns(c) });
-    await h.settled();
-    const shadow = container.shadowRoot;
-    assert.equal(h.exposed.slots[0].showing, c.id, `${c.id} should have drawn`);
-    assert.equal(shadow.find('headline').textContent, c.headline);
-    assert.equal(shadow.find('cta').textContent, c.cta.label);
-    assert.ok(shadow.find('unit').getAttribute('href').startsWith(c.cta.href), c.id);
-    assert.ok(shadow.find('logo').getAttribute('src').endsWith(c.logo.src));
-  }
+// ------------------------------------------------------------------------------------
+// The whole catalogue, drawn every way it can be
+// ------------------------------------------------------------------------------------
+
+const live = JSON.parse(readFileSync(join(root, 'site/v1/catalogue.json'), 'utf8'));
+const FORMATS = ['sidebar', 'in-content', 'footer', 'strip'];
+
+for (const c of live.campaigns) {
+  test(`${c.id} draws in every format, light and dark`, async () => {
+    // The matrix, not one cell of it. A campaign tested in one format and a format
+    // tested with one campaign both pass while the pair that actually breaks — a long
+    // headline in the strip, a logo with no dark variant on a dark card — goes unseen.
+    for (const format of FORMATS) {
+      for (const theme of ['light', 'dark']) {
+        const where = `${c.id} / ${format} / ${theme}`;
+        const container = el({ 'data-japode-ads': '', 'data-ad-format': format, 'data-ad-theme': theme });
+        // enabled:false is about rotation, not about whether the renderer can draw it;
+        // a withdrawn entry has to still be drawable the day it comes back.
+        const drawable = { ...c, enabled: true };
+        const h = run([container], { fetch: withCampaigns(drawable) });
+        await h.settled();
+
+        const shadow = container.shadowRoot;
+        assert.equal(h.exposed.slots[0].showing, c.id, `${where}: nothing drew`);
+
+        // A resolving logo: the file is on disk and the element points at it.
+        const src = shadow.find('logo').getAttribute('src');
+        const wanted = (theme === 'dark' && c.logo.srcDark) || c.logo.src;
+        assert.ok(src.endsWith(wanted), `${where}: logo is ${src}`);
+        assert.ok(existsSync(join(root, 'site', wanted)), `${where}: ${wanted} is not on disk`);
+        assert.equal(shadow.find('logo').getAttribute('width'), String(c.logo.width), where);
+
+        // Non-empty copy, straight from the entry.
+        assert.equal(shadow.find('headline').textContent, c.headline, where);
+        assert.ok(shadow.find('support').textContent.length, `${where}: empty support`);
+        assert.equal(shadow.find('product').textContent, c.product, where);
+
+        // A destination that still leads where the entry said.
+        const href = shadow.find('unit').getAttribute('href');
+        assert.ok(href.startsWith(c.cta.href), `${where}: href is ${href}`);
+        assert.equal(shadow.find('cta').textContent, c.cta.label, where);
+
+        // Applied theme tokens: the entry's own colours reached the stylesheet, and the
+        // half asked for is the half used.
+        const tokens = (c.theme && c.theme[theme]) || (c.theme && c.theme.light);
+        const style = styleOf(container);
+        assert.ok(style.includes(tokens.accent), `${where}: accent ${tokens.accent} missing`);
+        assert.ok(style.includes(tokens.surface), `${where}: surface ${tokens.surface} missing`);
+        assert.ok(style.includes(tokens.text), `${where}: text ${tokens.text} missing`);
+      }
+    }
+  });
+}
+
+test('a renamed field blanks the banner rather than announcing itself', async () => {
+  // This is the failure §RK20 names, and the renderer is the wrong place to stop it:
+  // asked for a field that is gone, it draws an empty one, on every host site at once
+  // and without complaining. The gate refusing the file first is the actual defence —
+  // validate-catalogue.test.mjs asserts that half. This one pins down why it is needed.
+  const renamed = campaign();
+  renamed.tagline = renamed.headline;
+  delete renamed.headline;
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(renamed) });
+  await h.settled();
+  assert.equal(h.exposed.slots[0].showing, 'roadkeep', 'it still draws, which is the problem');
+  assert.equal(container.shadowRoot.find('headline').textContent, '');
 });
 
 test('the formats match the catalogue schema exactly', () => {

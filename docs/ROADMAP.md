@@ -3,7 +3,6 @@
 ## Block F — Metrics, quality and operations
 
 - 📋 **RK19** (deps: RK11 ✅) **There is no local preview of the catalogue** — Reviewing how a banner looks should not require publishing it to production first. → §RK19
-- 📋 **RK20** (deps: RK11 ✅, RK4 ✅) **Nothing tests the renderer against the catalogue** — A field renamed in the JSON would silently blank a banner on every host site. → §RK20
 - 📋 **RK23** (deps: RK4 ✅) **The gate never checks that a campaign destination resolves** — It validates shape and assets offline, so a dead link passes and keeps passing until a reader reports it. → §RK23
 - 📋 **RK27** (deps: RK6 ✅) **Nothing runs the origin check unless someone remembers to** — Pages could drop the cross-origin header and every banner would stop rendering at once, with no error anyone here can see. → §RK27
 - 📋 **RK29** (deps: RK10 ✅, RK8 ✅) **Nothing checks that the generator emits a snippet the loader reads back** — A generator bug ships to every site that copied its output, onto pages we cannot reach to fix. → §RK29
