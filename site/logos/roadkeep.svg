@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160" role="img" aria-label="roadkeep">
+  <title>roadkeep</title>
+  <desc>Four task lines of increasing length stopping at a vertical gate; the fourth is cut, and the refused remainder sits beyond it.</desc>
+  <!-- Light surroundings. The dark variant is roadkeep-dark.svg and is chosen by the
+       renderer from the campaign theme, not by prefers-color-scheme: an SVG in an <img>
+       resolves that query against the visitor's OS, which says nothing about the
+       colour of the banner it is drawn on. -->
+  <style>
+    .bar  { fill: #334155; }
+    .gate { fill: #b45309; }
+    .cut  { fill: #334155; opacity: .26; }
+  </style>
+
+  <!-- task lines: each one shorter than the cap it is measured against -->
+  <rect class="bar" x="24" y="34"  width="46" height="12" rx="6"/>
+  <rect class="bar" x="24" y="62"  width="72" height="12" rx="6"/>
+  <rect class="bar" x="24" y="90"  width="58" height="12" rx="6"/>
+
+  <!-- the fourth reaches the cap and is cut there -->
+  <rect class="bar" x="24" y="118" width="90" height="12" rx="6"/>
+
+  <!-- the gate: the limit enforced before the prose exists -->
+  <rect class="gate" x="120" y="22" width="8" height="116" rx="4"/>
+
+  <!-- what the gate refused -->
+  <rect class="cut" x="136" y="118" width="30" height="12" rx="6"/>
+</svg>

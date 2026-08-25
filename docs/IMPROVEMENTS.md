@@ -10,13 +10,6 @@ alegauss.github.io/claude-tray and viglet.org. Each needs its own copy, colours 
 destination link. Writing all eight is also the first real test of whether the schema is
 expressive enough.
 
-### §RK3 Logo assets
-
-Logos live next to the catalogue, one SVG per product with a raster fallback, plus a
-light and a dark variant where the mark needs one. Fixed paths and long cache lifetimes,
-because the asset URL is written into the campaign entry and every host page will
-request it.
-
 ### §RK4 Catalogue validation
 
 A schema check refuses the file before it is published: unknown fields, missing

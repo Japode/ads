@@ -3,7 +3,6 @@
 ## Block A — Ad catalogue in JSON
 
 - 📋 **RK2** (deps: RK1 ✅) **The eight launch products have no entry in the catalogue** — Shio, Turing, Cursarei, Roadkeep, Mini-GPT, FreeWilly, Claude Tray and Viglet are the whole initial inventory. → §RK2
-- 📋 **RK3** (deps: RK1 ✅) **Product logos have no hosted, stable URL** — A banner is assembled around a logo, so every campaign needs an asset URL that works on light and dark surroundings. → §RK3
 - 📋 **RK4** (deps: RK1 ✅) **Nothing rejects a malformed catalogue before it is published** — One broken JSON file blanks every banner on every host site at once. → §RK4
 
 ## Block B — Static API on ads.japode.com
