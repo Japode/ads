@@ -2,12 +2,6 @@
 
 ## Block F — Metrics, quality and operations
 
-### §RK19 Preview gallery
-
-A local page renders every campaign in every format against light and dark backgrounds,
-reading the working catalogue file. It is how a theme edit gets judged, and it doubles
-as the screenshot source for the documentation page.
-
 ### §RK23 Destination link checking
 
 The publish gate reads the catalogue and the files beside it and never leaves the

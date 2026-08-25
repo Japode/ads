@@ -45,3 +45,4 @@
 - ✅ **RK32** **The strip's text link is drawn inside a pill border** — The strip's cta rule now resets border and border-radius as well as the fill, and a test asserts it for all three treatments rather than the shipping one.
 - ✅ **RK18** **Impressions and clicks are not counted** — Destinations carry utm_source, medium, campaign and content, so the product counts its own clicks with no request here; impressions are now a recorded non-goal.
 - ✅ **RK20** **Nothing tests the renderer against the catalogue** — Every catalogue entry is drawn in all four formats and both themes, asserting a resolving logo, non-empty copy, the destination and the entry's own tokens in the stylesheet.
+- ✅ **RK19** **There is no local preview of the catalogue** — npm run preview serves site/ with Pages' own headers and adds a gallery of every campaign in every format, pinned with data-ad-exclude rather than a preview-only attribute.

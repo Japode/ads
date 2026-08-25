@@ -8,6 +8,7 @@
   "scripts": {
     "validate": "node tools/validate-catalogue.mjs",
     "check-origin": "node tools/check-origin.mjs",
+    "preview": "node tools/preview.mjs",
     "test": "node --test"
   },
   "devDependencies": {
