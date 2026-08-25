@@ -2,13 +2,6 @@
 
 ## Block D — Banner rendering in HTML
 
-### §RK14 Accessibility and page weight
-
-The slot reserves its height before the catalogue answers, so nothing jumps. Logos carry
-alt text, the whole banner is one focusable link with a readable label, contrast is
-checked against the declared tokens, and the rendered unit stays small enough that no
-host page pays for it.
-
 ## Block E — Random rotation and delivery control
 
 ### §RK15 Weighted random pick

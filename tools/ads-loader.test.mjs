@@ -8,6 +8,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import { readFileSync } from 'node:fs';
+import { gzipSync } from 'node:zlib';
 import { join, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -481,7 +482,7 @@ test('a catalogue with nothing eligible leaves the slot empty', async () => {
   const h = run([container], { fetch: withCampaigns(campaign({ enabled: false })) });
   await h.settled();
   assert.equal(h.exposed.slots[0].showing, null);
-  assert.equal(container.shadowRoot.children.length, 0, 'nothing is drawn into the host page');
+  assert.equal(container.shadowRoot.find('unit'), null, 'no banner is drawn into the host page');
 });
 
 test('every slot on the page draws from the one response', async () => {
@@ -518,6 +519,117 @@ test('the formats match the catalogue schema exactly', () => {
   const schema = JSON.parse(readFileSync(join(root, 'schema/v1/catalogue.schema.json'), 'utf8'));
   const { formats } = run([]);
   assert.deepEqual(formats.slice().sort(), schema.$defs.slot.enum.slice().sort());
+});
+
+// ------------------------------------------------------------------------------------
+// What the host page pays
+// ------------------------------------------------------------------------------------
+
+test('the slot holds its height open before the request is answered', async () => {
+  // The whole point is that this is true *before* the fetch settles. Asserting it after
+  // would prove nothing about the jump it exists to prevent.
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(campaign()) });
+  assert.match(container.shadowRoot.children[0].textContent, /min-height: 140px/);
+  await h.settled();
+});
+
+test('every format reserves its own height', async () => {
+  const { formats, internals } = run([]);
+  for (const format of formats) {
+    const container = el({ 'data-japode-ads': '', 'data-ad-format': format });
+    run([container], { fetch: withCampaigns(campaign()) });
+    const reserved = internals.RESERVED[format];
+    assert.ok(reserved > 0, `${format} reserves nothing`);
+    assert.match(container.shadowRoot.children[0].textContent, new RegExp(`min-height: ${reserved}px`));
+  }
+});
+
+test('the reservation survives as a floor once the banner is drawn', async () => {
+  // Dropping it on render would let the box shrink to the content, which is the same
+  // jump, later and upward.
+  const container = el({ 'data-japode-ads': '', 'data-ad-format': 'footer' });
+  const h = run([container], { fetch: withCampaigns(campaign()) });
+  await h.settled();
+  assert.match(styleOf(container), /min-height: 96px/);
+});
+
+test('a slot that will never draw gives its space back', async () => {
+  // The one case where moving the page is right: holding a blank gap open makes the
+  // host site pay for an ad it never got.
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(campaign({ enabled: false })) });
+  await h.settled();
+  assert.match(container.shadowRoot.children[0].textContent, /display: none/);
+  assert.equal(h.exposed.slots[0].showing, null);
+});
+
+test('a page view stays inside its weight budget, worst campaign included', () => {
+  // Budget the thing the host page actually pays for, not the file that is easiest to
+  // measure: the loader, the catalogue, and one logo. Which logo matters — budgeting
+  // the average would let the heaviest campaign hide behind seven light ones, and the
+  // reader only ever gets one.
+  const gz = p => gzipSync(readFileSync(join(root, p))).length;
+  const loader = gz('site/v1/ads.js');
+  const catalogue = gz('site/v1/catalogue.json');
+
+  const live = JSON.parse(readFileSync(join(root, 'site/v1/catalogue.json'), 'utf8'));
+  const heaviest = live.campaigns
+    .map(c => ({ id: c.id, bytes: gz('site' + c.logo.src) }))
+    .sort((a, b) => b.bytes - a.bytes)[0];
+
+  const total = loader + catalogue + heaviest.bytes;
+  const budget = 40 * 1024;
+  assert.ok(
+    total < budget,
+    `worst page view is ${(total / 1024).toFixed(1)}KB ` +
+    `(loader ${(loader / 1024).toFixed(1)} + catalogue ${(catalogue / 1024).toFixed(1)} + ` +
+    `${heaviest.id} ${(heaviest.bytes / 1024).toFixed(1)}), budget is ${budget / 1024}KB`
+  );
+});
+
+test('no single logo can dominate a page view', () => {
+  // The failure this catches is one campaign quietly shipping artwork that costs more
+  // than everything else on the page combined, which is how freewilly's traced SVG got
+  // to 37KB without anyone noticing.
+  const gz = p => gzipSync(readFileSync(join(root, p))).length;
+  const live = JSON.parse(readFileSync(join(root, 'site/v1/catalogue.json'), 'utf8'));
+  for (const c of live.campaigns) {
+    for (const key of ['src', 'srcDark']) {
+      if (!c.logo[key]) continue;
+      const bytes = gz('site' + c.logo[key]);
+      assert.ok(bytes < 28 * 1024, `${c.id}.logo.${key} is ${(bytes / 1024).toFixed(1)}KB gzipped`);
+    }
+  }
+});
+
+test('the banner asks for nothing but its own logo', async () => {
+  // One catalogue request, one image. No fonts, no beacons, no third party: the network
+  // is this domain and a host page can verify that from its own network panel.
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(campaign()) });
+  await h.settled();
+  assert.equal(h.fetches.length, 1);
+  const style = styleOf(container);
+  assert.doesNotMatch(style, /url\(|@import/, 'the stylesheet fetches nothing');
+  assert.equal(container.shadowRoot.find('logo').getAttribute('loading'), 'lazy');
+});
+
+test('the banner respects a reader who asked for less motion', async () => {
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(campaign()) });
+  await h.settled();
+  assert.match(styleOf(container), /@media \(prefers-reduced-motion: reduce\)[^}]*transition: none/);
+});
+
+test('the link is reachable and visibly focused by keyboard', async () => {
+  // An <a href> is focusable on its own; what a shadow root can lose is the ring, and
+  // a slot nobody can see themselves land on is a slot nobody tabs into twice.
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(campaign()) });
+  await h.settled();
+  assert.ok(container.shadowRoot.find('unit').getAttribute('href'));
+  assert.match(styleOf(container), /\.unit:focus-visible \{ outline: 2px solid/);
 });
 
 // ------------------------------------------------------------------------------------

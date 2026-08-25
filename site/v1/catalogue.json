@@ -8,20 +8,49 @@
       "logo": {
         "src": "/logos/shio.png",
         "alt": "Viglet Shio",
-        "width": 256,
-        "height": 256
+        "width": 128,
+        "height": 128
       },
       "headline": "The headless CMS a coding agent operates",
       "support": "Content as files, MCP tools and blueprints. The curator approves in a React console with preview links.",
-      "cta": { "label": "See Shio", "href": "https://shio.viglet.org/" },
+      "cta": {
+        "label": "See Shio",
+        "href": "https://shio.viglet.org/"
+      },
       "theme": {
-        "light": { "accent": "#0275b0", "onAccent": "#ffffff", "surface": "#f8fafc", "text": "#0f172a", "muted": "#475569", "border": "#e2e8f0" },
-        "dark":  { "accent": "#38bdf8", "onAccent": "#082f49", "surface": "#0f172a", "text": "#e2e8f0", "muted": "#94a3b8", "border": "#1e293b" }
+        "light": {
+          "accent": "#0275b0",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#38bdf8",
+          "onAccent": "#082f49",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
       },
       "weight": 1,
-      "tags": ["cms", "headless", "open-source", "coding-agents"],
-      "lang": ["en"],
-      "excludeHosts": ["shio.viglet.org", "viglet.org", "www.viglet.org", "docs.viglet.org"]
+      "tags": [
+        "cms",
+        "headless",
+        "open-source",
+        "coding-agents"
+      ],
+      "lang": [
+        "en"
+      ],
+      "excludeHosts": [
+        "shio.viglet.org",
+        "viglet.org",
+        "www.viglet.org",
+        "docs.viglet.org"
+      ]
     },
     {
       "id": "turing",
@@ -29,20 +58,49 @@
       "logo": {
         "src": "/logos/turing.png",
         "alt": "Viglet Turing ES",
-        "width": 256,
-        "height": 256
+        "width": 128,
+        "height": 128
       },
       "headline": "Enterprise search you host yourself",
       "support": "Index AEM, WordPress, databases and files, then answer over them with RAG. Apache-2.0, on your own infrastructure.",
-      "cta": { "label": "Explore Turing", "href": "https://turing.viglet.org/" },
+      "cta": {
+        "label": "Explore Turing",
+        "href": "https://turing.viglet.org/"
+      },
       "theme": {
-        "light": { "accent": "#1d4ed8", "onAccent": "#ffffff", "surface": "#f8fafc", "text": "#0f172a", "muted": "#475569", "border": "#e2e8f0" },
-        "dark":  { "accent": "#60a5fa", "onAccent": "#0b1220", "surface": "#0f172a", "text": "#e2e8f0", "muted": "#94a3b8", "border": "#1e293b" }
+        "light": {
+          "accent": "#1d4ed8",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#60a5fa",
+          "onAccent": "#0b1220",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
       },
       "weight": 1,
-      "tags": ["search", "rag", "open-source", "self-hosted"],
-      "lang": ["en"],
-      "excludeHosts": ["viglet.org", "www.viglet.org", "turing.viglet.org", "docs.viglet.org"]
+      "tags": [
+        "search",
+        "rag",
+        "open-source",
+        "self-hosted"
+      ],
+      "lang": [
+        "en"
+      ],
+      "excludeHosts": [
+        "viglet.org",
+        "www.viglet.org",
+        "turing.viglet.org",
+        "docs.viglet.org"
+      ]
     },
     {
       "id": "viglet",
@@ -50,20 +108,50 @@
       "logo": {
         "src": "/logos/viglet.png",
         "alt": "Viglet",
-        "width": 256,
-        "height": 256
+        "width": 128,
+        "height": 128
       },
       "headline": "Open source content and search, self-hosted",
       "support": "The home of Shio CMS and Turing ES: two Apache-2.0 platforms that keep your content on your own servers.",
-      "cta": { "label": "Visit Viglet", "href": "https://www.viglet.org/" },
+      "cta": {
+        "label": "Visit Viglet",
+        "href": "https://www.viglet.org/"
+      },
       "theme": {
-        "light": { "accent": "#4f46e5", "onAccent": "#ffffff", "surface": "#f8fafc", "text": "#0f172a", "muted": "#475569", "border": "#e2e8f0" },
-        "dark":  { "accent": "#a5b4fc", "onAccent": "#1e1b4b", "surface": "#0f172a", "text": "#e2e8f0", "muted": "#94a3b8", "border": "#1e293b" }
+        "light": {
+          "accent": "#4f46e5",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#a5b4fc",
+          "onAccent": "#1e1b4b",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
       },
       "weight": 0.5,
-      "tags": ["open-source", "cms", "search", "platform"],
-      "lang": ["en"],
-      "excludeHosts": ["viglet.org", "www.viglet.org", "docs.viglet.org", "shio.viglet.org", "turing.viglet.org"]
+      "tags": [
+        "open-source",
+        "cms",
+        "search",
+        "platform"
+      ],
+      "lang": [
+        "en"
+      ],
+      "excludeHosts": [
+        "viglet.org",
+        "www.viglet.org",
+        "docs.viglet.org",
+        "shio.viglet.org",
+        "turing.viglet.org"
+      ]
     },
     {
       "id": "roadkeep",
@@ -77,34 +165,82 @@
       },
       "headline": "Your roadmap stops drifting from your code",
       "support": "A CLI owns the roadmap, the changelog and the rationale, so shipping a task updates all three or none of them.",
-      "cta": { "label": "Get roadkeep", "href": "https://github.com/alegauss/roadkeep" },
+      "cta": {
+        "label": "Get roadkeep",
+        "href": "https://github.com/alegauss/roadkeep"
+      },
       "theme": {
-        "light": { "accent": "#b45309", "onAccent": "#ffffff", "surface": "#f8fafc", "text": "#0f172a", "muted": "#475569", "border": "#e2e8f0" },
-        "dark":  { "accent": "#f59e0b", "onAccent": "#1c1917", "surface": "#0f172a", "text": "#e2e8f0", "muted": "#94a3b8", "border": "#1e293b" }
+        "light": {
+          "accent": "#b45309",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#f59e0b",
+          "onAccent": "#1c1917",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
       },
       "weight": 1,
-      "tags": ["devtools", "cli", "roadmap", "open-source"],
-      "lang": ["en"]
+      "tags": [
+        "devtools",
+        "cli",
+        "roadmap",
+        "open-source"
+      ],
+      "lang": [
+        "en"
+      ]
     },
     {
       "id": "freewilly",
       "product": "FreeWilly",
       "logo": {
-        "src": "/logos/freewilly.svg",
+        "src": "/logos/freewilly.png",
         "alt": "FreeWilly",
-        "width": 224,
-        "height": 256
+        "width": 110,
+        "height": 128
       },
       "headline": "Docker on Windows, under Apache-2.0",
       "support": "A Docker Desktop alternative with no headcount threshold, no revenue threshold and no licence to buy.",
-      "cta": { "label": "Download FreeWilly", "href": "https://github.com/alegauss/freewilly" },
+      "cta": {
+        "label": "Download FreeWilly",
+        "href": "https://github.com/alegauss/freewilly"
+      },
       "theme": {
-        "light": { "accent": "#0e7490", "onAccent": "#ffffff", "surface": "#f8fafc", "text": "#0f172a", "muted": "#475569", "border": "#e2e8f0" },
-        "dark":  { "accent": "#66bacb", "onAccent": "#0b2b33", "surface": "#0f172a", "text": "#e2e8f0", "muted": "#94a3b8", "border": "#1e293b" }
+        "light": {
+          "accent": "#0e7490",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#66bacb",
+          "onAccent": "#0b2b33",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
       },
       "weight": 1,
-      "tags": ["docker", "windows", "devtools", "open-source"],
-      "lang": ["en"]
+      "tags": [
+        "docker",
+        "windows",
+        "devtools",
+        "open-source"
+      ],
+      "lang": [
+        "en"
+      ]
     },
     {
       "id": "claude-tray",
@@ -117,14 +253,37 @@
       },
       "headline": "Your Claude Code usage, always in the tray",
       "support": "A native Windows tray icon that draws your rate-limit percentage as a vector, crisp at any DPI.",
-      "cta": { "label": "Install for Windows", "href": "https://github.com/alegauss/claude-tray" },
+      "cta": {
+        "label": "Install for Windows",
+        "href": "https://github.com/alegauss/claude-tray"
+      },
       "theme": {
-        "light": { "accent": "#c2410c", "onAccent": "#ffffff", "surface": "#f8fafc", "text": "#0f172a", "muted": "#475569", "border": "#e2e8f0" },
-        "dark":  { "accent": "#fb923c", "onAccent": "#1c1917", "surface": "#0f172a", "text": "#e2e8f0", "muted": "#94a3b8", "border": "#1e293b" }
+        "light": {
+          "accent": "#c2410c",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#fb923c",
+          "onAccent": "#1c1917",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
       },
       "weight": 1,
-      "tags": ["windows", "devtools", "monitoring"],
-      "lang": ["en"]
+      "tags": [
+        "windows",
+        "devtools",
+        "monitoring"
+      ],
+      "lang": [
+        "en"
+      ]
     },
     {
       "id": "mini-gpt",
@@ -137,15 +296,41 @@
       },
       "headline": "Um GPT em Java puro, sem biblioteca de ML",
       "support": "Modelo de linguagem em nivel de caractere escrito do zero, com a matematica de cada classe explicada.",
-      "cta": { "label": "Ler a aula", "href": "https://alegauss.github.io/mini-gpt/" },
+      "cta": {
+        "label": "Ler a aula",
+        "href": "https://alegauss.github.io/mini-gpt/"
+      },
       "theme": {
-        "light": { "accent": "#6d4aff", "onAccent": "#ffffff", "surface": "#f8fafc", "text": "#0f172a", "muted": "#475569", "border": "#e2e8f0" },
-        "dark":  { "accent": "#8b6bff", "onAccent": "#151334", "surface": "#0f172a", "text": "#e2e8f0", "muted": "#94a3b8", "border": "#1e293b" }
+        "light": {
+          "accent": "#6d4aff",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#8b6bff",
+          "onAccent": "#151334",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
       },
       "weight": 1,
-      "tags": ["java", "machine-learning", "educacao", "open-source"],
-      "lang": ["pt-BR"],
-      "excludeHosts": ["alegauss.github.io"]
+      "tags": [
+        "java",
+        "machine-learning",
+        "educacao",
+        "open-source"
+      ],
+      "lang": [
+        "pt-BR"
+      ],
+      "excludeHosts": [
+        "alegauss.github.io"
+      ]
     },
     {
       "id": "cursarei",
@@ -158,15 +343,41 @@
       },
       "headline": "Cursos brasileiros num lugar so",
       "support": "Graduacao, pos, MBA e cursos livres de varias instituicoes, num agregador independente.",
-      "cta": { "label": "Encontrar cursos", "href": "https://cursarei.com.br/" },
+      "cta": {
+        "label": "Encontrar cursos",
+        "href": "https://cursarei.com.br/"
+      },
       "theme": {
-        "light": { "accent": "#0b7c72", "onAccent": "#ffffff", "surface": "#f8fafc", "text": "#0f172a", "muted": "#475569", "border": "#e2e8f0" },
-        "dark":  { "accent": "#2dd4bf", "onAccent": "#042f2e", "surface": "#0f172a", "text": "#e2e8f0", "muted": "#94a3b8", "border": "#1e293b" }
+        "light": {
+          "accent": "#0b7c72",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#2dd4bf",
+          "onAccent": "#042f2e",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
       },
       "weight": 1,
-      "tags": ["educacao", "brasil", "cursos"],
-      "lang": ["pt-BR"],
-      "excludeHosts": ["cursarei.com.br", "www.cursarei.com.br"]
+      "tags": [
+        "educacao",
+        "brasil",
+        "cursos"
+      ],
+      "lang": [
+        "pt-BR"
+      ],
+      "excludeHosts": [
+        "cursarei.com.br",
+        "www.cursarei.com.br"
+      ]
     }
   ]
 }

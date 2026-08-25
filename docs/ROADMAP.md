@@ -2,8 +2,6 @@
 
 ## Block D — Banner rendering in HTML
 
-- 📋 **RK14** (deps: RK11 ✅) **Banners have no accessibility or layout-shift budget** — An ad that shifts the page or hides its link text costs the host site more than it earns. → §RK14
-
 ## Block E — Random rotation and delivery control
 
 - 📋 **RK15** (deps: RK2 ✅, RK11 ✅) **Every visitor would see the same campaign** — The pick has to be random per page view, and weighted so one product can be pushed harder than another. → §RK15

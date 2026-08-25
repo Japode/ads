@@ -214,6 +214,50 @@
     return el.shadowRoot || el.attachShadow({ mode: 'open' });
   }
 
+  /**
+   * The height each format occupies once drawn, reserved before the catalogue answers.
+   *
+   * Derived from the type scale and the copy limits the schema enforces — a headline of
+   * at most 60 characters and a supporting line of at most 140 — not measured from one
+   * example. They are floors: the box never shrinks when the banner arrives, so any
+   * error is a small downward growth rather than the page snapping upward.
+   *
+   * Reserving is the whole point. Without it the slot is zero-high until a network
+   * round trip finishes, and the banner arriving shoves everything below it down the
+   * page, on a site that agreed to carry an ad and not to have its article move.
+   */
+  var RESERVED = {
+    'in-content': 140,
+    sidebar: 200,
+    footer: 96,
+    strip: 42,
+  };
+
+  /**
+   * Hold the space open before anything is drawn.
+   *
+   * Inserted at discovery time and not after the response, because the response is
+   * exactly what it exists to be earlier than.
+   */
+  function reserve(doc, slot) {
+    var style = doc.createElement('style');
+    style.textContent = ':host { display: block; min-height: ' + (RESERVED[slot.format] || RESERVED['in-content']) + 'px; }';
+    slot.root.appendChild(style);
+  }
+
+  /**
+   * Give the space back.
+   *
+   * The one case where moving the page is right: nothing is going to be drawn, so
+   * holding a blank gap open would make the host site pay for an ad it never got.
+   */
+  function collapse(doc, slot) {
+    slot.root.textContent = '';
+    var style = doc.createElement('style');
+    style.textContent = ':host { display: none; }';
+    slot.root.appendChild(style);
+  }
+
   // ---------------------------------------------------------------------------------
   // The banner
   // ---------------------------------------------------------------------------------
@@ -341,7 +385,7 @@
     link.appendChild(mark);
 
     var style = doc.createElement('style');
-    style.textContent = css(tokens, treatment);
+    style.textContent = css(tokens, treatment, format);
 
     return { style: style, link: link };
   }
@@ -353,7 +397,7 @@
    * arbitrary values: every substitution below is a colour the schema already
    * constrained to a hex literal, so none of it can close the declaration it sits in.
    */
-  function css(t, treatment) {
+  function css(t, treatment, format) {
     var border = t.border || t.accent;
     var muted = t.muted || t.text;
     var onAccent = t.onAccent || t.surface;
@@ -372,7 +416,12 @@
       // Every format is fluid inside the slot it was given. The queries below are on the
       // container and never on the viewport, because the thing that decides whether a
       // banner fits is the column it sits in — a sidebar is narrow on a wide screen too.
-      ':host { display: block; container-type: inline-size; }',
+      //
+      // The reserved height stays as a floor after the banner arrives. Dropping it here
+      // would let the box shrink to the drawn content, which is the same jump the
+      // reservation exists to prevent, just later and upward.
+      ':host { display: block; container-type: inline-size;',
+      '  min-height: ' + (RESERVED[format] || RESERVED['in-content']) + 'px; }',
       '* { box-sizing: border-box; }',
 
       // ---- shared -------------------------------------------------------------------
@@ -495,7 +544,11 @@
 
     for (var k = 0; k < slots.length; k++) {
       slots[k].root = isolate(slots[k]);
-      if (!slots[k].root) {
+      if (slots[k].root) {
+        // Before the request, not after it: holding the space open is only worth
+        // anything if it happens earlier than the thing it is waiting for.
+        reserve(doc, slots[k]);
+      } else {
         slots[k].warnings.push('this browser has no shadow DOM, so the slot stays empty rather than inherit the page stylesheet');
         warn(win, slots[k].slot + ': ' + slots[k].warnings[slots[k].warnings.length - 1]);
       }
@@ -544,9 +597,12 @@
           // interesting choice so that replacing it changes nothing about the template.
           var campaign = eligible(catalogue.campaigns)[0];
 
-          // No campaign is not an error. The slot collapses, exactly as it does when the
-          // catalogue could not be read at all, and nothing is drawn into the host page.
-          if (!campaign) continue;
+          // No campaign is not an error. The slot gives its reserved space back and
+          // collapses, exactly as it does when the catalogue could not be read at all.
+          if (!campaign) {
+            collapse(doc, slot);
+            continue;
+          }
 
           win.japodeAds.slots[s].showing = draw(win, doc, slot, campaign, origin);
         }
@@ -585,6 +641,9 @@
       loadCatalogue: loadCatalogue,
       isolate: isolate,
       eligible: eligible,
+      RESERVED: RESERVED,
+      reserve: reserve,
+      collapse: collapse,
       pickTheme: pickTheme,
       pickLogo: pickLogo,
       draw: draw,
