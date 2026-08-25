@@ -12,9 +12,10 @@
       "const": 1
     },
     "updated": {
-      "description": "When the catalogue was last assembled. Informational only.",
+      "description": "Deprecated and not maintained. HTTP already answers this: the origin sends Last-Modified and an ETag, and a conditional request is answered 304, so a hand-typed copy of the same fact can only drift out of agreement with it. Still allowed here because narrowing a published schema would make a document that used to validate stop validating; the publish gate refuses it instead.",
       "type": "string",
-      "format": "date-time"
+      "format": "date-time",
+      "deprecated": true
     },
     "campaigns": {
       "description": "Every campaign, enabled or not. A disabled entry stays in the file so its id keeps meaning. An empty array is the defined fallback response: it is what a loader treats an unreadable catalogue as, and it means collapse the slot silently. A published catalogue may not be empty — that is the gate's rule, not the contract's, because the fallback has to stay expressible.",

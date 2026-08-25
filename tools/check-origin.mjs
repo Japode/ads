@@ -78,6 +78,22 @@ async function main() {
       failures.push(`cache lifetime is ${seconds}s: longer than an hour makes a campaign edit unshippable`);
   }
 
+  // 3b. When the catalogue last changed. The file used to carry a hand-typed "updated"
+  // field, which was wrong by seventeen hours the day it shipped; it was removed on the
+  // argument that HTTP answers this correctly and for free. That argument is only worth
+  // anything while it keeps being true, which is what these assert.
+  const lastModified = cat.headers.get('last-modified');
+  const etag = cat.headers.get('etag');
+  ok(!!lastModified, 'the origin says when the catalogue last changed', lastModified ?? '(no last-modified)');
+  ok(!!etag, 'the catalogue has an entity tag', etag ?? '(no etag)');
+
+  if (etag) {
+    // The other half: a reader who already has it spends nothing to find out it is
+    // unchanged. Without this, freshness would cost a full download every time.
+    const conditional = await fetch(origin + CATALOGUE_PATH, { headers: { 'if-none-match': etag } });
+    ok(conditional.status === 304, 'an unchanged catalogue is answered 304', `got ${conditional.status}`);
+  }
+
   // 4. An asset, on a path that never changes, where a long lifetime is what we want.
   const logo = await fetch(`${origin}/logos/roadkeep.svg`);
   ok(logo.status === 200, 'a logo responds 200', `got ${logo.status}`);

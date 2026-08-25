@@ -200,6 +200,18 @@ if (schema && catalogue) {
     }
   }
 
+  // The contract still allows `updated`, because narrowing a published schema would make
+  // a document that used to validate stop validating. Publishing one is another matter:
+  // the field claims to say when the catalogue was assembled, nothing stamps it, and the
+  // shipped copy had been wrong by seventeen hours since the day it was written. HTTP
+  // carries the same fact correctly and for free.
+  if (Object.hasOwn(catalogue, 'updated')) {
+    errors.push(
+      'remove "updated": nothing maintains it and the origin already sends Last-Modified ' +
+      'and an ETag, so a hand-typed copy can only disagree with them'
+    );
+  }
+
   // An empty array is a legal v1 response — it is the fallback a loader uses when it
   // cannot read the catalogue at all. It is not a legal thing to publish: shipping the
   // fallback as the real file is indistinguishable, to every host page, from the origin

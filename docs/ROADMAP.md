@@ -4,7 +4,6 @@
 
 - 📋 **RK33** (deps: RK14 ✅) **Half the loader a host page downloads is comments** — ads.js is 9.3KB gzipped and 4.8KB of that is prose no browser reads, paid for on every page view. → §RK33
 - 📋 **RK34** (deps: RK14 ✅) **One logo is two thirds of what a page view downloads** — viglet.png is 20KB of a 31KB worst case, and cutting it further needs a palette encoder this project has no tool for. → §RK34
-- 📋 **RK36** (deps: RK21 ✅) **The catalogue's updated field is typed by hand and drifts** — It claims to say when the file was assembled, nothing stamps it, and the loader never reads it either. → §RK36
 
 ## Non-goals
 

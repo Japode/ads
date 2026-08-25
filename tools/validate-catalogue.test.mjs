@@ -115,6 +115,31 @@ test('the empty fallback response is valid against the v1 schema', async () => {
   assert.equal(valid, true, 'an empty campaigns array must be a legal v1 response');
 });
 
+test('a hand-typed updated field is refused', () => {
+  // It shipped wrong by seventeen hours and nothing noticed, because nothing reads it.
+  // The contract still allows it — narrowing a published schema would make a document
+  // that used to validate stop validating — so the gate is what says no.
+  const { code, out } = gate('updated', broken(c => { c.updated = '2026-08-25T00:00:00Z'; }));
+  assert.equal(code, 1);
+  assert.match(out, /remove "updated".*Last-Modified/s);
+});
+
+test('the shipped catalogue carries no updated field', () => {
+  const live = JSON.parse(readFileSync(join(root, 'site/v1/catalogue.json'), 'utf8'));
+  assert.ok(!Object.hasOwn(live, 'updated'));
+});
+
+test('the schema still accepts updated, so the contract did not narrow', async () => {
+  const Ajv2020 = (await import('ajv/dist/2020.js')).default;
+  const addFormats = (await import('ajv-formats')).default;
+  const schema = JSON.parse(readFileSync(join(root, 'schema/v1/catalogue.schema.json'), 'utf8'));
+  const ajv = new Ajv2020({ allErrors: true, strict: true });
+  addFormats(ajv);
+  const withField = structuredClone(good);
+  withField.updated = '2026-08-25T00:00:00Z';
+  assert.equal(ajv.compile(schema)(withField), true, 'a document that used to validate still does');
+});
+
 test('publishing the empty fallback is refused', () => {
   const { code, out } = gate('empty-array', broken(c => { c.campaigns = []; }));
   assert.equal(code, 1, 'legal to answer with, not legal to publish');

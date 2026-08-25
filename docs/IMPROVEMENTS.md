@@ -35,17 +35,3 @@ So this is a dependency question rather than an image question: an image toolcha
 devDependencies, run once and committed, versus a static-files project that currently
 installs nothing but a schema validator. Whatever is chosen, the per-logo ceiling the
 tests now enforce is what keeps the answer honest.
-
-### §RK36 Stamp the field or drop it
-
-The catalogue declares `updated` and the schema says it is when the file was assembled.
-It is typed by hand and has not changed since the eight entries were written, so it is a
-field that will be wrong for as long as nobody remembers it, which is the same as
-always.
-
-Either the deploy stamps it or the contract stops claiming it. Stamping is a line in the
-workflow, but it means the published catalogue differs from the committed one, and this
-project has spent every task so far keeping site/ the artifact — the gate validates the
-file that ships, and the tests read the file the domain serves. Dropping the field costs
-nothing anybody currently uses, since the loader never reads it and the cache-busting
-token carries freshness instead.
