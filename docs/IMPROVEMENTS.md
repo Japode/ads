@@ -2,22 +2,6 @@
 
 ## Block F — Metrics, quality and operations
 
-### §RK29 The generator and the parser must agree
-
-The loader is covered by tests against the file the domain serves. The generator that
-tells a site owner what to paste is not covered by anything, and it is the more
-dangerous of the two: the loader failing is one site's slot staying empty, while the
-generator emitting a subtly wrong block is every site that copied it, each one carrying
-the mistake away to a page we cannot reach or edit.
-
-The cases are small and they are exactly the ones a reader would not notice: an
-attribute whose value contains a quote, a tag list typed with stray commas, the
-difference between an omitted attribute and an empty one — which the loader treats as
-two different answers for lang. What the test has to assert is not that the generator
-produces some string, but that the string it produces, fed back through the loader's own
-parser, yields the configuration the site owner selected. The two halves of the contract
-agreeing with each other is the only thing worth checking.
-
 ### §RK33 Minifying costs the readable artifact
 
 Measured while setting the page-weight budget: ads.js is 9.3KB gzipped, and 4.8KB of

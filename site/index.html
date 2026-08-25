@@ -94,6 +94,8 @@
   th, td { text-align: left; padding: .6rem .75rem; border-bottom: 1px solid var(--border); vertical-align: top; }
   th { font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
   td:first-child { white-space: nowrap; }
+  label.inline { display: inline-flex; align-items: center; gap: .4rem; font-weight: 400; font-size: .85rem; color: var(--muted); margin-top: .45rem; }
+  label.inline input { width: auto; margin: 0; }
   .formats { display: grid; gap: 1.75rem; grid-template-columns: minmax(0, 1fr); margin: 1.5rem 0; }
   .formats > * { min-width: 0; }
   .fmt { margin: 0; }
@@ -206,7 +208,12 @@
     <div class="field">
       <label for="g-lang">Language</label>
       <input id="g-lang" placeholder="inherits your &lt;html lang&gt;" autocomplete="off">
-      <small>Leave blank to inherit the page's own language.</small>
+      <label class="inline"><input type="checkbox" id="g-lang-any"> any language</label>
+      <small>
+        Leave blank to inherit the page's own language, or tick <em>any language</em> to
+        take every campaign whatever it is written in. An omitted attribute and an empty
+        one are two different answers, so the generator has to emit both.
+      </small>
     </div>
     <div class="field">
       <label for="g-tags">Only these tags</label>
@@ -347,10 +354,23 @@
     tags: document.getElementById('g-tags'),
     exclude: document.getElementById('g-exclude'),
   };
+  var langAny = document.getElementById('g-lang-any');
   var out = document.querySelector('#generated code');
 
   function esc(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  /**
+   * A value going inside double quotes in the emitted snippet.
+   *
+   * The generator's output is HTML that someone else's page will parse, so an ampersand
+   * or a quote typed into a field has to survive as itself rather than end the attribute
+   * early. This is not the same job as esc() above, which exists only to show the
+   * snippet on this page.
+   */
+  function attr(value) {
+    return String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
   }
 
   // Only emit what the site owner actually chose. A snippet padded with every default
@@ -361,12 +381,21 @@
     for (var i = 0; i < order.length; i++) {
       var key = order[i];
       var value = fields[key].value.trim();
+
+      // An omitted data-ad-lang inherits the page's language; an empty one accepts every
+      // language. Two different answers, so an empty text field cannot mean both — the
+      // checkbox is what says the second one out loud.
+      if (key === 'lang' && langAny && langAny.checked) {
+        attrs.push('data-ad-lang=""');
+        continue;
+      }
+
       if (!value) continue;
       if (key === 'tags' || key === 'exclude') {
         value = value.split(',').map(function (s) { return s.trim(); }).filter(Boolean).join(',');
         if (!value) continue;
       }
-      attrs.push('data-ad-' + key + '="' + value + '"');
+      attrs.push('data-ad-' + key + '="' + attr(value) + '"');
     }
     var open = attrs.length > 2
       ? '<div ' + attrs.join('\n     ') + '></div>'
@@ -374,14 +403,26 @@
     return open + '\n<script src="' + ORIGIN + '/v1/ads.js" async><\/script>';
   }
 
-  function refresh() { out.innerHTML = esc(build()); }
+  function refresh() {
+    if (langAny) fields.lang.disabled = langAny.checked;
+    out.innerHTML = esc(build());
+  }
   for (var key in fields) {
     if (Object.prototype.hasOwnProperty.call(fields, key)) {
       fields[key].addEventListener('input', refresh);
       fields[key].addEventListener('change', refresh);
     }
   }
+  if (langAny) langAny.addEventListener('change', refresh);
   refresh();
+
+  // Reachable when this page's script is evaluated with a document supplied by a test.
+  // The generator is the more dangerous half of the contract: the loader failing leaves
+  // one slot empty, while a subtly wrong snippet is carried away by every site that
+  // copied it, onto pages nothing here can reach or edit.
+  if (typeof globalThis !== 'undefined') {
+    globalThis.__japodeSnippetInternals = { build: build, attr: attr, refresh: refresh };
+  }
 
   // Copy buttons.
   var buttons = document.querySelectorAll('.copy');
