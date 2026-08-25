@@ -7,6 +7,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "validate": "node tools/validate-catalogue.mjs",
+    "check-origin": "node tools/check-origin.mjs",
     "test": "node --test"
   },
   "devDependencies": {

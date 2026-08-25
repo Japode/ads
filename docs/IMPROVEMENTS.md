@@ -2,16 +2,6 @@
 
 ## Block B — Static API on ads.japode.com
 
-### §RK6 Living with fixed headers
-
-Pages answers with a permissive cross-origin header already, which is what makes a
-static catalogue readable from other domains at all; the task is to confirm it rather
-than to configure it. Caching is the real constraint: Pages sets its own lifetime and
-there is no header to override it, so a campaign edit reaches readers only when the URL
-changes. The loader therefore requests the catalogue with a cache-busting parameter it
-controls, and logos and versioned scripts stay on paths that never change so a long
-lifetime is what we want there anyway.
-
 ### §RK7 Versioning and fallback
 
 Serve under a version path so an incompatible schema ships alongside the old one instead

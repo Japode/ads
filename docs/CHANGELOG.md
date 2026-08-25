@@ -12,6 +12,7 @@
 
 - ✅ **RK5** **ads.japode.com serves nothing** — Pages on Japode/ads serves ads.japode.com over enforced HTTPS with source Actions, and site/CNAME claims the domain in the artifact; the DNS CNAME to japode.github.io was already in place.
 - ✅ **RK21** **Nothing builds and publishes the site to Pages** — .github/workflows/deploy.yml tests the gate, validates the catalogue and uploads site/ to Pages on every push to main; a docs-only commit is skipped since docs are never served.
+- ✅ **RK6** **GitHub Pages serves headers we cannot configure** — npm run check-origin measures what Pages answers: CORS is * on the catalogue and the logos, http 301s to https, a missing path is a clean 404, and the cache lifetime is 600s.
 
 ## Block C — Embed snippet and JavaScript loader
 

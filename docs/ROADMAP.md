@@ -2,7 +2,6 @@
 
 ## Block B — Static API on ads.japode.com
 
-- 📋 **RK6** (deps: RK5 ✅) **GitHub Pages serves headers we cannot configure** — Pages fixes its own CORS and cache lifetime, so freshness has to come from the URL rather than from a policy we choose. → §RK6
 - 📋 **RK7** (deps: RK5 ✅, RK1 ✅) **The endpoint has no version path and no fallback payload** — A later schema change would break every snippet already pasted into a site we do not control. → §RK7
 
 ## Block C — Embed snippet and JavaScript loader
