@@ -2,13 +2,6 @@
 
 ## Block F — Metrics, quality and operations
 
-### §RK18 Click and impression accounting
-
-Destination links carry campaign parameters so each product sees the traffic in its own
-analytics, which needs no infrastructure here. Impressions are the harder half: decide
-whether a count is worth a collector at all, and if it is, keep it aggregate and
-cookieless.
-
 ### §RK19 Preview gallery
 
 A local page renders every campaign in every format against light and dark backgrounds,

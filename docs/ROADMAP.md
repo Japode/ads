@@ -2,7 +2,6 @@
 
 ## Block F — Metrics, quality and operations
 
-- 📋 **RK18** (deps: RK11 ✅) **Impressions and clicks are not counted** — Nothing shows which product the network is actually sending readers to. → §RK18
 - 📋 **RK19** (deps: RK11 ✅) **There is no local preview of the catalogue** — Reviewing how a banner looks should not require publishing it to production first. → §RK19
 - 📋 **RK20** (deps: RK11 ✅, RK4 ✅) **Nothing tests the renderer against the catalogue** — A field renamed in the JSON would silently blank a banner on every host site. → §RK20
 - 📋 **RK23** (deps: RK4 ✅) **The gate never checks that a campaign destination resolves** — It validates shape and assets offline, so a dead link passes and keeps passing until a reader reports it. → §RK23
@@ -25,3 +24,6 @@
   reviewed like code; an admin interface would cost more than eight entries are worth.
 - **No iframe-based ad slots** The banner renders inline in a shadow root, which keeps
   it responsive and light in a way a fixed-size iframe cannot be.
+- **No impression counting** Any collector is a server or a third party, and both are
+  already refused; the advertiser's own click data is the number that decides whether
+  advertising here is worth it.

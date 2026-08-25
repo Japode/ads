@@ -409,7 +409,7 @@ test('a banner is assembled entirely from catalogue fields', async () => {
   const link = root.find('unit');
   assert.ok(link, 'the unit is drawn inside the shadow root');
   assert.equal(link.tagName, 'A');
-  assert.equal(link.getAttribute('href'), 'https://github.com/alegauss/roadkeep');
+  assert.match(link.getAttribute('href'), /^https:\/\/github\.com\/alegauss\/roadkeep\?/);
   assert.equal(root.find('product').textContent, 'roadkeep');
   assert.equal(root.find('headline').textContent, 'Your roadmap stops drifting');
   assert.equal(root.find('support').textContent, 'A CLI owns the roadmap, the changelog and the rationale.');
@@ -541,7 +541,7 @@ test('the real catalogue renders every campaign it carries', async () => {
     assert.equal(h.exposed.slots[0].showing, c.id, `${c.id} should have drawn`);
     assert.equal(shadow.find('headline').textContent, c.headline);
     assert.equal(shadow.find('cta').textContent, c.cta.label);
-    assert.equal(shadow.find('unit').getAttribute('href'), c.cta.href);
+    assert.ok(shadow.find('unit').getAttribute('href').startsWith(c.cta.href), c.id);
     assert.ok(shadow.find('logo').getAttribute('src').endsWith(c.logo.src));
   }
 });
@@ -636,6 +636,61 @@ test('the shipped catalogue draws every campaign it carries', () => {
   const seen = new Set();
   for (let i = 0; i < 1000; i++) seen.add(internals.drawWeighted(eligible, () => i / 1000).id);
   assert.equal(seen.size, eligible.length, `unreachable: ${eligible.filter(c => !seen.has(c.id)).map(c => c.id)}`);
+});
+
+// ------------------------------------------------------------------------------------
+// Accounting
+// ------------------------------------------------------------------------------------
+
+test('the destination is tagged so the product can count its own traffic', async () => {
+  const container = el({ 'data-japode-ads': '', 'data-ad-format': 'sidebar' });
+  const h = run([container], { fetch: withCampaigns(campaign()) });
+  await h.settled();
+  const url = new URL(container.shadowRoot.find('unit').getAttribute('href'));
+  assert.equal(url.origin + url.pathname, 'https://github.com/alegauss/roadkeep');
+  assert.equal(url.searchParams.get('utm_source'), 'japode-ads');
+  assert.equal(url.searchParams.get('utm_medium'), 'banner');
+  assert.equal(url.searchParams.get('utm_campaign'), 'roadkeep');
+  assert.equal(url.searchParams.get('utm_content'), 'sidebar', 'which layout drove the click');
+});
+
+test('the link carries nothing about the reader or their page', async () => {
+  // The referrer already tells the advertiser where a reader came from, and a site that
+  // set a referrer policy chose to say less. Writing the host into the URL would
+  // override that choice for them.
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(campaign()), host: 'someones-blog.example' });
+  await h.settled();
+  const href = container.shadowRoot.find('unit').getAttribute('href');
+  assert.doesNotMatch(href, /someones-blog/);
+  const params = Array.from(new URL(href).searchParams.keys()).sort();
+  assert.deepEqual(params, ['utm_campaign', 'utm_content', 'utm_medium', 'utm_source']);
+});
+
+test('a parameter the catalogue already set is never overwritten', () => {
+  // The entry's author knew something the renderer does not.
+  const { internals } = run([]);
+  const tagged = internals.attributed('https://example.com/x?utm_source=newsletter&ref=1', 'a', 'footer');
+  const url = new URL(tagged);
+  assert.equal(url.searchParams.get('utm_source'), 'newsletter');
+  assert.equal(url.searchParams.get('ref'), '1', 'unrelated parameters survive');
+  assert.equal(url.searchParams.get('utm_campaign'), 'a', 'the rest are still added');
+});
+
+test('an unparseable destination sends the reader there untagged', () => {
+  // The gate should have refused it; the reader should still not be sent nowhere.
+  const { internals } = run([]);
+  assert.equal(internals.attributed('not a url', 'a', 'footer'), 'not a url');
+});
+
+test('counting a click costs this domain no request at all', async () => {
+  // A network that counted clicks itself would need a redirector, which is a server.
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(campaign()) });
+  await h.settled();
+  assert.equal(h.fetches.length, 1, 'the catalogue, and nothing else');
+  assert.match(container.shadowRoot.find('unit').getAttribute('href'), /^https:\/\/github\.com\//,
+    'the link goes straight to the advertiser, not through us');
 });
 
 // ------------------------------------------------------------------------------------

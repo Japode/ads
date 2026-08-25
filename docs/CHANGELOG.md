@@ -43,3 +43,4 @@
 - ✅ **RK28** **The network uses an advertiser's logo as its own icon** — site/brand/japode-ads.svg is the network's own mark, kept out of site/logos so the gate's unreferenced-asset warning stays about advertisers; it is the favicon and the header lockup.
 - ✅ **RK30** **The snippet generator's form panel is crushed to one word wide** — minmax(0,1fr) on both grids and min-width:0 on their items, so a pre sizes to its share and scrolls inside it instead of sizing its track.
 - ✅ **RK32** **The strip's text link is drawn inside a pill border** — The strip's cta rule now resets border and border-radius as well as the fill, and a test asserts it for all three treatments rather than the shipping one.
+- ✅ **RK18** **Impressions and clicks are not counted** — Destinations carry utm_source, medium, campaign and content, so the product counts its own clicks with no request here; impressions are now a recorded non-goal.

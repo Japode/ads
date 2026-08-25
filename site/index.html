@@ -299,6 +299,14 @@
   domain serving static files, and nothing about your reader is ever sent anywhere.
 </p>
 <p>
+  Clicks are counted by the advertiser, not by us. The destination link carries
+  <code>utm_source</code>, <code>utm_medium</code>, <code>utm_campaign</code> and
+  <code>utm_content</code>, so each product sees this traffic in its own analytics and the
+  reader goes straight there — no redirector, no request back to this domain. The link
+  says nothing about your page or your reader. Impressions are not counted at all: every
+  way of doing it needs a server or a third party, and this network has neither.
+</p>
+<p>
   The one thing that is stored is a list of the last four campaign ids a slot drew, with a
   timestamp, so a reader reloading does not meet the same banner every time. It expires
   after thirty minutes and it is written to <em>your</em> origin's

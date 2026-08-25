@@ -325,6 +325,44 @@
   }
 
   /**
+   * The destination, tagged so the product can see this traffic in its own analytics.
+   *
+   * This is the whole of click accounting, and it needs nothing here: the count lives
+   * with the advertiser, who already has somewhere to put it, and no request comes back
+   * to this domain. A network that counted clicks itself would need a redirector, which
+   * is a server, which is the thing the design does not have.
+   *
+   * What is deliberately absent is the host page. The browser's referrer already tells
+   * the advertiser where a reader came from, and a site that set a referrer policy chose
+   * to say less — writing the hostname into the URL would override that choice on their
+   * behalf.
+   *
+   * A parameter the catalogue already set is never overwritten: the entry's author knew
+   * something we do not.
+   */
+  function attributed(href, campaignId, format) {
+    try {
+      var url = new URL(href);
+      var tags = {
+        utm_source: 'japode-ads',
+        utm_medium: 'banner',
+        utm_campaign: campaignId,
+        utm_content: format,
+      };
+      for (var key in tags) {
+        if (Object.prototype.hasOwnProperty.call(tags, key) && !url.searchParams.has(key)) {
+          url.searchParams.set(key, tags[key]);
+        }
+      }
+      return url.toString();
+    } catch (e) {
+      // A href the browser cannot parse is one the gate should have refused. Send the
+      // reader to it untagged rather than nowhere.
+      return href;
+    }
+  }
+
+  /**
    * Every string here comes from the catalogue, and every one of them is set with
    * textContent rather than markup. A campaign is data, and data that can introduce
    * markup into someone else's page is an injection whether or not we wrote it.
@@ -332,7 +370,7 @@
   function build(doc, campaign, tokens, logoSrc, origin, format, treatment) {
     var link = doc.createElement('a');
     link.className = 'unit ' + format;
-    link.setAttribute('href', campaign.cta.href);
+    link.setAttribute('href', attributed(campaign.cta.href, campaign.id, format));
     link.setAttribute('rel', 'sponsored noopener');
     link.setAttribute('target', '_blank');
     // One focusable link for the whole unit, labelled with what it actually does, so a
@@ -916,6 +954,7 @@
       RESERVED: RESERVED,
       reserve: reserve,
       collapse: collapse,
+      attributed: attributed,
       pickTheme: pickTheme,
       pickLogo: pickLogo,
       draw: draw,
