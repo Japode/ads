@@ -85,6 +85,27 @@ function fakeFetch(answer) {
 const jsonResponse = body => Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve(body) });
 
 /**
+ * localStorage, or a broken one.
+ *
+ * `throwOn` models a private window, where the property exists and using it raises —
+ * which is why the loader has to touch it rather than only check that it is there.
+ */
+function fakeStorage({ seed, throwOn } = {}) {
+  const map = new Map(seed ? [[Object.keys(seed)[0], Object.values(seed)[0]]] : []);
+  return {
+    map,
+    getItem(k) {
+      if (throwOn === 'read' || throwOn === 'both') throw new Error('refused');
+      return map.has(k) ? map.get(k) : null;
+    },
+    setItem(k, v) {
+      if (throwOn === 'write' || throwOn === 'both') throw new Error('quota');
+      map.set(k, v);
+    },
+  };
+}
+
+/**
  * Evaluate the served loader against a page made of `containers`, and return what it
  * exposed plus anything it warned about.
  *
@@ -93,7 +114,7 @@ const jsonResponse = body => Promise.resolve({ ok: true, status: 200, json: () =
  */
 function run(containers, {
   pageLang, fetch, scriptSrc = 'https://ads.japode.com/v1/ads.js',
-  dark = false, randoms, host = 'example.com',
+  dark = false, randoms, host = 'example.com', storage = fakeStorage(),
 } = {}) {
   const warnings = [];
   const fetchFn = fetch ?? fakeFetch(() => jsonResponse({ version: 1, campaigns: [] }));
@@ -117,6 +138,7 @@ function run(containers, {
     URL,
     matchMedia: q => ({ matches: dark && q.includes('dark') }),
     location: { hostname: host },
+    localStorage: storage,
   };
   // Shadow the realm's Math so the draw is checkable rather than statistical. Created
   // from Math so floor and the rest still work through the prototype.
@@ -614,6 +636,108 @@ test('the shipped catalogue draws every campaign it carries', () => {
   const seen = new Set();
   for (let i = 0; i < 1000; i++) seen.add(internals.drawWeighted(eligible, () => i / 1000).id);
   assert.equal(seen.size, eligible.length, `unreachable: ${eligible.filter(c => !seen.has(c.id)).map(c => c.id)}`);
+});
+
+// ------------------------------------------------------------------------------------
+// A short memory
+// ------------------------------------------------------------------------------------
+
+const KEY = 'japode-ads.v1.recent';
+const seenAt = (t, ...campaignIds) => ({ [KEY]: JSON.stringify(campaignIds.map(id => ({ id, at: t }))) });
+
+test('what was just shown is demoted, not excluded', async () => {
+  // Excluding would narrow the draw to the remainder and make rotation predictable in
+  // the other direction — and leave nothing at all once every entry has been seen.
+  const { internals } = run([]);
+  const p = [campaign({ id: 'seen', weight: 1 }), campaign({ id: 'fresh', weight: 1 })];
+  const weigh = internals.demoting([{ id: 'seen', at: Date.now() }]);
+  assert.equal(weigh(p[0]), internals.DEMOTION);
+  assert.equal(weigh(p[1]), 1);
+  // Still reachable: 0.15 of 1.15 is the top of the range.
+  assert.equal(internals.drawWeighted(p, () => 0.05, weigh).id, 'seen');
+  assert.equal(internals.drawWeighted(p, () => 0.5, weigh).id, 'fresh');
+});
+
+test('a page view writes what it drew', async () => {
+  const store = fakeStorage();
+  const h = run([el({ 'data-japode-ads': '' })], {
+    fetch: withCampaigns(campaign({ id: 'a' })), storage: store, randoms: [0],
+  });
+  await h.settled();
+  const written = JSON.parse(store.map.get(KEY));
+  assert.equal(written.length, 1);
+  assert.equal(written[0].id, 'a');
+  assert.equal(typeof written[0].at, 'number');
+});
+
+test('the memory keeps the newest and forgets past its size', () => {
+  const { internals } = run([]);
+  const now = 1_000_000;
+  const store = fakeStorage();
+  const previous = ['w', 'x', 'y', 'z'].map(id => ({ id, at: now - 1000 }));
+  internals.remember({ localStorage: store }, now, previous, ['new']);
+  const written = JSON.parse(store.map.get(KEY));
+  assert.equal(written.length, internals.MEMORY_SIZE);
+  assert.equal(written[0].id, 'new', 'the newest sighting leads');
+  assert.ok(!written.some(e => e.id === 'z'), 'the oldest fell off');
+});
+
+test('a sighting stops counting once its window passes', () => {
+  const { internals } = run([]);
+  const now = 5_000_000;
+  const old = now - (internals.MEMORY_MINUTES + 1) * 60 * 1000;
+  const store = fakeStorage({ seed: seenAt(old, 'stale') });
+  assert.deepEqual(Array.from(internals.recent({ localStorage: store }, now)), []);
+
+  const fresh = fakeStorage({ seed: seenAt(now - 60 * 1000, 'recent') });
+  assert.equal(internals.recent({ localStorage: fresh }, now).length, 1);
+});
+
+test('a reader whose storage is unavailable still gets a banner', async () => {
+  // A private window throws on use, not on access, which is why the loader touches it.
+  for (const throwOn of ['read', 'write', 'both']) {
+    const h = run([el({ 'data-japode-ads': '' })], {
+      fetch: withCampaigns(campaign({ id: 'a' })), storage: fakeStorage({ throwOn }), randoms: [0],
+    });
+    await h.settled();
+    assert.equal(h.exposed.slots[0].showing, 'a', `storage throwing on ${throwOn} must not cost the banner`);
+  }
+});
+
+test('a corrupted memory is discarded rather than trusted', () => {
+  const { internals } = run([]);
+  const now = Date.now();
+  for (const junk of ['not json', '{"not":"an array"}', '[{"id":42}]', '[null]', '[{"id":"x"}]']) {
+    const store = fakeStorage({ seed: { [KEY]: junk } });
+    assert.deepEqual(Array.from(internals.recent({ localStorage: store }, now)), [], junk);
+  }
+});
+
+test('the memory holds ids and a time, and nothing else', () => {
+  // The one place this design writes anything about a reader. If a field ever appears
+  // here that is not one of these two, it is the start of the profile it refuses to be.
+  const store = fakeStorage();
+  const h = run([el({ 'data-japode-ads': '' })], {
+    fetch: withCampaigns(campaign({ id: 'a' })), storage: store, randoms: [0],
+  });
+  return h.settled().then(() => {
+    for (const entry of JSON.parse(store.map.get(KEY))) {
+      assert.deepEqual(Object.keys(entry).sort(), ['at', 'id']);
+    }
+    assert.deepEqual(Array.from(store.map.keys()), [KEY], 'one key, and it is ours');
+  });
+});
+
+test('nothing about the reader leaves the browser', async () => {
+  // The memory exists to vary a banner, and the only request the loader makes is the
+  // catalogue — no beacon, no query string carrying what was seen.
+  const store = fakeStorage({ seed: seenAt(Date.now(), 'a', 'b') });
+  const h = run([el({ 'data-japode-ads': '' })], {
+    fetch: withCampaigns(campaign({ id: 'c' })), storage: store,
+  });
+  await h.settled();
+  assert.equal(h.fetches.length, 1);
+  assert.match(h.fetches[0], /^https:\/\/ads\.japode\.com\/v1\/catalogue\.json\?v=\d+$/);
 });
 
 // ------------------------------------------------------------------------------------

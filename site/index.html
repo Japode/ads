@@ -295,8 +295,16 @@
   any reason, every slot collapses silently rather than leaving a broken frame.
 </p>
 <p>
-  Nothing about your reader is read, stored or sent anywhere. There are no cookies, no
-  identifiers and no third parties: the whole network is this domain serving static files.
+  There are no cookies, no identifiers and no third parties: the whole network is this
+  domain serving static files, and nothing about your reader is ever sent anywhere.
+</p>
+<p>
+  The one thing that is stored is a list of the last four campaign ids a slot drew, with a
+  timestamp, so a reader reloading does not meet the same banner every time. It expires
+  after thirty minutes and it is written to <em>your</em> origin's
+  <code>localStorage</code>, not ours — which means it cannot follow anyone between sites,
+  and a reader on two of your pages and someone else's has two unrelated memories. If
+  storage is unavailable, as in a private window, the draw simply happens without it.
 </p>
 
 <h2>Versioning</h2>

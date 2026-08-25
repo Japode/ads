@@ -615,16 +615,17 @@
    *
    * `random` is a parameter because the alternative is a test hook in shipped code.
    */
-  function drawWeighted(pool, random) {
+  function drawWeighted(pool, random, weigh) {
+    weigh = weigh || weightOf;
     if (!pool.length) return null;
     var total = 0;
     var i;
-    for (i = 0; i < pool.length; i++) total += weightOf(pool[i]);
+    for (i = 0; i < pool.length; i++) total += weigh(pool[i]);
     if (total <= 0) return null;
 
     var point = random() * total;
     for (i = 0; i < pool.length; i++) {
-      point -= weightOf(pool[i]);
+      point -= weigh(pool[i]);
       // Strictly less than zero, so an entry weighted 0 can never be landed on by a
       // point that merely reached it.
       if (point < 0) return pool[i];
@@ -644,12 +645,105 @@
    * answer: an empty slot is worse than a second sighting, and the site owner chose how
    * many slots to place.
    */
-  function pickFor(pool, taken, random) {
+  function pickFor(pool, taken, random, weigh) {
     var fresh = [];
     for (var i = 0; i < pool.length; i++) {
       if (taken.indexOf(pool[i].id) === -1) fresh.push(pool[i]);
     }
-    return drawWeighted(fresh.length ? fresh : pool, random);
+    return drawWeighted(fresh.length ? fresh : pool, random, weigh);
+  }
+
+  // ---------------------------------------------------------------------------------
+  // A short memory
+  // ---------------------------------------------------------------------------------
+
+  /**
+   * Where the last few picks are noted.
+   *
+   * This is the host site's localStorage, not ours — the loader runs on their page, so
+   * the entry is scoped to their origin and a reader on two different sites has two
+   * unrelated memories. That is not a limitation to work around: it is what keeps a
+   * feature about variety from becoming the cross-site profile this network refuses to
+   * build. Nothing here is ever sent anywhere, and there is no identifier to send.
+   */
+  var MEMORY_KEY = 'japode-ads.v1.recent';
+
+  /** How long a sighting counts for. Past this, variety stops mattering. */
+  var MEMORY_MINUTES = 30;
+
+  /** How many sightings are kept. Longer than the number of slots on a typical page. */
+  var MEMORY_SIZE = 4;
+
+  /**
+   * What a recent sighting does to a campaign's share.
+   *
+   * Demoted and not excluded. On a catalogue of eight with four remembered, excluding
+   * would narrow the draw to the remainder and make rotation predictable in the other
+   * direction; and where every eligible entry has been seen, exclusion leaves nothing
+   * to draw at all.
+   */
+  var DEMOTION = 0.15;
+
+  /** localStorage, or null where reading it throws — private modes do. */
+  function storage(win) {
+    try {
+      var s = win.localStorage;
+      // Touching the object is not enough: some browsers only throw on use.
+      s.getItem(MEMORY_KEY);
+      return s;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  /** The campaign ids seen recently, newest first, expired entries dropped. */
+  function recent(win, now) {
+    var s = storage(win);
+    if (!s) return [];
+    var parsed;
+    try {
+      parsed = JSON.parse(s.getItem(MEMORY_KEY) || '[]');
+    } catch (e) {
+      return [];
+    }
+    if (Object.prototype.toString.call(parsed) !== '[object Array]') return [];
+
+    var cutoff = now - MEMORY_MINUTES * 60 * 1000;
+    var ids = [];
+    for (var i = 0; i < parsed.length; i++) {
+      var entry = parsed[i];
+      if (entry && typeof entry.id === 'string' && typeof entry.at === 'number' && entry.at > cutoff) {
+        ids.push(entry);
+      }
+    }
+    return ids;
+  }
+
+  /** Note what was drawn. Failing to write is not worth telling anyone about. */
+  function remember(win, now, previous, drawn) {
+    var s = storage(win);
+    if (!s || !drawn.length) return;
+    var next = [];
+    for (var i = 0; i < drawn.length; i++) next.push({ id: drawn[i], at: now });
+    for (var j = 0; j < previous.length && next.length < MEMORY_SIZE; j++) {
+      var keep = true;
+      for (var k = 0; k < next.length && keep; k++) {
+        if (next[k].id === previous[j].id) keep = false;
+      }
+      if (keep) next.push(previous[j]);
+    }
+    try {
+      s.setItem(MEMORY_KEY, JSON.stringify(next.slice(0, MEMORY_SIZE)));
+    } catch (e) { /* full, or refused: the reader still gets a banner */ }
+  }
+
+  /** A weight function that pushes recently seen campaigns down the draw. */
+  function demoting(seen) {
+    var ids = [];
+    for (var i = 0; i < seen.length; i++) ids.push(seen[i].id);
+    return function (c) {
+      return ids.indexOf(c.id) === -1 ? weightOf(c) : weightOf(c) * DEMOTION;
+    };
   }
 
   /** Campaigns a slot may draw at all: withdrawn and zero-weighted entries are out. */
@@ -744,13 +838,18 @@
         var host = (win.location && win.location.hostname || '').toLowerCase();
         var taken = [];
 
+        // A reader whose storage is unavailable gets an empty memory and an undemoted
+        // draw, which is the ordinary weighted one. Variety is worth less than a banner.
+        var seen = recent(win, now);
+        var weigh = demoting(seen);
+
         for (var s = 0; s < slots.length; s++) {
           var slot = slots[s];
           if (!slot.root) continue;
 
           // Per slot, not once for the page: two slots can ask for different topics or
           // languages, and the host exclusion is the only part they share.
-          var campaign = pickFor(eligibleFor(pool, slot, host), taken, random);
+          var campaign = pickFor(eligibleFor(pool, slot, host), taken, random, weigh);
 
           // No campaign is not an error. The slot gives its reserved space back and
           // collapses, exactly as it does when the catalogue could not be read at all.
@@ -762,6 +861,10 @@
           taken.push(campaign.id);
           win.japodeAds.slots[s].showing = draw(win, doc, slot, campaign, origin);
         }
+
+        // Written once for the page rather than per slot, so the memory holds this
+        // page view and not the order its slots happened to be drawn in.
+        remember(win, now, seen, taken);
       });
     }
 
@@ -803,6 +906,13 @@
       weightOf: weightOf,
       drawWeighted: drawWeighted,
       pickFor: pickFor,
+      MEMORY_KEY: MEMORY_KEY,
+      MEMORY_MINUTES: MEMORY_MINUTES,
+      MEMORY_SIZE: MEMORY_SIZE,
+      DEMOTION: DEMOTION,
+      recent: recent,
+      remember: remember,
+      demoting: demoting,
       RESERVED: RESERVED,
       reserve: reserve,
       collapse: collapse,

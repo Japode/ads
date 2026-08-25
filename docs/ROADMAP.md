@@ -2,8 +2,6 @@
 
 ## Block E — Random rotation and delivery control
 
-- 📋 **RK17** (deps: RK15 ✅) **A returning reader keeps seeing the same pick** — Without a short memory of what was already shown, rotation reads as a bug rather than as variety. → §RK17
-
 ## Block F — Metrics, quality and operations
 
 - 📋 **RK18** (deps: RK11 ✅) **Impressions and clicks are not counted** — Nothing shows which product the network is actually sending readers to. → §RK18

@@ -2,13 +2,6 @@
 
 ## Block E — Random rotation and delivery control
 
-### §RK17 Frequency and recency
-
-The loader remembers the last few campaigns it rendered for this reader and demotes them
-in the next draw, expiring the memory after a short window. Stored locally, no
-identifier leaves the browser, and a reader whose storage is unavailable simply gets an
-unweighted draw.
-
 ## Block F — Metrics, quality and operations
 
 ### §RK18 Click and impression accounting
