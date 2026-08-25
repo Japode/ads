@@ -23,3 +23,4 @@
 ## Block F — Metrics, quality and operations
 
 - ✅ **RK24** **Three campaign destinations are not the product's canonical URL** — cursarei points at cursarei.com.br and is back in rotation, turing at turing.viglet.org and viglet at the www host its apex 301s to; all eight now answer 200 on the first hop.
+- ✅ **RK25** **Nothing updates the actions the deploy runs on or the packages the gate validates with** — Dependabot now watches the deploy actions and the gate packages, opening one grouped pull request a month per ecosystem, with an ajv major arriving on its own.

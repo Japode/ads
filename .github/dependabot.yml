@@ -1,0 +1,39 @@
+version: 2
+
+# Six dependencies is not enough to justify six pull requests a month, so both ecosystems
+# are grouped. What a group costs is the ability to revert one bump on its own; what it
+# buys is that the batch gets read at all instead of accumulating unopened.
+
+updates:
+  # checkout, setup-node, upload-pages-artifact and deploy-pages are one deploy path from
+  # one publisher: the evidence for all four is the same green run, so they travel as one.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 2
+    commit-message:
+      prefix: "chore"
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+  # ajv and ajv-formats are the gate itself. Minors and patches ride together; a major
+  # changes what the validator accepts, and that is the one bump that has to arrive alone
+  # and be read rather than buried among patches.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    open-pull-requests-limit: 2
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    groups:
+      validation:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
