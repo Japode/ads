@@ -1,7 +1,5 @@
 # Roadmap (active backlog)
 
-## Block B — Static API on ads.japode.com
-
 ## Block C — Embed snippet and JavaScript loader
 
 - 📋 **RK8** (deps: RK5 ✅) **There is no HTML snippet a site owner can paste** — The whole product is one copy-paste block, the way an ad network ships one. → §RK8
@@ -27,6 +25,8 @@
 - 📋 **RK19** (deps: RK11) **There is no local preview of the catalogue** — Reviewing how a banner looks should not require publishing it to production first. → §RK19
 - 📋 **RK20** (deps: RK11, RK4 ✅) **Nothing tests the renderer against the catalogue** — A field renamed in the JSON would silently blank a banner on every host site. → §RK20
 - 📋 **RK23** (deps: RK4 ✅) **The gate never checks that a campaign destination resolves** — It validates shape and assets offline, so a dead link passes and keeps passing until a reader reports it. → §RK23
+- 📋 **RK26** (deps: RK21 ✅) **The deploy workflow pins actions three major versions behind** — checkout and setup-node sit at v4 while v7 ships, and the runner already warns it is forcing all four off the Node 20 they declare. → §RK26
+- 📋 **RK27** (deps: RK6 ✅) **Nothing runs the origin check unless someone remembers to** — Pages could drop the cross-origin header and every banner would stop rendering at once, with no error anyone here can see. → §RK27
 
 ## Non-goals
 
