@@ -10,6 +10,8 @@
 
 ## Block B — Static API on ads.japode.com
 
+- ✅ **RK5** **ads.japode.com serves nothing** — Pages on Japode/ads serves ads.japode.com over enforced HTTPS with source Actions, and site/CNAME claims the domain in the artifact; the DNS CNAME to japode.github.io was already in place.
+
 ## Block C — Embed snippet and JavaScript loader
 
 ## Block D — Banner rendering in HTML

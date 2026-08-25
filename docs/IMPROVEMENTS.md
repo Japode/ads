@@ -2,15 +2,6 @@
 
 ## Block B — Static API on ads.japode.com
 
-### §RK5 GitHub Pages under a custom domain
-
-The site is published by GitHub Pages: the catalogue, the loader script and the logos
-are all static files served from this repository. ads.japode.com is a custom domain on
-the Pages site, which means a CNAME record on japode.com, the domain declared in the
-repository, and enforced HTTPS so a snippet embedded on an https page is never blocked
-as mixed content. No server logic exists anywhere in the design, and Pages is what holds
-that constraint honest.
-
 ### §RK6 Living with fixed headers
 
 Pages answers with a permissive cross-origin header already, which is what makes a
