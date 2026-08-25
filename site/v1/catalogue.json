@@ -3,14 +3,14 @@
   "campaigns": [
     {
       "id": "shio",
-      "product": "Viglet Shio",
+      "product": "Viglet Shio CMS",
       "logo": {
         "src": "/logos/shio.png",
-        "alt": "Viglet Shio",
+        "alt": "Viglet Shio CMS",
         "width": 128,
         "height": 128
       },
-      "headline": "The headless CMS a coding agent operates",
+      "headline": "Headless, and your coding agent can drive it",
       "support": "Content as files, MCP tools and blueprints. The curator approves in a React console with preview links.",
       "cta": {
         "label": "See Shio",
@@ -294,7 +294,7 @@
         "height": 64
       },
       "headline": "Um GPT em Java puro, sem biblioteca de ML",
-      "support": "Modelo de linguagem em nivel de caractere escrito do zero, com a matematica de cada classe explicada.",
+      "support": "Modelo de linguagem em nível de caractere escrito do zero, com a matemática de cada classe explicada.",
       "cta": {
         "label": "Ler a aula",
         "href": "https://alegauss.github.io/mini-gpt/"
@@ -340,8 +340,8 @@
         "width": 64,
         "height": 64
       },
-      "headline": "Cursos brasileiros num lugar so",
-      "support": "Graduacao, pos, MBA e cursos livres de varias instituicoes, num agregador independente.",
+      "headline": "Cursos brasileiros num lugar só",
+      "support": "Graduação, pós, MBA e cursos livres de várias instituições, num agregador independente.",
       "cta": {
         "label": "Encontrar cursos",
         "href": "https://cursarei.com.br/"
