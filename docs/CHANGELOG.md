@@ -56,6 +56,7 @@
 - ✅ **RK34** **One logo is two thirds of what a page view downloads** — A zlib-only tool re-encodes the logos as indexed colour: viglet drops 20.6KB to 6.6KB, the worst page view 36KB to 22KB, and no dependency was added to do it.
 - ✅ **RK38** **logo.alt is required by the schema and ignored by the renderer** — The renderer now writes the catalogue's alt, which aria-label on the link keeps out of the accessible name, so it serves the case it was written for: an image that did not load.
 - ✅ **RK39** **Nothing checks that a deploy actually served what it uploaded** — A verify job runs check-deploy after the deployment step, comparing every file in site/ against what the domain serves, and it names truncation, an old version and a CRLF working copy apart.
+- ✅ **RK42** **Nothing declares line endings, so the deploy check flags a correct deploy** — A .gitattributes pins LF and marks the PNGs binary, and the existing files were renormalised, so the byte-for-byte deploy check now runs clean locally.
 
 ## Block G — The project's public face
 

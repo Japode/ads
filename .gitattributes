@@ -1,0 +1,15 @@
+# What a working copy holds, so it is not whatever the last editor decided.
+#
+# eol=lf and not merely text=auto: the origin serves LF, and this project's whole property
+# is that the file in site/ is the file the domain serves. A checkout that differed by line
+# endings would make that false locally and the deploy check would report a correct deploy
+# as wrong — which it did, until this file existed.
+* text=auto eol=lf
+
+# The opposite treatment, for the opposite reason: a byte changed inside one of these is a
+# corrupted image rather than a reformatted file. Never filtered, never diffed as text.
+*.png binary
+
+# roadkeep writes the three governed files and refuses a hand edit. Its merge driver turns
+# two branches appending under one heading into two additions instead of a conflict, and it
+# is registered by `roadkeep merge --register` rather than by hand.
