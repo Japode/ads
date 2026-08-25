@@ -13,7 +13,7 @@
       "headline": "Headless, and your coding agent can drive it",
       "support": "Content as files, MCP tools and blueprints. The curator approves in a React console with preview links.",
       "cta": {
-        "label": "See Shio",
+        "label": "See Shio CMS",
         "href": "https://shio.viglet.org/"
       },
       "theme": {
@@ -63,7 +63,7 @@
       "headline": "Enterprise search you host yourself",
       "support": "Index AEM, WordPress, databases and files, then answer over them with RAG. Apache-2.0, on your own infrastructure.",
       "cta": {
-        "label": "Explore Turing",
+        "label": "Explore Turing ES",
         "href": "https://turing.viglet.org/"
       },
       "theme": {
@@ -166,7 +166,7 @@
       "support": "A CLI owns the roadmap, the changelog and the rationale, so shipping a task updates all three or none of them.",
       "cta": {
         "label": "Get roadkeep",
-        "href": "https://github.com/alegauss/roadkeep"
+        "href": "https://alegauss.github.io/roadkeep"
       },
       "theme": {
         "light": {
@@ -210,7 +210,7 @@
       "support": "A Docker Desktop alternative with no headcount threshold, no revenue threshold and no licence to buy.",
       "cta": {
         "label": "Download FreeWilly",
-        "href": "https://github.com/alegauss/freewilly"
+        "href": "https://alegauss.github.io/freewilly"
       },
       "theme": {
         "light": {
@@ -254,7 +254,7 @@
       "support": "A native Windows tray icon that draws your rate-limit percentage as a vector, crisp at any DPI.",
       "cta": {
         "label": "Install for Windows",
-        "href": "https://github.com/alegauss/claude-tray"
+        "href": "https://alegauss.github.io/claude-tray"
       },
       "theme": {
         "light": {
