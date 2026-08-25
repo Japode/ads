@@ -126,3 +126,31 @@ run on a schedule instead of when somebody remembers.
 
 It belongs on the same schedule as the destination check: both are network jobs that
 must stay out of the publish path, and one job reporting both is one place to look.
+
+### §RK28 The network has no mark of its own
+
+The tutorial page declares roadkeep's mark as its icon, because it was the one vector
+file already on the domain. roadkeep is an advertiser here, not the network, so every
+tab and bookmark of ads.japode.com currently carries one campaign's branding — the
+closest thing this design has to an endorsement, given to whichever logo happened to be
+convenient.
+
+The network has no mark of its own, which is the actual gap. It needs one that reads at
+16px and cannot be mistaken for any of the eight products it carries, on a page whose
+whole argument is that it treats them evenly.
+
+### §RK29 The generator and the parser must agree
+
+The loader is covered by tests against the file the domain serves. The generator that
+tells a site owner what to paste is not covered by anything, and it is the more
+dangerous of the two: the loader failing is one site's slot staying empty, while the
+generator emitting a subtly wrong block is every site that copied it, each one carrying
+the mistake away to a page we cannot reach or edit.
+
+The cases are small and they are exactly the ones a reader would not notice: an
+attribute whose value contains a quote, a tag list typed with stray commas, the
+difference between an omitted attribute and an empty one — which the loader treats as
+two different answers for lang. What the test has to assert is not that the generator
+produces some string, but that the string it produces, fed back through the loader's own
+parser, yields the configuration the site owner selected. The two halves of the contract
+agreeing with each other is the only thing worth checking.
