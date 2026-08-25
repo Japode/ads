@@ -438,8 +438,9 @@ test('the whole unit is one link, labelled by what it does', async () => {
   const link = container.shadowRoot.find('unit');
   assert.match(link.getAttribute('aria-label'), /Get roadkeep — roadkeep: Your roadmap stops drifting/);
   assert.equal(link.getAttribute('rel'), 'sponsored noopener');
-  // The logo is decorative once the link is labelled; announcing it repeats the product.
-  assert.equal(container.shadowRoot.find('logo').getAttribute('alt'), '');
+  // One name, and it is the link's. The logo's alt is not a second one: aria-label here
+  // overrides the descendants, so the alt is only ever read by eyes, in an empty box.
+  assert.equal(container.shadowRoot.children.filter(c => c.tagName === 'A').length, 1);
 });
 
 test('the mark is never reshaped by the renderer', async () => {
@@ -1177,6 +1178,46 @@ test('the banner respects a reader who asked for less motion', async () => {
   const h = run([container], { fetch: withCampaigns(campaign()) });
   await h.settled();
   assert.match(styleOf(container), /@media \(prefers-reduced-motion: reduce\)[^}]*transition: none/);
+});
+
+test('the logo carries the catalogue alt for the case where it does not load', async () => {
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(campaign()) });
+  await h.settled();
+  assert.equal(container.shadowRoot.find('logo').getAttribute('alt'), campaign().logo.alt);
+});
+
+test('the alt does not become a second accessible name', async () => {
+  // aria-label on the link overrides its descendants for the name computation, which is
+  // the whole reason the alt can carry text at all. If the label ever moved off the link,
+  // the alt would start being announced and the product would be said twice.
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(campaign()) });
+  await h.settled();
+  const unit = container.shadowRoot.find('unit');
+  const label = unit.getAttribute('aria-label');
+  assert.ok(label, 'the link must carry the accessible name');
+  assert.match(label, /roadkeep/, 'and it must name the product');
+});
+
+test('every shipped campaign supplies an alt worth showing', () => {
+  // It stands in for the logo in an empty box, so it has to name the product rather than
+  // describe the artwork — "logo" or "icon" alone tells a reader nothing.
+  const live = JSON.parse(readFileSync(join(root, 'site/v1/catalogue.json'), 'utf8'));
+  for (const c of live.campaigns) {
+    assert.ok(c.logo.alt?.trim(), `${c.id} has no alt`);
+    assert.doesNotMatch(c.logo.alt, /^(logo|icon|image)$/i, `${c.id}.logo.alt says nothing`);
+  }
+});
+
+test('the narrow strip is why the alt matters', async () => {
+  // It hides the product name, so the logo is the only thing naming whose product this
+  // is. That is the case an empty alt would leave as a headline from nobody.
+  const container = el({ 'data-japode-ads': '', 'data-ad-format': 'strip' });
+  const h = run([container], { fetch: withCampaigns(campaign()) });
+  await h.settled();
+  assert.match(styleOf(container), /@container \(max-width: 26rem\) \{ \.unit\.strip \.product \{ display: none; \} \}/);
+  assert.ok(container.shadowRoot.find('logo').getAttribute('alt'));
 });
 
 test('the link is reachable and visibly focused by keyboard', async () => {

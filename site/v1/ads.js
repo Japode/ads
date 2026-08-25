@@ -409,7 +409,12 @@
     var img = doc.createElement('img');
     img.className = 'logo';
     img.setAttribute('src', origin + logoSrc);
-    img.setAttribute('alt', '');
+    // The catalogue's own alt, and it costs a screen reader nothing: aria-label on the
+    // link overrides its descendants for the accessible name, so this is never announced
+    // as part of it. What it buys is the visible case — an image that does not load. A
+    // narrow strip hides the product name, so there the logo is the only thing naming
+    // whose product this is, and an empty alt would leave a headline from nobody.
+    img.setAttribute('alt', text(campaign.logo.alt));
     // Declared in the catalogue and set as attributes: the box is reserved before the
     // file arrives, so the host page does not jump when it does.
     img.setAttribute('width', String(campaign.logo.width));

@@ -2,24 +2,6 @@
 
 ## Block F — Metrics, quality and operations
 
-### §RK38 Where logo.alt is actually used
-
-The schema requires logo.alt on every campaign and every entry supplies it. The renderer
-ignores it and writes alt="" instead, which is correct: the banner is one link labelled
-with the product and the headline, so a logo that announced the product again would say
-it twice to a screen reader.
-
-Both halves are right and together they mislead. Someone reading the schema sees a
-required field described as the image's alternative text and reasonably concludes it
-reaches the page; someone auditing the rendered banner finds an empty alt and reasonably
-concludes the catalogue forgot to supply one. Neither can tell from their own side that
-the other is deliberate.
-
-The fix is a decision about which one moves, not a fix to either. The field can stay
-required with the schema saying out loud where it is used and where it is not, or it can
-become optional, or the renderer can find the use the field was written for — a preview
-listing, or an alt on a logo that fails to load, where nothing else names the product.
-
 ### §RK39 Verifying the deploy, not the day
 
 The origin check runs daily and by hand, and neither catches the deploy that broke

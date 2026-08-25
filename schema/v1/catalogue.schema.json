@@ -64,6 +64,7 @@
           "$ref": "#/$defs/assetPath"
         },
         "alt": {
+          "description": "What stands in for the logo when the image does not load. It is not the banner's accessible name — the whole unit is one link carrying that — so write what a reader should see in the empty box, which is the product, not a description of the artwork. Screen readers never announce it, because aria-label on the link overrides its descendants.",
           "type": "string",
           "minLength": 1,
           "maxLength": 100

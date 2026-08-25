@@ -2,7 +2,6 @@
 
 ## Block F — Metrics, quality and operations
 
-- 📋 **RK38** (deps: RK11 ✅) **logo.alt is required by the schema and ignored by the renderer** — The schema reader assumes it reaches the page and the banner auditor assumes it was forgotten; both are reading a deliberate choice. → §RK38
 - 📋 **RK39** (deps: RK27 ✅, RK21 ✅) **Nothing checks that a deploy actually served what it uploaded** — Five logos were re-encoded today and a person fetching them by hand is what confirmed the domain served them. → §RK39
 
 ## Block G — The project's public face
