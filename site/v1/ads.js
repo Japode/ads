@@ -32,6 +32,9 @@
   /** How a slot picks between a campaign's light and dark tokens. */
   var THEMES = ['auto', 'light', 'dark'];
 
+  /** Whether a slot consents to the recency memory being stored on the host's origin. */
+  var MEMORY_CHOICES = ['on', 'off'];
+
   /**
    * Defaults, which matter more than the attributes do: the minimal paste is
    * `<div data-japode-ads></div>` and it has to be a working slot, not a broken one.
@@ -39,6 +42,7 @@
   var DEFAULTS = {
     format: 'in-content',
     theme: 'auto',
+    memory: 'on',
   };
 
   /** A comma-separated attribute, emptied of blanks. Absent and "" both mean no filter. */
@@ -98,6 +102,15 @@
 
     var lang = raw('lang');
 
+    var memory = attr('memory').toLowerCase();
+    if (memory && MEMORY_CHOICES.indexOf(memory) === -1) {
+      warnings.push(
+        'data-ad-memory="' + memory + '" is not one of ' + MEMORY_CHOICES.join(', ') +
+        '; falling back to "' + DEFAULTS.memory + '"'
+      );
+      memory = '';
+    }
+
     return {
       el: el,
       // What this placement is called, for the site owner's own reading. Defaults to
@@ -114,6 +127,10 @@
       // Never show these campaign ids here. This is how a product's own site avoids
       // advertising itself beyond what the catalogue already excludes.
       exclude: list(attr('exclude')),
+      // Whether this slot consents to the recency memory being kept in the host site's
+      // own localStorage. On by default: off by default would make rotation worse on
+      // almost every site to satisfy a minority of them.
+      memory: memory || DEFAULTS.memory,
       warnings: warnings,
     };
   }
@@ -858,6 +875,9 @@
       // seeing 0 knows the catalogue answered and had nothing, which is a different
       // problem from null, where it never answered at all.
       campaigns: null,
+      // 'on' or 'off' once the draw runs: whether this page consented to the recency
+      // memory. Null before then, like campaigns.
+      memory: null,
       slots: slots.map(function (s) {
         return {
           slot: s.slot,
@@ -866,6 +886,7 @@
           lang: s.lang,
           tags: s.tags.slice(),
           exclude: s.exclude.slice(),
+          memory: s.memory,
           isolated: !!s.root,
           // The campaign id this slot ended up drawing, or null if it drew nothing.
           showing: null,
@@ -888,9 +909,24 @@
         var host = (win.location && win.location.hostname || '').toLowerCase();
         var taken = [];
 
+        // One "off" anywhere on the page silences the memory for all of it.
+        //
+        // Consent belongs to the site, not to a slot, and the storage is a single key on
+        // their origin — there is no coherent way for one slot to keep a memory another
+        // declined. A site owner who wrote the opt-out once and pasted a second snippet
+        // without it meant off, and the conservative reading is the only safe one when
+        // the obligation is theirs and the write is ours.
+        var consented = true;
+        for (var m = 0; m < slots.length; m++) {
+          if (slots[m].memory === 'off') consented = false;
+        }
+        win.japodeAds.memory = consented ? 'on' : 'off';
+
         // A reader whose storage is unavailable gets an empty memory and an undemoted
         // draw, which is the ordinary weighted one. Variety is worth less than a banner.
-        var seen = recent(win, now);
+        // Declining is deliberately the same path: absent attribute, unreadable storage
+        // and an explicit "off" all arrive here as an empty memory.
+        var seen = consented ? recent(win, now) : [];
         var weigh = demoting(seen);
 
         for (var s = 0; s < slots.length; s++) {
@@ -913,8 +949,9 @@
         }
 
         // Written once for the page rather than per slot, so the memory holds this
-        // page view and not the order its slots happened to be drawn in.
-        remember(win, now, seen, taken);
+        // page view and not the order its slots happened to be drawn in. Skipped
+        // entirely when the site declined: not a shorter write, no write.
+        if (consented) remember(win, now, seen, taken);
       });
     }
 
@@ -939,6 +976,7 @@
       MARKER: MARKER,
       FORMATS: FORMATS,
       THEMES: THEMES,
+      MEMORY_CHOICES: MEMORY_CHOICES,
       DEFAULTS: DEFAULTS,
       CACHE_SECONDS: CACHE_SECONDS,
       EMPTY: EMPTY,

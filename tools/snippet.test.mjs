@@ -40,7 +40,7 @@ const field = () => ({
 
 /** Run the generator with these field values, and return the snippet it emits. */
 function generate(values = {}) {
-  const ids = ['g-format', 'g-slot', 'g-theme', 'g-lang', 'g-lang-any', 'g-tags', 'g-exclude'];
+  const ids = ['g-format', 'g-slot', 'g-theme', 'g-lang', 'g-lang-any', 'g-tags', 'g-exclude', 'g-memory'];
   const nodes = {};
   for (const id of ids) nodes[id] = field();
   for (const [id, v] of Object.entries(values)) {
@@ -213,4 +213,20 @@ test('every option the page offers round-trips without warning', () => {
     const slot = roundTrip(theme ? { 'g-theme': theme } : {});
     assert.deepEqual([...slot.warnings], [], `theme "${theme}" warns`);
   }
+  for (const memory of options('memory')) {
+    const slot = roundTrip(memory ? { 'g-memory': memory } : {});
+    assert.deepEqual([...slot.warnings], [], `memory "${memory}" warns`);
+  }
+});
+
+test('declining the memory round-trips as a decline', () => {
+  // The one attribute whose value the site owner may be held to by somebody else, so a
+  // generator that emitted it wrong would be worse than one that omitted it.
+  const off = generate({ 'g-memory': 'off' });
+  assert.match(off, /data-ad-memory="off"/);
+  assert.equal(readBack(off).slot.memory, 'off');
+
+  // Default stays absent: the snippet says only what the owner chose.
+  assert.doesNotMatch(generate(), /data-ad-memory/);
+  assert.equal(roundTrip().memory, 'on');
 });

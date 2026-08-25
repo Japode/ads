@@ -94,13 +94,21 @@ const jsonResponse = body => Promise.resolve({ ok: true, status: 200, json: () =
  */
 function fakeStorage({ seed, throwOn } = {}) {
   const map = new Map(seed ? [[Object.keys(seed)[0], Object.values(seed)[0]]] : []);
+  // Every touch is recorded, because "did not write" is not the same claim as "wrote
+  // nothing useful", and RK35 is about the former.
+  const reads = [];
+  const writes = [];
   return {
     map,
+    reads,
+    writes,
     getItem(k) {
+      reads.push(k);
       if (throwOn === 'read' || throwOn === 'both') throw new Error('refused');
       return map.has(k) ? map.get(k) : null;
     },
     setItem(k, v) {
+      writes.push(k);
       if (throwOn === 'write' || throwOn === 'both') throw new Error('quota');
       map.set(k, v);
     },
@@ -182,6 +190,7 @@ test('the minimal paste is a working slot', () => {
     lang: '',
     tags: [],
     exclude: [],
+    memory: 'on',
     isolated: true,
     showing: null,
     warnings: [],
@@ -199,6 +208,7 @@ test('every documented attribute is read', () => {
       'data-ad-lang': 'pt-BR',
       'data-ad-tags': 'devtools, cms ,',
       'data-ad-exclude': 'roadkeep,shio',
+      'data-ad-memory': 'off',
     }),
   ]);
   assert.deepEqual(exposed.slots[0], {
@@ -208,6 +218,7 @@ test('every documented attribute is read', () => {
     lang: 'pt-BR',
     tags: ['devtools', 'cms'],
     exclude: ['roadkeep', 'shio'],
+    memory: 'off',
     isolated: true,
     showing: null,
     warnings: [],
@@ -985,6 +996,67 @@ test('the shipped catalogue keeps every Viglet property off its own sites', () =
     }
     assert.ok(kept.length, `${host} would have nothing at all to show`);
   }
+});
+
+// ------------------------------------------------------------------------------------
+// Whose storage it is
+// ------------------------------------------------------------------------------------
+
+test('the memory is on unless the site says otherwise', async () => {
+  const h = run([el({ 'data-japode-ads': '' })], { fetch: withCampaigns(campaign()) });
+  assert.equal(h.exposed.slots[0].memory, 'on');
+  await h.settled();
+  assert.equal(h.exposed.memory, 'on');
+});
+
+test('a slot can decline, and then nothing is written at all', async () => {
+  // Not a shorter write. No write: the obligation is the site's and the write is ours.
+  const store = fakeStorage();
+  const h = run([el({ 'data-japode-ads': '', 'data-ad-memory': 'off' })], {
+    fetch: withCampaigns(campaign()),
+    storage: store,
+  });
+  await h.settled();
+  assert.equal(h.exposed.memory, 'off');
+  assert.deepEqual(store.writes, [], 'the host origin was not touched');
+  assert.deepEqual(store.reads, [], 'nor read');
+  assert.ok(h.exposed.slots[0].showing, 'declining costs the reader no banner');
+});
+
+test('one slot declining silences the memory for the whole page', async () => {
+  // Consent belongs to the site, not the slot, and the storage is one key on their
+  // origin — there is no coherent way to keep a memory another slot declined.
+  const store = fakeStorage();
+  const h = run([
+    el({ 'data-japode-ads': '' }),
+    el({ 'data-japode-ads': '', 'data-ad-memory': 'off' }),
+  ], { fetch: withCampaigns(campaign({ id: 'a' }), campaign({ id: 'b' })), storage: store });
+  await h.settled();
+  assert.equal(h.exposed.memory, 'off');
+  assert.deepEqual(store.writes, []);
+});
+
+test('declining, an absent attribute and unreadable storage are one path', async () => {
+  // They already were, and RK35 must not have split them: each arrives at the draw as
+  // an empty memory and an ordinary weighted pick.
+  const declined = run([el({ 'data-japode-ads': '', 'data-ad-memory': 'off' })], {
+    fetch: withCampaigns(campaign()), randoms: [0.5],
+  });
+  const broken = run([el({ 'data-japode-ads': '' })], {
+    fetch: withCampaigns(campaign()), storage: null, randoms: [0.5],
+  });
+  await declined.settled();
+  await broken.settled();
+  assert.equal(declined.exposed.slots[0].showing, broken.exposed.slots[0].showing);
+  assert.deepEqual(declined.warnings, [], 'declining is a choice, not a problem to report');
+});
+
+test('an unknown memory value warns and keeps the default', async () => {
+  const h = run([el({ 'data-japode-ads': '', 'data-ad-memory': 'maybe' })], {
+    fetch: withCampaigns(campaign()),
+  });
+  assert.equal(h.exposed.slots[0].memory, 'on');
+  assert.match(h.warnings[0], /data-ad-memory="maybe" is not one of on, off/);
 });
 
 // ------------------------------------------------------------------------------------

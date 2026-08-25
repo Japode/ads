@@ -216,6 +216,17 @@
       </small>
     </div>
     <div class="field">
+      <label for="g-memory">Recency memory</label>
+      <select id="g-memory">
+        <option value="">on (default)</option>
+        <option value="off">off</option>
+      </select>
+      <small>
+        Turning it off stops the loader touching your <code>localStorage</code> at all.
+        Rotation still works; a returning reader is just likelier to see a repeat.
+      </small>
+    </div>
+    <div class="field">
       <label for="g-tags">Only these tags</label>
       <input id="g-tags" placeholder="devtools, cms" autocomplete="off">
       <small>Comma separated. Blank means no filter.</small>
@@ -288,6 +299,17 @@
       <td>Only campaigns carrying one of these tags.</td>
     </tr>
     <tr>
+      <td><code>data-ad-memory</code></td>
+      <td><code>on</code>, <code>off</code></td>
+      <td><code>on</code></td>
+      <td>
+        Whether the loader may keep its recency memory in your own
+        <code>localStorage</code>. Set <code>off</code> and it never reads or writes
+        there — nothing to declare in a consent notice. One slot saying
+        <code>off</code> silences it for the whole page.
+      </td>
+    </tr>
+    <tr>
       <td><code>data-ad-exclude</code></td><td>comma separated ids</td><td>none</td>
       <td>Campaign ids this slot must never show.</td>
     </tr>
@@ -353,6 +375,7 @@
     lang: document.getElementById('g-lang'),
     tags: document.getElementById('g-tags'),
     exclude: document.getElementById('g-exclude'),
+    memory: document.getElementById('g-memory'),
   };
   var langAny = document.getElementById('g-lang-any');
   var out = document.querySelector('#generated code');
@@ -377,7 +400,7 @@
   // is a snippet whose reader cannot tell which parts matter.
   function build() {
     var attrs = ['data-japode-ads'];
-    var order = ['format', 'slot', 'theme', 'lang', 'tags', 'exclude'];
+    var order = ['format', 'slot', 'theme', 'lang', 'tags', 'exclude', 'memory'];
     for (var i = 0; i < order.length; i++) {
       var key = order[i];
       var value = fields[key].value.trim();
