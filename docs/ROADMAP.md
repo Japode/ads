@@ -1,9 +1,5 @@
 # Roadmap (active backlog)
 
-## Block F — Metrics, quality and operations
-
-## Block G — The project's public face
-
 ## Non-goals
 
 - **No ad server or real-time bidding** The whole network is a static JSON file and a
