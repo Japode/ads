@@ -2,13 +2,6 @@
 
 ## Block D — Banner rendering in HTML
 
-### §RK12 Formats and sizes
-
-Several named formats over one campaign entry: a wide leaderboard, a rectangle, a tall
-sidebar and a compact inline strip. Each rearranges the same fields rather than
-requiring new ones, and each is fluid within its slot so a narrow column does not
-overflow.
-
 ### §RK13 Theme tokens in the JSON
 
 The entry declares its own tokens: background or gradient, text and accent colours, the

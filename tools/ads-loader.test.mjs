@@ -499,10 +499,84 @@ test('the real catalogue renders every campaign it carries', async () => {
   }
 });
 
-test('the three formats match the catalogue schema exactly', () => {
+test('the formats match the catalogue schema exactly', () => {
   // The snippet and the catalogue name the same layout families or a slot can ask for
   // something no campaign can ever fill.
   const schema = JSON.parse(readFileSync(join(root, 'schema/v1/catalogue.schema.json'), 'utf8'));
   const { formats } = run([]);
   assert.deepEqual(formats.slice().sort(), schema.$defs.slot.enum.slice().sort());
+});
+
+// ------------------------------------------------------------------------------------
+// Formats
+// ------------------------------------------------------------------------------------
+
+/** The stylesheet the renderer inserted alongside the unit. */
+function styleOf(container) {
+  return container.shadowRoot.children[0].textContent;
+}
+
+test('each format reaches the markup as its own class', async () => {
+  const { formats } = run([]);
+  for (const format of formats) {
+    const container = el({ 'data-japode-ads': '', 'data-ad-format': format });
+    const h = run([container], { fetch: withCampaigns(campaign()) });
+    await h.settled();
+    assert.equal(container.shadowRoot.find('unit').className, 'unit ' + format);
+  }
+});
+
+test('every format carries the same fields from the same entry', async () => {
+  // §RK12's constraint: a format rearranges the entry, it never asks for a new field.
+  // What each one chooses to show is CSS; what the renderer builds is identical.
+  const { formats } = run([]);
+  for (const format of formats) {
+    const container = el({ 'data-japode-ads': '', 'data-ad-format': format });
+    const h = run([container], { fetch: withCampaigns(campaign()) });
+    await h.settled();
+    const root = container.shadowRoot;
+    for (const part of ['logo', 'product', 'headline', 'support', 'cta', 'mark']) {
+      assert.ok(root.find(part), `${format} is missing .${part}`);
+    }
+  }
+});
+
+test('every format has a rule of its own in the stylesheet', async () => {
+  // A format that names itself in the markup and nowhere in the CSS is a format that
+  // silently renders as the default — the failure this test exists to catch.
+  const { formats } = run([]);
+  for (const format of formats) {
+    if (format === 'in-content') continue; // the base shape, deliberately unstyled
+    const container = el({ 'data-japode-ads': '', 'data-ad-format': format });
+    const h = run([container], { fetch: withCampaigns(campaign()) });
+    await h.settled();
+    assert.match(styleOf(container), new RegExp('\\.unit\\.' + format + '\\b'), `${format} has no layout`);
+  }
+});
+
+test('the strip drops the supporting line rather than shrink it away', async () => {
+  // Compact means carrying less, not rendering the same thing at a size nobody reads.
+  const container = el({ 'data-japode-ads': '', 'data-ad-format': 'strip' });
+  const h = run([container], { fetch: withCampaigns(campaign()) });
+  await h.settled();
+  assert.match(styleOf(container), /\.unit\.strip \.support \{ display: none; \}/);
+  assert.equal(container.shadowRoot.find('support').textContent, campaign().support,
+    'still built, so a wider format sharing this entry is unaffected');
+});
+
+test('fluidity is measured against the slot, never the viewport', async () => {
+  // A sidebar is narrow on a wide screen too, so @media would answer the wrong question.
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(campaign()) });
+  await h.settled();
+  const style = styleOf(container);
+  assert.match(style, /container-type: inline-size/);
+  assert.match(style, /@container \(max-width/);
+  // prefers-reduced-motion is the one media query that is genuinely about the reader.
+  const mediaQueries = style.match(/@media[^{]*/g) ?? [];
+  assert.deepEqual(
+    mediaQueries.filter(q => !q.includes('prefers-reduced-motion')),
+    [],
+    'layout must not depend on viewport width'
+  );
 });

@@ -26,8 +26,8 @@
   /** Marks a container as an ad slot. Its presence is the only thing required. */
   var MARKER = 'data-japode-ads';
 
-  /** Layout families a slot may ask for; the catalogue names the same three. */
-  var FORMATS = ['sidebar', 'in-content', 'footer'];
+  /** Layout families a slot may ask for; the catalogue names the same four. */
+  var FORMATS = ['sidebar', 'in-content', 'footer', 'strip'];
 
   /** How a slot picks between a campaign's light and dark tokens. */
   var THEMES = ['auto', 'light', 'dark'];
@@ -316,14 +316,23 @@
    * constrained to a hex literal, so none of it can close the declaration it sits in.
    */
   function css(t) {
+    var border = t.border || t.accent;
+    var muted = t.muted || t.text;
+    var onAccent = t.onAccent || t.surface;
+
     return [
+      // Every format is fluid inside the slot it was given. The queries below are on the
+      // container and never on the viewport, because the thing that decides whether a
+      // banner fits is the column it sits in — a sidebar is narrow on a wide screen too.
       ':host { display: block; container-type: inline-size; }',
       '* { box-sizing: border-box; }',
+
+      // ---- shared -------------------------------------------------------------------
       '.unit {',
-      '  display: flex; gap: .875rem; align-items: flex-start;',
-      '  position: relative; text-decoration: none;',
+      '  display: flex; position: relative; text-decoration: none;',
+      '  gap: .875rem; align-items: flex-start;',
       '  padding: 1rem; border-radius: 12px;',
-      '  border: 1px solid ' + (t.border || t.accent) + ';',
+      '  border: 1px solid ' + border + ';',
       '  background: ' + t.surface + '; color: ' + t.text + ';',
       '  font: 400 15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;',
       '  transition: border-color .15s ease;',
@@ -335,22 +344,57 @@
       '.product { font-size: .75rem; font-weight: 600; letter-spacing: .04em;',
       '  text-transform: uppercase; color: ' + t.accent + '; }',
       '.headline { font-size: 1rem; font-weight: 650; line-height: 1.3; letter-spacing: -.01em; }',
-      '.support { font-size: .875rem; color: ' + (t.muted || t.text) + '; }',
-      '.cta { margin-top: .4rem; align-self: flex-start;',
+      '.support { font-size: .875rem; color: ' + muted + '; }',
+      '.cta { margin-top: .4rem; align-self: flex-start; white-space: nowrap;',
       '  padding: .35rem .75rem; border-radius: 999px; font-size: .8rem; font-weight: 600;',
-      '  background: ' + t.accent + '; color: ' + (t.onAccent || t.surface) + '; }',
+      '  background: ' + t.accent + '; color: ' + onAccent + '; }',
       // The disclosure never competes with the content and never disappears.
       '.mark { position: absolute; top: .5rem; right: .625rem;',
       '  font-size: .625rem; letter-spacing: .08em; text-transform: uppercase;',
-      '  color: ' + (t.muted || t.text) + '; opacity: .75; }',
-      // Narrow slots stack; the query is on the slot, not the viewport, because a
-      // sidebar is narrow on a wide screen too.
-      '@container (max-width: 22rem) {',
-      '  .unit { flex-direction: column; gap: .625rem; }',
-      '  .logo { width: 32px; }',
+      '  color: ' + muted + '; opacity: .75; }',
+
+      // ---- sidebar: a tall column ---------------------------------------------------
+      '.unit.sidebar { flex-direction: column; gap: .75rem; }',
+      '.unit.sidebar .logo { width: 48px; }',
+      '.unit.sidebar .cta { align-self: stretch; text-align: center; }',
+
+      // ---- in-content: a rectangle inside an article --------------------------------
+      // The default shape: logo beside the copy, nothing hidden.
+
+      // ---- footer: a wide leaderboard -----------------------------------------------
+      // One row, the call to action pushed to the far end so a wide slot does not leave
+      // it stranded mid-line. The support text is what gives way when the row tightens.
+      '.unit.footer { align-items: center; gap: 1rem; padding: .875rem 1.25rem; }',
+      '.unit.footer .body { flex: 1 1 auto; }',
+      '.unit.footer .cta { margin-top: 0; margin-left: auto; align-self: center; }',
+      '.unit.footer .mark { position: static; margin-left: .5rem; align-self: center; }',
+      '@container (max-width: 34rem) { .unit.footer .support { display: none; } }',
+
+      // ---- strip: one compact line --------------------------------------------------
+      // Deliberately the least of the four. It carries the product, the headline and the
+      // link, and drops the supporting sentence rather than shrink type until nothing is
+      // readable — a strip that has to be squinted at is worse than a shorter one.
+      '.unit.strip { align-items: center; gap: .625rem; padding: .5rem .75rem; border-radius: 8px; }',
+      '.unit.strip .logo { width: 24px; border-radius: 5px; }',
+      '.unit.strip .body { flex: 1 1 auto; flex-direction: row; align-items: baseline; gap: .5rem; }',
+      '.unit.strip .support { display: none; }',
+      '.unit.strip .product { font-size: .7rem; flex: 0 0 auto; }',
+      '.unit.strip .headline { font-size: .875rem; font-weight: 600;',
+      '  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }',
+      '.unit.strip .cta { margin-top: 0; padding: 0; background: none; font-size: .8rem;',
+      '  color: ' + t.accent + '; text-decoration: underline; text-underline-offset: 2px; }',
+      '.unit.strip .mark { position: static; flex: 0 0 auto; margin-left: .25rem; }',
+      '@container (max-width: 26rem) { .unit.strip .product { display: none; } }',
+
+      // ---- narrow anything ----------------------------------------------------------
+      // Below this the row shape stops working for the two formats that use one, so they
+      // become the column the sidebar always was.
+      '@container (max-width: 20rem) {',
+      '  .unit:not(.strip) { flex-direction: column; gap: .625rem; }',
+      '  .unit:not(.strip) .logo { width: 32px; }',
+      '  .unit.footer .cta { margin-left: 0; align-self: flex-start; }',
       '}',
-      '.unit.sidebar { flex-direction: column; gap: .625rem; }',
-      '.unit.footer { align-items: center; }',
+
       '@media (prefers-reduced-motion: reduce) { .unit { transition: none; } }',
     ].join('\n');
   }

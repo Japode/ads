@@ -47,9 +47,9 @@
       "pattern": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
     },
     "slot": {
-      "description": "A layout family a campaign may be rendered into. The renderer owns the sizes; the catalogue only says which are allowed.",
+      "description": "A layout family a campaign may be rendered into. The renderer owns the sizes; the catalogue only says which are allowed. sidebar is a tall column, in-content a rectangle inside an article, footer a wide leaderboard, and strip a compact one-line unit. Adding a name here is backwards-compatible; renaming one is not, because a pasted snippet names it.",
       "type": "string",
-      "enum": ["sidebar", "in-content", "footer"]
+      "enum": ["sidebar", "in-content", "footer", "strip"]
     },
     "logo": {
       "description": "The one image a banner is assembled around. Intrinsic size is declared so the slot can reserve space before the file loads.",

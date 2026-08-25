@@ -86,6 +86,15 @@
   th, td { text-align: left; padding: .6rem .75rem; border-bottom: 1px solid var(--border); vertical-align: top; }
   th { font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
   td:first-child { white-space: nowrap; }
+  .formats { display: grid; gap: 1.75rem; grid-template-columns: 1fr; margin: 1.5rem 0; }
+  .fmt { margin: 0; }
+  .fmt figcaption { font-size: .78rem; color: var(--muted); margin-bottom: .5rem; }
+  /* The demo widths are the point: each format has to hold up in a different column. */
+  .fmt-narrow > div { max-width: 15rem; }
+  @media (min-width: 48rem) {
+    .formats { grid-template-columns: 1fr 1fr; }
+    .fmt-wide { grid-column: 1 / -1; }
+  }
   .note { border-left: 3px solid var(--warn); padding: .25rem 0 .25rem 1rem; color: var(--muted); margin: 1rem 0; }
   .state { font-size: .8rem; color: var(--muted); margin-top: .75rem; }
   .state pre { font-size: .78rem; max-height: 16rem; overflow: auto; }
@@ -112,7 +121,7 @@
 <p>Two lines. The container marks where the banner goes; the script tag can sit anywhere.</p>
 
 <div class="snippet">
-  <button class="copy" data-copy="#minimal">Copy</button>
+  <button type="button" class="copy" data-copy="#minimal">Copy</button>
   <pre id="minimal"><code>&lt;div data-japode-ads&gt;&lt;/div&gt;
 &lt;script src="https://ads.japode.com/v1/ads.js" async&gt;&lt;/script&gt;</code></pre>
 </div>
@@ -120,6 +129,40 @@
 <p>
   That is a working slot. Every attribute below is optional and exists to narrow what it
   shows.
+</p>
+
+<h2>The four formats</h2>
+<p>
+  One campaign entry, four layouts. Each rearranges the same fields rather than asking the
+  advertiser for new ones, and each is fluid inside whatever column you give it — the
+  widths below are deliberately different. Every unit here is live.
+</p>
+
+<div class="formats">
+  <figure class="fmt fmt-wide">
+    <figcaption><code>footer</code> — a wide leaderboard</figcaption>
+    <div data-japode-ads data-ad-format="footer" data-ad-slot="demo-footer"></div>
+  </figure>
+
+  <figure class="fmt">
+    <figcaption><code>in-content</code> — a rectangle inside an article</figcaption>
+    <div data-japode-ads data-ad-format="in-content" data-ad-slot="demo-in-content"></div>
+  </figure>
+
+  <figure class="fmt fmt-narrow">
+    <figcaption><code>sidebar</code> — a tall column</figcaption>
+    <div data-japode-ads data-ad-format="sidebar" data-ad-slot="demo-sidebar"></div>
+  </figure>
+
+  <figure class="fmt fmt-wide">
+    <figcaption><code>strip</code> — one compact line</figcaption>
+    <div data-japode-ads data-ad-format="strip" data-ad-slot="demo-strip"></div>
+  </figure>
+</div>
+
+<p style="font-size:.875rem;color:var(--muted)">
+  Narrow your window: the row formats become columns when their slot gets tight, not when
+  the screen does. A sidebar is narrow on a wide screen too.
 </p>
 
 <h2>Build a snippet</h2>
@@ -133,8 +176,9 @@
         <option value="sidebar">sidebar</option>
         <option value="in-content">in-content</option>
         <option value="footer">footer</option>
+        <option value="strip">strip</option>
       </select>
-      <small>Which layout family to draw. The catalogue names the same three.</small>
+      <small>Which layout family to draw. The catalogue names the same four.</small>
     </div>
     <div class="field">
       <label for="g-slot">Slot name</label>
@@ -169,7 +213,7 @@
 
   <div>
     <div class="snippet">
-      <button class="copy" data-copy="#generated">Copy</button>
+      <button type="button" class="copy" data-copy="#generated">Copy</button>
       <pre id="generated"><code></code></pre>
     </div>
 
@@ -205,9 +249,9 @@
     </tr>
     <tr>
       <td><code>data-ad-format</code></td>
-      <td><code>sidebar</code>, <code>in-content</code>, <code>footer</code></td>
+      <td><code>sidebar</code>, <code>in-content</code>, <code>footer</code>, <code>strip</code></td>
       <td><code>in-content</code></td>
-      <td>The layout family. An unrecognised value warns in the console and falls back rather than leaving your reader with nothing.</td>
+      <td>The layout family — see the four above. An unrecognised value warns in the console and falls back rather than leaving your reader with nothing.</td>
     </tr>
     <tr>
       <td><code>data-ad-slot</code></td><td>any label</td><td>format + position</td>

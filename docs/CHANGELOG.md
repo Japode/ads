@@ -24,6 +24,7 @@
 ## Block D — Banner rendering in HTML
 
 - ✅ **RK11** **No HTML template turns a catalogue entry into a banner** — The renderer builds logo, product, headline, support, CTA and an Ad mark from JSON alone, as one labelled link inside the shadow root, with every string set as text.
+- ✅ **RK12** **Only one banner size is imagined** — Four layouts over one entry: sidebar column, in-content rectangle, footer leaderboard and a compact strip, each fluid against its own slot with container queries and never the viewport.
 
 ## Block E — Random rotation and delivery control
 
