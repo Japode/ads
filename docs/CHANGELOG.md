@@ -53,3 +53,6 @@
 - ✅ **RK36** **The catalogue's updated field is typed by hand and drifts** — The field is gone from the catalogue and refused by the gate: HTTP sends Last-Modified, an ETag and a 304, which check-origin now asserts so the argument for removing it stays true.
 - 🗑 **RK33** **Half the loader a host page downloads is comments** — abandoned: The loader is the only place a site owner can verify the page's claims about tracking and storage, and 7.5KB is not worth making those unverifiable while the logo beside it costs 20KB.
 - ✅ **RK34** **One logo is two thirds of what a page view downloads** — A zlib-only tool re-encodes the logos as indexed colour: viglet drops 20.6KB to 6.6KB, the worst page view 36KB to 22KB, and no dependency was added to do it.
+
+## Block G — The project's public face
+

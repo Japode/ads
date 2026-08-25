@@ -1,5 +1,14 @@
 # Roadmap (active backlog)
 
+## Block F — Metrics, quality and operations
+
+- 📋 **RK38** (deps: RK11 ✅) **logo.alt is required by the schema and ignored by the renderer** — The schema reader assumes it reaches the page and the banner auditor assumes it was forgotten; both are reading a deliberate choice. → §RK38
+- 📋 **RK39** (deps: RK27 ✅, RK21 ✅) **Nothing checks that a deploy actually served what it uploaded** — Five logos were re-encoded today and a person fetching them by hand is what confirmed the domain served them. → §RK39
+
+## Block G — The project's public face
+
+- 📋 **RK37** (deps: —) **A public repository explains itself only on the domain it publishes** — Someone arriving at the source finds a directory listing and nothing saying what the project is or how to run its gate. → §RK37
+
 ## Non-goals
 
 - **No ad server or real-time bidding** The whole network is a static JSON file and a
