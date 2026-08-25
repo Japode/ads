@@ -59,9 +59,13 @@
     padding: 1rem;
     overflow-x: auto;
     margin: 0;
+    max-width: 100%;
     font-size: .875rem;
     line-height: 1.6;
   }
+  /* The snippet is short lines by design; wrapping it beats a scrollbar under a
+     block someone is about to select and copy. */
+  #minimal code, #generated code { white-space: pre-wrap; overflow-wrap: anywhere; }
   pre code { background: none; padding: 0; font-size: inherit; }
   .snippet { position: relative; }
   .copy {
@@ -71,8 +75,12 @@
     font: inherit; font-size: .8rem; cursor: pointer;
   }
   .copy:hover { opacity: .9; }
-  .grid { display: grid; gap: 1.5rem; grid-template-columns: 1fr; }
-  @media (min-width: 56rem) { .grid { grid-template-columns: 1fr 1fr; } }
+  /* minmax(0,1fr), not 1fr: a grid item defaults to min-width:auto, so the wide <pre>
+     in the right column would size its own track from its longest line and take the
+     form panel's width with it. The min-width:0 below is the same fix for the items. */
+  .grid { display: grid; gap: 1.5rem; grid-template-columns: minmax(0, 1fr); }
+  .grid > * { min-width: 0; }
+  @media (min-width: 56rem) { .grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
   .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.25rem; }
   label { display: block; font-size: .8rem; font-weight: 600; margin: 0 0 .25rem; letter-spacing: .01em; }
   .field { margin-bottom: .9rem; }
@@ -86,13 +94,14 @@
   th, td { text-align: left; padding: .6rem .75rem; border-bottom: 1px solid var(--border); vertical-align: top; }
   th { font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
   td:first-child { white-space: nowrap; }
-  .formats { display: grid; gap: 1.75rem; grid-template-columns: 1fr; margin: 1.5rem 0; }
+  .formats { display: grid; gap: 1.75rem; grid-template-columns: minmax(0, 1fr); margin: 1.5rem 0; }
+  .formats > * { min-width: 0; }
   .fmt { margin: 0; }
   .fmt figcaption { font-size: .78rem; color: var(--muted); margin-bottom: .5rem; }
   /* The demo widths are the point: each format has to hold up in a different column. */
   .fmt-narrow > div { max-width: 15rem; }
   @media (min-width: 48rem) {
-    .formats { grid-template-columns: 1fr 1fr; }
+    .formats { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
     .fmt-wide { grid-column: 1 / -1; }
   }
   .note { border-left: 3px solid var(--warn); padding: .25rem 0 .25rem 1rem; color: var(--muted); margin: 1rem 0; }
