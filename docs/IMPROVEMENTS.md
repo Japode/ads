@@ -2,6 +2,19 @@
 
 ## Block A — Ad catalogue in JSON
 
+### §RK22 Cursarei has no public destination
+
+The local checkout's remote is github.com/openviglet/cursarei, and the launch entry
+points there because cursarei has no published site to point at instead. That repository
+is not public: a request returns 404, so the campaign advertises an error page, and it
+is the one entry whose reader is a student rather than a developer who might guess at a
+private repo.
+
+Withdraw it rather than correct it. The contract keeps a disabled campaign in the file
+so its id keeps meaning for counting and rotation, and re-enabling is a one-field change
+the day cursarei has a destination a stranger can open. Guessing at a future URL now
+would put a second dead link in the catalogue instead of one.
+
 ## Block B — Static API on ads.japode.com
 
 ### §RK5 GitHub Pages under a custom domain
@@ -136,3 +149,17 @@ Tests render each catalogue entry in each format and assert the parts that must 
 resolving logo, a non-empty headline, a destination link, applied theme tokens. Paired
 with the schema gate, a catalogue edit then cannot reach production in a state the
 renderer cannot draw.
+
+### §RK23 Destination link checking
+
+The publish gate reads the catalogue and the files beside it and never leaves the
+machine. That is what lets it run on every push, but it means the one thing a banner
+exists to do, send a reader somewhere, is the one thing nothing verifies. Eight
+destinations shipped and one was already dead, found by hand rather than by the gate.
+
+A destination rots with no edit to the catalogue: a repository turns private, a domain
+lapses, a path moves. So the check belongs on a schedule and not in the publish path,
+where a flaky network would block a deploy that changed nothing about the links. A job
+that requests every href, follows redirects and reports what stopped answering turns a
+silent 404 into a message, and a redirect that has become permanent into a catalogue
+edit worth making.

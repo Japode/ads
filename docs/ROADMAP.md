@@ -2,6 +2,8 @@
 
 ## Block A — Ad catalogue in JSON
 
+- 📋 **RK22** (deps: —) **The cursarei campaign points at a repository that returns 404** — github.com/openviglet/cursarei does not resolve publicly, so the banner's only click destination is an error page. → §RK22
+
 ## Block B — Static API on ads.japode.com
 
 - 📋 **RK5** (deps: —) **ads.japode.com serves nothing** — The catalogue and the loader script need a public origin before any site can embed them. → §RK5
@@ -33,6 +35,7 @@
 - 📋 **RK18** (deps: RK11) **Impressions and clicks are not counted** — Nothing shows which product the network is actually sending readers to. → §RK18
 - 📋 **RK19** (deps: RK11) **There is no local preview of the catalogue** — Reviewing how a banner looks should not require publishing it to production first. → §RK19
 - 📋 **RK20** (deps: RK11, RK4 ✅) **Nothing tests the renderer against the catalogue** — A field renamed in the JSON would silently blank a banner on every host site. → §RK20
+- 📋 **RK23** (deps: RK4 ✅) **The gate never checks that a campaign destination resolves** — It validates shape and assets offline, so a dead link passes and keeps passing until a reader reports it. → §RK23
 
 ## Non-goals
 
