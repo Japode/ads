@@ -91,7 +91,10 @@ const jsonResponse = body => Promise.resolve({ ok: true, status: 200, json: () =
  * `pageLang` is what <html lang> says; `containers` are the elements a real
  * querySelectorAll would return for the marker.
  */
-function run(containers, { pageLang, fetch, scriptSrc = 'https://ads.japode.com/v1/ads.js', dark = false, randoms } = {}) {
+function run(containers, {
+  pageLang, fetch, scriptSrc = 'https://ads.japode.com/v1/ads.js',
+  dark = false, randoms, host = 'example.com',
+} = {}) {
   const warnings = [];
   const fetchFn = fetch ?? fakeFetch(() => jsonResponse({ version: 1, campaigns: [] }));
   const document = {
@@ -113,6 +116,7 @@ function run(containers, { pageLang, fetch, scriptSrc = 'https://ads.japode.com/
     fetch: fetchFn,
     URL,
     matchMedia: q => ({ matches: dark && q.includes('dark') }),
+    location: { hostname: host },
   };
   // Shadow the realm's Math so the draw is checkable rather than statistical. Created
   // from Math so floor and the rest still work through the prototype.
@@ -610,6 +614,144 @@ test('the shipped catalogue draws every campaign it carries', () => {
   const seen = new Set();
   for (let i = 0; i < 1000; i++) seen.add(internals.drawWeighted(eligible, () => i / 1000).id);
   assert.equal(seen.size, eligible.length, `unreachable: ${eligible.filter(c => !seen.has(c.id)).map(c => c.id)}`);
+});
+
+// ------------------------------------------------------------------------------------
+// Eligibility
+// ------------------------------------------------------------------------------------
+
+/** The slot shape eligibleFor expects, with the loader's own defaults. */
+const asSlot = (over = {}) => ({ format: 'in-content', exclude: [], tags: [], lang: '', ...over });
+
+/**
+ * Campaign ids as a host-realm array.
+ *
+ * Array.from and not .map: the loader builds its result inside the vm, and mapping a
+ * vm array yields another vm array, which deepStrictEqual rejects on its prototype.
+ */
+const ids = arr => Array.from(arr, c => c.id);
+
+test('a site never advertises itself, listed or not', async () => {
+  const { internals } = run([]);
+  const shio = campaign({ id: 'shio', cta: { label: 'See Shio', href: 'https://shio.viglet.org/' } });
+  const other = campaign({ id: 'other' });
+
+  // Named in the entry's own excludeHosts.
+  const listed = campaign({ id: 'listed', excludeHosts: ['viglet.org'] });
+  assert.deepEqual(ids(internals.eligibleFor([listed, other], asSlot(), 'docs.viglet.org')), ['other'],
+    'a listed domain covers its subdomains');
+
+  // Not listed anywhere: the destination's own hostname is what catches it. This is the
+  // case nobody remembers to write down.
+  assert.deepEqual(ids(internals.eligibleFor([shio, other], asSlot(), 'shio.viglet.org')), ['other']);
+});
+
+test('domain matching stops at a label boundary', () => {
+  const { internals } = run([]);
+  assert.equal(internals.under('docs.viglet.org', 'viglet.org'), true);
+  assert.equal(internals.under('viglet.org', 'viglet.org'), true);
+  assert.equal(internals.under('notviglet.org', 'viglet.org'), false, 'a suffix is not a domain');
+  assert.equal(internals.under('viglet.org.evil.com', 'viglet.org'), false);
+});
+
+test('a slot can name campaigns it will never carry', () => {
+  const { internals } = run([]);
+  const p = [campaign({ id: 'a' }), campaign({ id: 'b' })];
+  const kept = internals.eligibleFor(p, asSlot({ exclude: ['a'] }), 'example.com');
+  assert.deepEqual(ids(kept), ['b']);
+});
+
+test('a tag filter includes rather than excludes', () => {
+  const { internals } = run([]);
+  const p = [
+    campaign({ id: 'cms', tags: ['cms', 'open-source'] }),
+    campaign({ id: 'docker', tags: ['docker'] }),
+    campaign({ id: 'untagged', tags: undefined }),
+  ];
+  const kept = internals.eligibleFor(p, asSlot({ tags: ['cms'] }), 'example.com');
+  // The untagged entry matches no filter: a slot that asked for a topic did not ask for
+  // whatever happened to declare nothing.
+  assert.deepEqual(ids(kept), ['cms']);
+});
+
+test('language matches on the primary subtag', () => {
+  const { internals } = run([]);
+  const p = [
+    campaign({ id: 'br', lang: ['pt-BR'] }),
+    campaign({ id: 'en', lang: ['en'] }),
+    campaign({ id: 'neutral', lang: undefined }),
+  ];
+  // A page in pt gets pt-BR copy; the split would otherwise make them different
+  // languages and leave a Portuguese page with English banners.
+  assert.deepEqual(
+    ids(internals.eligibleFor(p, asSlot({ lang: 'pt' }), 'example.com')),
+    ['br', 'neutral']
+  );
+  assert.deepEqual(
+    ids(internals.eligibleFor(p, asSlot({ lang: 'en-GB' }), 'example.com')),
+    ['en', 'neutral']
+  );
+});
+
+test('a campaign can name the formats it was written for', () => {
+  const { internals } = run([]);
+  const p = [
+    campaign({ id: 'wide', slots: ['footer'] }),
+    campaign({ id: 'anywhere' }),
+  ];
+  assert.deepEqual(
+    ids(internals.eligibleFor(p, asSlot({ format: 'strip' }), 'example.com')),
+    ['anywhere']
+  );
+});
+
+test('filtering happens before the draw, so weights keep their proportion', () => {
+  // If a filtered entry still counted toward the total, the survivors would each draw
+  // less often than the catalogue says, in a way nothing would ever surface.
+  const { internals } = run([]);
+  const p = [
+    campaign({ id: 'gone', weight: 8, lang: ['de'] }),
+    campaign({ id: 'a', weight: 1, lang: ['en'] }),
+    campaign({ id: 'b', weight: 1, lang: ['en'] }),
+  ];
+  const kept = internals.eligibleFor(p, asSlot({ lang: 'en' }), 'example.com');
+  assert.deepEqual(ids(kept), ['a', 'b']);
+  // Half and half, not one in ten each.
+  assert.equal(internals.drawWeighted(kept, () => 0.49).id, 'a');
+  assert.equal(internals.drawWeighted(kept, () => 0.51).id, 'b');
+});
+
+test('a slot with nothing eligible collapses instead of drawing anyway', async () => {
+  const container = el({ 'data-japode-ads': '', 'data-ad-tags': 'nothing-has-this' });
+  const h = run([container], { fetch: withCampaigns(campaign()) });
+  await h.settled();
+  assert.equal(h.exposed.slots[0].showing, null);
+  assert.match(container.shadowRoot.children[0].textContent, /display: none/);
+});
+
+test('two slots on one page filter independently', async () => {
+  const en = el({ 'data-japode-ads': '', 'data-ad-lang': 'en' });
+  const pt = el({ 'data-japode-ads': '', 'data-ad-lang': 'pt-BR' });
+  const h = run([en, pt], {
+    fetch: withCampaigns(campaign({ id: 'en-one', lang: ['en'] }), campaign({ id: 'pt-one', lang: ['pt-BR'] })),
+    randoms: [0],
+  });
+  await h.settled();
+  assert.deepEqual(h.exposed.slots.map(s => s.showing), ['en-one', 'pt-one']);
+});
+
+test('the shipped catalogue keeps every Viglet property off its own sites', () => {
+  // The excludeHosts written in RK2 were never read by anything until now.
+  const { internals } = run([]);
+  const live = JSON.parse(readFileSync(join(root, 'site/v1/catalogue.json'), 'utf8'));
+  const p = internals.eligible(live.campaigns);
+  for (const host of ['shio.viglet.org', 'turing.viglet.org', 'www.viglet.org', 'docs.viglet.org']) {
+    const kept = ids(internals.eligibleFor(p, asSlot(), host));
+    for (const id of ['shio', 'turing', 'viglet']) {
+      assert.ok(!kept.includes(id), `${id} would advertise itself on ${host}`);
+    }
+    assert.ok(kept.length, `${host} would have nothing at all to show`);
+  }
 });
 
 // ------------------------------------------------------------------------------------

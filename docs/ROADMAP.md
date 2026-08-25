@@ -2,7 +2,6 @@
 
 ## Block E — Random rotation and delivery control
 
-- 📋 **RK16** (deps: RK15 ✅) **A site can advertise itself** — Turing pages should never render a Turing banner, and a slot may want to filter by tag or language. → §RK16
 - 📋 **RK17** (deps: RK15 ✅) **A returning reader keeps seeing the same pick** — Without a short memory of what was already shown, rotation reads as a bug rather than as variety. → §RK17
 
 ## Block F — Metrics, quality and operations

@@ -32,6 +32,7 @@
 ## Block E — Random rotation and delivery control
 
 - ✅ **RK15** **Every visitor would see the same campaign** — Each slot draws in the browser from the whole catalogue, weighted by the declared field, and slots on one page exclude what the others already took.
+- ✅ **RK16** **A site can advertise itself** — The pick drops any campaign whose destination or excludeHosts covers the host page, plus the slot's own excluded ids, tag filter, language and format, all before the draw.
 
 ## Block F — Metrics, quality and operations
 

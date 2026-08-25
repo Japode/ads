@@ -506,6 +506,101 @@
     ].join('\n');
   }
 
+  // ---------------------------------------------------------------------------------
+  // Eligibility
+  // ---------------------------------------------------------------------------------
+
+  /** The hostname of a URL, or '' when it cannot be read. */
+  function hostOf(url) {
+    try {
+      return new URL(url).hostname.toLowerCase();
+    } catch (e) {
+      return '';
+    }
+  }
+
+  /**
+   * Does `host` fall under `domain`?
+   *
+   * Suffix matching on a label boundary, so listing viglet.org covers
+   * docs.viglet.org without listing it, and never covers notviglet.org.
+   */
+  function under(host, domain) {
+    if (!host || !domain) return false;
+    domain = domain.toLowerCase();
+    return host === domain || host.slice(-(domain.length + 1)) === '.' + domain;
+  }
+
+  /**
+   * Is this campaign about the page it would be drawn on?
+   *
+   * Two sources, because they answer different halves. The catalogue's excludeHosts is
+   * what a product uses to name the sites it owns; the destination's own hostname is
+   * the case nobody remembers to list — a page linking to itself is an advertisement
+   * for where the reader already is.
+   */
+  function advertisesHost(campaign, host) {
+    if (!host) return false;
+    if (under(host, hostOf(campaign.cta.href))) return true;
+    var listed = campaign.excludeHosts || [];
+    for (var i = 0; i < listed.length; i++) {
+      if (under(host, listed[i])) return true;
+    }
+    return false;
+  }
+
+  /** The primary subtag: pt-BR and pt are the same language for this purpose. */
+  function primary(tag) {
+    return String(tag || '').toLowerCase().split('-')[0];
+  }
+
+  /**
+   * Everything a slot may draw, in catalogue order.
+   *
+   * Filtering happens here rather than inside the draw so the weighting never has to
+   * compensate for an entry that was never eligible: a campaign removed for language
+   * takes its weight with it, and the remaining shares stay in the proportion the
+   * catalogue declared.
+   */
+  function eligibleFor(pool, slot, host) {
+    var out = [];
+    for (var i = 0; i < pool.length; i++) {
+      var c = pool[i];
+
+      if (advertisesHost(c, host)) continue;
+      if (slot.exclude.indexOf(c.id) !== -1) continue;
+
+      // A campaign may name the formats it was written for; absent means all of them.
+      if (c.slots && c.slots.indexOf(slot.format) === -1) continue;
+
+      // An include filter: the slot names the topics it will carry, and an entry has to
+      // match one. A campaign with no tags matches no filter, which is the honest
+      // reading of a slot that asked for a topic.
+      if (slot.tags.length) {
+        var tagged = false;
+        var tags = c.tags || [];
+        for (var t = 0; t < tags.length && !tagged; t++) {
+          if (slot.tags.indexOf(tags[t]) !== -1) tagged = true;
+        }
+        if (!tagged) continue;
+      }
+
+      // A campaign that declares no language is copy that reads anywhere, so it is
+      // never filtered out by one.
+      if (slot.lang && c.lang && c.lang.length) {
+        var wanted = primary(slot.lang);
+        var speaks = false;
+        for (var l = 0; l < c.lang.length && !speaks; l++) {
+          if (primary(c.lang[l]) === wanted) speaks = true;
+        }
+        if (!speaks) continue;
+      }
+
+      out.push(c);
+    }
+    return out;
+  }
+
   /** A campaign's share of the draw. Absent means 1, which is what most entries want. */
   function weightOf(c) {
     return typeof c.weight === 'number' ? c.weight : 1;
@@ -646,13 +741,16 @@
         // Nothing is asked of a server, which is what keeps the network a static file.
         var pool = eligible(catalogue.campaigns);
         var random = (win.Math || Math).random;
+        var host = (win.location && win.location.hostname || '').toLowerCase();
         var taken = [];
 
         for (var s = 0; s < slots.length; s++) {
           var slot = slots[s];
           if (!slot.root) continue;
 
-          var campaign = pickFor(pool, taken, random);
+          // Per slot, not once for the page: two slots can ask for different topics or
+          // languages, and the host exclusion is the only part they share.
+          var campaign = pickFor(eligibleFor(pool, slot, host), taken, random);
 
           // No campaign is not an error. The slot gives its reserved space back and
           // collapses, exactly as it does when the catalogue could not be read at all.
@@ -699,6 +797,9 @@
       loadCatalogue: loadCatalogue,
       isolate: isolate,
       eligible: eligible,
+      eligibleFor: eligibleFor,
+      advertisesHost: advertisesHost,
+      under: under,
       weightOf: weightOf,
       drawWeighted: drawWeighted,
       pickFor: pickFor,

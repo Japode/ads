@@ -2,13 +2,6 @@
 
 ## Block E — Random rotation and delivery control
 
-### §RK16 Eligibility filters
-
-The pick excludes any campaign whose destination is the host site itself, matched on
-domain, and honours include and exclude tags plus a language field set on the slot. The
-filter runs before the draw, so the weighting never has to compensate for an entry that
-was never eligible.
-
 ### §RK17 Frequency and recency
 
 The loader remembers the last few campaigns it rendered for this reader and demotes them
