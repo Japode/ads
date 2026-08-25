@@ -2,14 +2,6 @@
 
 ## Block A — Ad catalogue in JSON
 
-### §RK4 Catalogue validation
-
-A schema check refuses the file before it is published: unknown fields, missing
-destination URLs, assets that do not resolve, weights out of range. It runs in the
-deploy workflow rather than in the loader, because by the time a browser sees a bad
-catalogue the damage is already on someone else's page, and on a static host there is
-nothing to roll back but another push.
-
 ## Block B — Static API on ads.japode.com
 
 ### §RK5 GitHub Pages under a custom domain

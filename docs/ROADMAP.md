@@ -2,14 +2,12 @@
 
 ## Block A — Ad catalogue in JSON
 
-- 📋 **RK4** (deps: RK1 ✅) **Nothing rejects a malformed catalogue before it is published** — One broken JSON file blanks every banner on every host site at once. → §RK4
-
 ## Block B — Static API on ads.japode.com
 
 - 📋 **RK5** (deps: —) **ads.japode.com serves nothing** — The catalogue and the loader script need a public origin before any site can embed them. → §RK5
 - 📋 **RK6** (deps: RK5) **GitHub Pages serves headers we cannot configure** — Pages fixes its own CORS and cache lifetime, so freshness has to come from the URL rather than from a policy we choose. → §RK6
 - 📋 **RK7** (deps: RK5, RK1 ✅) **The endpoint has no version path and no fallback payload** — A later schema change would break every snippet already pasted into a site we do not control. → §RK7
-- 📋 **RK21** (deps: RK5, RK4) **Nothing builds and publishes the site to Pages** — The catalogue, the loader and the assets have to reach the published site by a workflow rather than by hand. → §RK21
+- 📋 **RK21** (deps: RK5, RK4 ✅) **Nothing builds and publishes the site to Pages** — The catalogue, the loader and the assets have to reach the published site by a workflow rather than by hand. → §RK21
 
 ## Block C — Embed snippet and JavaScript loader
 
@@ -34,7 +32,7 @@
 
 - 📋 **RK18** (deps: RK11) **Impressions and clicks are not counted** — Nothing shows which product the network is actually sending readers to. → §RK18
 - 📋 **RK19** (deps: RK11) **There is no local preview of the catalogue** — Reviewing how a banner looks should not require publishing it to production first. → §RK19
-- 📋 **RK20** (deps: RK11, RK4) **Nothing tests the renderer against the catalogue** — A field renamed in the JSON would silently blank a banner on every host site. → §RK20
+- 📋 **RK20** (deps: RK11, RK4 ✅) **Nothing tests the renderer against the catalogue** — A field renamed in the JSON would silently blank a banner on every host site. → §RK20
 
 ## Non-goals
 
