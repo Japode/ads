@@ -2,14 +2,6 @@
 
 ## Block A — Ad catalogue in JSON
 
-### §RK2 Launch inventory
-
-Eight campaigns: shio.viglet.org, turing.viglet.org, cursarei.com.br,
-alegauss.github.io/roadkeep, alegauss.github.io/mini-gpt, alegauss.github.io/freewilly,
-alegauss.github.io/claude-tray and viglet.org. Each needs its own copy, colours and
-destination link. Writing all eight is also the first real test of whether the schema is
-expressive enough.
-
 ### §RK4 Catalogue validation
 
 A schema check refuses the file before it is published: unknown fields, missing
