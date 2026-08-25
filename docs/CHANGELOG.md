@@ -31,6 +31,8 @@
 
 ## Block E — Random rotation and delivery control
 
+- ✅ **RK15** **Every visitor would see the same campaign** — Each slot draws in the browser from the whole catalogue, weighted by the declared field, and slots on one page exclude what the others already took.
+
 ## Block F — Metrics, quality and operations
 
 - ✅ **RK24** **Three campaign destinations are not the product's canonical URL** — cursarei points at cursarei.com.br and is back in rotation, turing at turing.viglet.org and viglet at the www host its apex 301s to; all eight now answer 200 on the first hop.

@@ -506,6 +506,57 @@
     ].join('\n');
   }
 
+  /** A campaign's share of the draw. Absent means 1, which is what most entries want. */
+  function weightOf(c) {
+    return typeof c.weight === 'number' ? c.weight : 1;
+  }
+
+  /**
+   * Draw one campaign, weighted by the field the entry declares.
+   *
+   * Walks the cumulative weight rather than building a bucket array: an entry may
+   * declare 0.5, so there is nothing to repeat an integer number of times, and a
+   * catalogue of eight does not need the index.
+   *
+   * `random` is a parameter because the alternative is a test hook in shipped code.
+   */
+  function drawWeighted(pool, random) {
+    if (!pool.length) return null;
+    var total = 0;
+    var i;
+    for (i = 0; i < pool.length; i++) total += weightOf(pool[i]);
+    if (total <= 0) return null;
+
+    var point = random() * total;
+    for (i = 0; i < pool.length; i++) {
+      point -= weightOf(pool[i]);
+      // Strictly less than zero, so an entry weighted 0 can never be landed on by a
+      // point that merely reached it.
+      if (point < 0) return pool[i];
+    }
+    // Only reachable through floating-point drift at the very top of the range.
+    return pool[pool.length - 1];
+  }
+
+  /**
+   * One campaign for this slot, avoiding what the other slots on the page already took.
+   *
+   * Two banners for the same product stacked down one page reads as a bug, so the
+   * already-drawn are removed before the draw rather than redrawn after a collision —
+   * a retry loop on a catalogue smaller than the number of slots never terminates.
+   *
+   * When the page asks for more slots than there are campaigns, repeating is the right
+   * answer: an empty slot is worse than a second sighting, and the site owner chose how
+   * many slots to place.
+   */
+  function pickFor(pool, taken, random) {
+    var fresh = [];
+    for (var i = 0; i < pool.length; i++) {
+      if (taken.indexOf(pool[i].id) === -1) fresh.push(pool[i]);
+    }
+    return drawWeighted(fresh.length ? fresh : pool, random);
+  }
+
   /** Campaigns a slot may draw at all: withdrawn and zero-weighted entries are out. */
   function eligible(campaigns) {
     var out = [];
@@ -591,15 +642,17 @@
       loadCatalogue(win, now).then(function (catalogue) {
         win.japodeAds.campaigns = catalogue.campaigns.length;
 
+        // Every decision here is made in the reader's browser from the whole catalogue.
+        // Nothing is asked of a server, which is what keeps the network a static file.
+        var pool = eligible(catalogue.campaigns);
+        var random = (win.Math || Math).random;
+        var taken = [];
+
         for (var s = 0; s < slots.length; s++) {
           var slot = slots[s];
           if (!slot.root) continue;
 
-          // Which campaign a slot gets is not this task's: weighting and per-slot
-          // filtering arrive with rotation and delivery control. Taking the first
-          // eligible entry is a seam, not a policy, and it is deliberately the least
-          // interesting choice so that replacing it changes nothing about the template.
-          var campaign = eligible(catalogue.campaigns)[0];
+          var campaign = pickFor(pool, taken, random);
 
           // No campaign is not an error. The slot gives its reserved space back and
           // collapses, exactly as it does when the catalogue could not be read at all.
@@ -608,6 +661,7 @@
             continue;
           }
 
+          taken.push(campaign.id);
           win.japodeAds.slots[s].showing = draw(win, doc, slot, campaign, origin);
         }
       });
@@ -645,6 +699,9 @@
       loadCatalogue: loadCatalogue,
       isolate: isolate,
       eligible: eligible,
+      weightOf: weightOf,
+      drawWeighted: drawWeighted,
+      pickFor: pickFor,
       RESERVED: RESERVED,
       reserve: reserve,
       collapse: collapse,

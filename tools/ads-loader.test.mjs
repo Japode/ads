@@ -91,7 +91,7 @@ const jsonResponse = body => Promise.resolve({ ok: true, status: 200, json: () =
  * `pageLang` is what <html lang> says; `containers` are the elements a real
  * querySelectorAll would return for the marker.
  */
-function run(containers, { pageLang, fetch, scriptSrc = 'https://ads.japode.com/v1/ads.js', dark = false } = {}) {
+function run(containers, { pageLang, fetch, scriptSrc = 'https://ads.japode.com/v1/ads.js', dark = false, randoms } = {}) {
   const warnings = [];
   const fetchFn = fetch ?? fakeFetch(() => jsonResponse({ version: 1, campaigns: [] }));
   const document = {
@@ -114,6 +114,13 @@ function run(containers, { pageLang, fetch, scriptSrc = 'https://ads.japode.com/
     URL,
     matchMedia: q => ({ matches: dark && q.includes('dark') }),
   };
+  // Shadow the realm's Math so the draw is checkable rather than statistical. Created
+  // from Math so floor and the rest still work through the prototype.
+  if (randoms) {
+    const queue = randoms.slice();
+    context.Math = Object.create(Math);
+    context.Math.random = () => (queue.length > 1 ? queue.shift() : queue[0]);
+  }
   context.window = context;
   vm.createContext(context);
   vm.runInContext(source, context, { filename: 'ads.js' });
@@ -519,6 +526,90 @@ test('the formats match the catalogue schema exactly', () => {
   const schema = JSON.parse(readFileSync(join(root, 'schema/v1/catalogue.schema.json'), 'utf8'));
   const { formats } = run([]);
   assert.deepEqual(formats.slice().sort(), schema.$defs.slot.enum.slice().sort());
+});
+
+// ------------------------------------------------------------------------------------
+// The draw
+// ------------------------------------------------------------------------------------
+
+const pool = (...specs) => specs.map(([id, weight]) => campaign({ id, weight }));
+
+test('the draw lands in the band its weight buys', () => {
+  // Three entries, weights 1/3/1, total 5. The bands are [0,.2) [.2,.8) [.8,1).
+  const { internals } = run([]);
+  const p = pool(['a', 1], ['b', 3], ['c', 1]);
+  const at = r => internals.drawWeighted(p, () => r).id;
+  assert.equal(at(0), 'a');
+  assert.equal(at(0.19), 'a');
+  assert.equal(at(0.2), 'b');
+  assert.equal(at(0.79), 'b');
+  assert.equal(at(0.8), 'c');
+  assert.equal(at(0.999), 'c');
+});
+
+test('a weight of zero is never landed on, even at its own boundary', () => {
+  // Walking cumulative weight, the point reaches a zero-weight entry exactly and must
+  // pass through it rather than stop.
+  const { internals } = run([]);
+  const p = pool(['a', 1], ['zero', 0], ['c', 1]);
+  for (const r of [0, 0.4999, 0.5, 0.7, 0.999]) {
+    assert.notEqual(internals.drawWeighted(p, () => r).id, 'zero', `r=${r}`);
+  }
+});
+
+test('a fractional weight is honoured, not rounded', () => {
+  // viglet ships at 0.5 precisely so it does not compete evenly with its own children.
+  const { internals } = run([]);
+  const p = pool(['half', 0.5], ['whole', 1]);
+  assert.equal(internals.drawWeighted(p, () => 0.32).id, 'half');
+  assert.equal(internals.drawWeighted(p, () => 0.34).id, 'whole');
+});
+
+test('an entry that declares no weight draws as one', () => {
+  const { internals } = run([]);
+  const bare = campaign({ id: 'bare' });
+  delete bare.weight;
+  assert.equal(internals.weightOf(bare), 1);
+});
+
+test('two slots on one page never draw the same campaign', async () => {
+  // Always landing on the first band would repeat without the exclusion.
+  const a = el({ 'data-japode-ads': '' });
+  const b = el({ 'data-japode-ads': '' });
+  const h = run([a, b], { fetch: withCampaigns(...pool(['a', 1], ['b', 1])), randoms: [0] });
+  await h.settled();
+  const [first, second] = h.exposed.slots.map(s => s.showing);
+  assert.equal(first, 'a');
+  assert.equal(second, 'b', 'the second slot drew from what was left');
+});
+
+test('more slots than campaigns repeats rather than leaving one empty', async () => {
+  // A retry-on-collision loop would spin forever here. The site owner chose how many
+  // slots to place, and an empty one is worse than a second sighting.
+  const containers = [el({ 'data-japode-ads': '' }), el({ 'data-japode-ads': '' })];
+  const h = run(containers, { fetch: withCampaigns(campaign({ id: 'only' })), randoms: [0] });
+  await h.settled();
+  assert.deepEqual(h.exposed.slots.map(s => s.showing), ['only', 'only']);
+});
+
+test('the pick is made in the browser from the whole catalogue', async () => {
+  // One request for the catalogue and nothing else: no selection endpoint, which is
+  // what lets the entire network be a static file.
+  const h = run([el({ 'data-japode-ads': '' })], { fetch: withCampaigns(...pool(['a', 1], ['b', 1])) });
+  await h.settled();
+  assert.equal(h.fetches.length, 1);
+  assert.match(h.fetches[0], /catalogue\.json/);
+});
+
+test('the shipped catalogue draws every campaign it carries', () => {
+  // Weights that made an entry unreachable would be silent: the banner still renders,
+  // just never that one.
+  const { internals } = run([]);
+  const live = JSON.parse(readFileSync(join(root, 'site/v1/catalogue.json'), 'utf8'));
+  const eligible = internals.eligible(live.campaigns);
+  const seen = new Set();
+  for (let i = 0; i < 1000; i++) seen.add(internals.drawWeighted(eligible, () => i / 1000).id);
+  assert.equal(seen.size, eligible.length, `unreachable: ${eligible.filter(c => !seen.has(c.id)).map(c => c.id)}`);
 });
 
 // ------------------------------------------------------------------------------------

@@ -2,13 +2,6 @@
 
 ## Block E — Random rotation and delivery control
 
-### §RK15 Weighted random pick
-
-Selection happens in the browser from the full catalogue: draw one eligible campaign per
-slot, weighted by the field the entry declares. Two slots on one page draw without
-repeating each other. Nothing is decided on a server, which is what keeps the whole
-network a static file.
-
 ### §RK16 Eligibility filters
 
 The pick excludes any campaign whose destination is the host site itself, matched on
