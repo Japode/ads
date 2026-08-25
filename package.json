@@ -11,7 +11,8 @@
     "check-links": "node tools/check-links.mjs",
     "preview": "node tools/preview.mjs",
     "test": "node --test",
-    "optimise-logos": "node tools/optimise-logos.mjs"
+    "optimise-logos": "node tools/optimise-logos.mjs",
+    "check-deploy": "node tools/check-deploy.mjs"
   },
   "devDependencies": {
     "ajv": "^8.17.1",

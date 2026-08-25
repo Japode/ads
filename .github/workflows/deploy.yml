@@ -61,3 +61,18 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v5
+
+  # After the deploy and never before it. This one leaves the machine, and a network check
+  # that can block a publish is one that will eventually block a good one — running here it
+  # can only mark the run, which is what it is for: saying whether the domain actually
+  # started serving what was uploaded.
+  verify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+      - name: The domain serves what site/ contains
+        run: node tools/check-deploy.mjs
