@@ -4,8 +4,6 @@
 
 ## Block G — The project's public face
 
-- 📋 **RK40** (deps: RK37 ✅) **The repository claims a licence it does not carry the text of** — package.json says Apache-2.0, no LICENSE file exists, and the field was filled while building the gate rather than chosen. → §RK40
-
 ## Non-goals
 
 - **No ad server or real-time bidding** The whole network is a static JSON file and a

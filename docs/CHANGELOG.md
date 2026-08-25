@@ -59,3 +59,4 @@
 ## Block G — The project's public face
 
 - ✅ **RK37** **A public repository explains itself only on the domain it publishes** — A README for whoever reads the source: what the network is, where the three parts live, how to run the gate and the preview, and that site/ is served byte for byte.
+- ✅ **RK40** **The repository claims a licence it does not carry the text of** — The canonical Apache-2.0 text, identical to every sibling project's, plus a README section saying the logos are marks the licence's clause 6 grants no rights in.

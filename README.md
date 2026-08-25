@@ -85,6 +85,11 @@ never published — the deploy uploads `site/` and nothing else.
 The roadmap's non-goals are worth reading before proposing anything: they are the
 constraints the design is built out of, not a wishlist that ran out of time.
 
----
+## Licence
 
-Declared Apache-2.0 in `package.json`. The licence text is not in the repository yet.
+The catalogue, the loader and the tooling are [Apache-2.0](LICENSE), matching every other
+project in this family.
+
+The logos in `site/logos/` are not covered by it. They are the marks of the products they
+name, taken from those projects' own repositories, and clause 6 of the licence grants no
+rights in a trade mark. Reuse of the code here is not permission to use anybody's logo.
