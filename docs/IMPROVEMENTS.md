@@ -2,23 +2,6 @@
 
 ## Block F — Metrics, quality and operations
 
-### §RK33 Minifying costs the readable artifact
-
-Measured while setting the page-weight budget: ads.js is 9.3KB gzipped, and 4.8KB of
-that is comments. Stripping them halves the file. Those comments are why the loader is
-maintainable and none of them are worth a browser downloading, on every host page,
-forever.
-
-What this costs is the property that site/ is the artifact. Today the served file is the
-source file, tests run against the bytes the domain hands out, and the deploy workflow
-copies a directory. A minifier makes site/v1/ads.js a source whose output is generated,
-which means the tests have to keep running against the built file or they stop being
-about what a host page receives.
-
-That is the decision to weigh, not the 4.8KB. A build step is worth it if the minifier
-is one dependency the deploy already has an excuse to install, and it is not worth it if
-keeping the artifact readable and directly testable is the thing this project is for.
-
 ### §RK34 Quantizing needs a toolchain, not a resize
 
 The budget is set at 40KB for a page view and the shipped worst case is 31KB, of which
