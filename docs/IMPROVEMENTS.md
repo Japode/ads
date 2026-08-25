@@ -4,20 +4,16 @@
 
 ## Block G — The project's public face
 
-### §RK37 A README for whoever reads the source
+### §RK40 A licence claim with nothing behind it
 
-The repository is public and has no README, so the only place the project explains
-itself is the domain it publishes. Someone who arrives from a commit, a search or the
-snippet pasted into a site they maintain lands on a directory listing of site/, tools/
-and docs/ with nothing saying what any of it is.
+package.json declares Apache-2.0 and no licence text is in the repository, so the claim
+rests on one field in a manifest. For a public repository whose whole pitch is that a
+stranger can read the loader before pasting it into their own page, that is the wrong
+place for the terms to live and the wrong amount of them to state.
 
-What belongs here is not the documentation page rewritten. That page addresses a site
-owner about to paste a block, and it should stay that. A README addresses somebody
-reading the source: what the network is, that it publishes eight of our own products and
-takes no third parties, where the three moving parts live, and how to run the gate, the
-preview and the tests. The design rationale stays in the governed files and is not
-pasted into it.
-
-The one thing it has to state plainly is the property the whole repository is built on:
-what site/ contains is what the domain serves, byte for byte, which is why the gate can
-validate the real file and the preview can serve the real thing.
+The declaration was written into package.json while building the publish gate, by
+whoever needed the field filled, not by anybody choosing a licence. So this is two
+questions and the second only follows the first: whether Apache-2.0 is the intended
+licence for the catalogue, the loader and the tooling, and then supplying its text. The
+logos are a separate matter again — they are product marks rather than code, and a
+source licence has no business granting anything about them.

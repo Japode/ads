@@ -4,7 +4,7 @@
 
 ## Block G — The project's public face
 
-- 📋 **RK37** (deps: —) **A public repository explains itself only on the domain it publishes** — Someone arriving at the source finds a directory listing and nothing saying what the project is or how to run its gate. → §RK37
+- 📋 **RK40** (deps: RK37 ✅) **The repository claims a licence it does not carry the text of** — package.json says Apache-2.0, no LICENSE file exists, and the field was filled while building the gate rather than chosen. → §RK40
 
 ## Non-goals
 

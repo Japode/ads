@@ -58,3 +58,4 @@
 
 ## Block G — The project's public face
 
+- ✅ **RK37** **A public repository explains itself only on the domain it publishes** — A README for whoever reads the source: what the network is, where the three parts live, how to run the gate and the preview, and that site/ is served byte for byte.
