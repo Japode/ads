@@ -1,20 +1,5 @@
 # Improvements
 
-## Block A — Ad catalogue in JSON
-
-### §RK22 Cursarei has no public destination
-
-The local checkout's remote is github.com/openviglet/cursarei, and the launch entry
-points there because cursarei has no published site to point at instead. That repository
-is not public: a request returns 404, so the campaign advertises an error page, and it
-is the one entry whose reader is a student rather than a developer who might guess at a
-private repo.
-
-Withdraw it rather than correct it. The contract keeps a disabled campaign in the file
-so its id keeps meaning for counting and rotation, and re-enabling is a one-field change
-the day cursarei has a destination a stranger can open. Guessing at a future URL now
-would put a second dead link in the catalogue instead of one.
-
 ## Block B — Static API on ads.japode.com
 
 ### §RK5 GitHub Pages under a custom domain

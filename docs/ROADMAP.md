@@ -1,9 +1,5 @@
 # Roadmap (active backlog)
 
-## Block A — Ad catalogue in JSON
-
-- 📋 **RK22** (deps: —) **The cursarei campaign points at a repository that returns 404** — github.com/openviglet/cursarei does not resolve publicly, so the banner's only click destination is an error page. → §RK22
-
 ## Block B — Static API on ads.japode.com
 
 - 📋 **RK5** (deps: —) **ads.japode.com serves nothing** — The catalogue and the loader script need a public origin before any site can embed them. → §RK5

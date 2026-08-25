@@ -159,6 +159,7 @@
       "headline": "Cursos brasileiros num lugar so",
       "support": "Graduacao, pos, MBA e cursos livres de varias instituicoes, num agregador independente.",
       "cta": { "label": "Ver o projeto", "href": "https://github.com/openviglet/cursarei" },
+      "enabled": false,
       "theme": {
         "light": { "accent": "#0d9488", "onAccent": "#ffffff", "surface": "#f8fafc", "text": "#0f172a", "muted": "#475569", "border": "#e2e8f0" },
         "dark":  { "accent": "#2dd4bf", "onAccent": "#042f2e", "surface": "#0f172a", "text": "#e2e8f0", "muted": "#94a3b8", "border": "#1e293b" }

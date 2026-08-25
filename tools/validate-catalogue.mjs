@@ -145,5 +145,13 @@ if (errors.length) {
   process.exit(1);
 }
 
-const n = catalogue?.campaigns?.length ?? 0;
-console.log(`${label}: ${n} campaign(s), valid against ${rel(schemaPath)}, every asset resolves at its declared size.`);
+// Report what can actually be drawn, not what is in the file: once an entry can be
+// withdrawn without being deleted, the total stops being the number that matters.
+const all = catalogue?.campaigns ?? [];
+const live = all.filter(c => c?.enabled !== false && c?.weight !== 0);
+const withdrawn = all.length - live.length;
+console.log(
+  `${label}: ${live.length} campaign(s) in rotation` +
+  (withdrawn ? `, ${withdrawn} withdrawn (${all.filter(c => !live.includes(c)).map(c => c.id).join(', ')})` : '') +
+  `, valid against ${rel(schemaPath)}, every asset resolves at its declared size.`
+);
