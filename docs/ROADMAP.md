@@ -2,16 +2,15 @@
 
 ## Block A — Ad catalogue in JSON
 
-- 📋 **RK1** (deps: —) **No JSON schema describes an ad campaign** — Without a data contract nothing can parameterise the banner, its logo and its link from the JSON alone. → §RK1
-- 📋 **RK2** (deps: RK1) **The eight launch products have no entry in the catalogue** — Shio, Turing, Cursarei, Roadkeep, Mini-GPT, FreeWilly, Claude Tray and Viglet are the whole initial inventory. → §RK2
-- 📋 **RK3** (deps: RK1) **Product logos have no hosted, stable URL** — A banner is assembled around a logo, so every campaign needs an asset URL that works on light and dark surroundings. → §RK3
-- 📋 **RK4** (deps: RK1) **Nothing rejects a malformed catalogue before it is published** — One broken JSON file blanks every banner on every host site at once. → §RK4
+- 📋 **RK2** (deps: RK1 ✅) **The eight launch products have no entry in the catalogue** — Shio, Turing, Cursarei, Roadkeep, Mini-GPT, FreeWilly, Claude Tray and Viglet are the whole initial inventory. → §RK2
+- 📋 **RK3** (deps: RK1 ✅) **Product logos have no hosted, stable URL** — A banner is assembled around a logo, so every campaign needs an asset URL that works on light and dark surroundings. → §RK3
+- 📋 **RK4** (deps: RK1 ✅) **Nothing rejects a malformed catalogue before it is published** — One broken JSON file blanks every banner on every host site at once. → §RK4
 
 ## Block B — Static API on ads.japode.com
 
 - 📋 **RK5** (deps: —) **ads.japode.com serves nothing** — The catalogue and the loader script need a public origin before any site can embed them. → §RK5
 - 📋 **RK6** (deps: RK5) **GitHub Pages serves headers we cannot configure** — Pages fixes its own CORS and cache lifetime, so freshness has to come from the URL rather than from a policy we choose. → §RK6
-- 📋 **RK7** (deps: RK5, RK1) **The endpoint has no version path and no fallback payload** — A later schema change would break every snippet already pasted into a site we do not control. → §RK7
+- 📋 **RK7** (deps: RK5, RK1 ✅) **The endpoint has no version path and no fallback payload** — A later schema change would break every snippet already pasted into a site we do not control. → §RK7
 - 📋 **RK21** (deps: RK5, RK4) **Nothing builds and publishes the site to Pages** — The catalogue, the loader and the assets have to reach the published site by a workflow rather than by hand. → §RK21
 
 ## Block C — Embed snippet and JavaScript loader
@@ -22,7 +21,7 @@
 
 ## Block D — Banner rendering in HTML
 
-- 📋 **RK11** (deps: RK1, RK9) **No HTML template turns a catalogue entry into a banner** — Logo, headline, supporting line and call to action all have to be assembled from JSON fields. → §RK11
+- 📋 **RK11** (deps: RK1 ✅, RK9) **No HTML template turns a catalogue entry into a banner** — Logo, headline, supporting line and call to action all have to be assembled from JSON fields. → §RK11
 - 📋 **RK12** (deps: RK11) **Only one banner size is imagined** — Sidebar, in-content and footer slots on host pages each need their own layout from the same entry. → §RK12
 - 📋 **RK13** (deps: RK11) **Colours, type and dark mode are hardcoded instead of declared** — Each product carries its own brand, so the visual theme has to travel inside the campaign entry. → §RK13
 - 📋 **RK14** (deps: RK11) **Banners have no accessibility or layout-shift budget** — An ad that shifts the page or hides its link text costs the host site more than it earns. → §RK14

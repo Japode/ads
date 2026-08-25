@@ -1,0 +1,179 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ads.japode.com/v1/catalogue.schema.json",
+  "title": "Japode Ads catalogue, version 1",
+  "description": "One catalogue file holds every campaign the network may render. Each entry carries everything a banner shows, so a renderer never needs a second source.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "campaigns"],
+  "properties": {
+    "version": {
+      "description": "Schema major version. Pinned per version path, so a v1 reader never has to inspect it to know what it is holding.",
+      "const": 1
+    },
+    "updated": {
+      "description": "When the catalogue was last assembled. Informational only.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "campaigns": {
+      "description": "Every campaign, enabled or not. A disabled entry stays in the file so its id keeps meaning.",
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/campaign" }
+    }
+  },
+  "$defs": {
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "minLength": 2,
+      "maxLength": 40
+    },
+    "url": {
+      "type": "string",
+      "format": "uri",
+      "pattern": "^https://",
+      "maxLength": 500
+    },
+    "assetPath": {
+      "description": "Root-relative path on the ads origin, so a catalogue never hardcodes the domain it is served from.",
+      "type": "string",
+      "pattern": "^/[A-Za-z0-9._~\\-/]+\\.(svg|png|webp)$",
+      "maxLength": 300
+    },
+    "colour": {
+      "type": "string",
+      "pattern": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
+    },
+    "slot": {
+      "description": "A layout family a campaign may be rendered into. The renderer owns the sizes; the catalogue only says which are allowed.",
+      "type": "string",
+      "enum": ["sidebar", "in-content", "footer"]
+    },
+    "logo": {
+      "description": "The one image a banner is assembled around. Intrinsic size is declared so the slot can reserve space before the file loads.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["src", "alt", "width", "height"],
+      "properties": {
+        "src": { "$ref": "#/$defs/assetPath" },
+        "srcDark": {
+          "description": "Optional replacement used on dark surroundings. Absent means src works on both.",
+          "$ref": "#/$defs/assetPath"
+        },
+        "alt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "width": { "type": "integer", "minimum": 1, "maximum": 2000 },
+        "height": { "type": "integer", "minimum": 1, "maximum": 2000 }
+      }
+    },
+    "themeTokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["accent", "surface", "text"],
+      "properties": {
+        "accent": { "$ref": "#/$defs/colour" },
+        "onAccent": { "$ref": "#/$defs/colour" },
+        "surface": { "$ref": "#/$defs/colour" },
+        "text": { "$ref": "#/$defs/colour" },
+        "muted": { "$ref": "#/$defs/colour" },
+        "border": { "$ref": "#/$defs/colour" }
+      }
+    },
+    "theme": {
+      "description": "The campaign's own brand, travelling with the entry. A light set is required; a dark set is optional and falls back to light.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["light"],
+      "properties": {
+        "light": { "$ref": "#/$defs/themeTokens" },
+        "dark": { "$ref": "#/$defs/themeTokens" }
+      }
+    },
+    "campaign": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "product", "logo", "headline", "support", "cta", "theme"],
+      "properties": {
+        "id": {
+          "description": "Stable identifier. Used by self-exclusion, by frequency memory and by counting, so it must never be reused for another product.",
+          "$ref": "#/$defs/slug"
+        },
+        "product": {
+          "description": "Display name of the advertised product.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 40
+        },
+        "logo": { "$ref": "#/$defs/logo" },
+        "headline": {
+          "description": "The banner's first line. Kept short so it survives the narrowest slot without wrapping to three lines.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "support": {
+          "description": "One supporting sentence under the headline.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 140
+        },
+        "cta": {
+          "description": "The call to action. Its label is the link text, so it must read as a link on its own.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["label", "href"],
+          "properties": {
+            "label": { "type": "string", "minLength": 1, "maxLength": 24 },
+            "href": { "$ref": "#/$defs/url" }
+          }
+        },
+        "theme": { "$ref": "#/$defs/theme" },
+        "weight": {
+          "description": "Relative share of the random pick. Absent means 1; 0 keeps the entry in the file but out of rotation.",
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 1
+        },
+        "enabled": {
+          "description": "Absent means true. Set false to withdraw a campaign without deleting its history.",
+          "type": "boolean",
+          "default": true
+        },
+        "slots": {
+          "description": "Layout families this campaign may render into. Absent means all of them.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/slot" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "tags": {
+          "description": "Free-form topics a slot can filter on, both to include and to exclude.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/slug" },
+          "maxItems": 12,
+          "uniqueItems": true
+        },
+        "lang": {
+          "description": "Languages this copy is written in, as BCP 47 tags. Absent means the copy is language-neutral.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z]{2}(?:-[A-Za-z0-9]{2,8})*$" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "excludeHosts": {
+          "description": "Hostnames that must never render this campaign, so a product does not advertise itself on its own site.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[a-z0-9]([a-z0-9\\-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9\\-]*[a-z0-9])?)+$" },
+          "maxItems": 20,
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}

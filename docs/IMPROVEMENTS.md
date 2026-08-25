@@ -2,14 +2,6 @@
 
 ## Block A — Ad catalogue in JSON
 
-### §RK1 Campaign JSON contract
-
-One entry per campaign, and every visible part of the banner comes from a field: product
-name, logo asset, headline, supporting line, call-to-action text, destination URL, theme
-tokens, weight and tags. Sizes and variants hang off the same entry so one campaign can
-render in any slot. The contract is versioned from day one because it is what the
-loader, the renderer and the catalogue all agree on.
-
 ### §RK2 Launch inventory
 
 Eight campaigns: shio.viglet.org, turing.viglet.org, cursarei.com.br,
