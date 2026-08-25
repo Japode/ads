@@ -280,13 +280,6 @@
   // ---------------------------------------------------------------------------------
 
   /**
-   * Which half of a campaign's tokens to draw with.
-   *
-   * "auto" asks the reader's own browser rather than the host page, because a host page
-   * that is dark has no way to tell us so — and matchMedia is the only signal that
-   * crosses the shadow boundary without the host having to cooperate.
-   */
-  /**
    * What a campaign that declares no theme is drawn with.
    *
    * Neutral on purpose. A default that guessed at a brand would be wrong in a way the
@@ -307,13 +300,24 @@
 
   var CTA_STYLES = ['solid', 'outline', 'text'];
 
-  function pickTheme(win, slot, campaign) {
+  /**
+   * Which of the two palettes a slot is asking for right now.
+   *
+   * Read again on every draw rather than settled once, because both answers can change
+   * after the banner is on the page: "auto" asks the reader's own browser, which flips at
+   * sunset, and an explicit value is an attribute the host page can rewrite when someone
+   * clicks its own light/dark toggle. matchMedia is what "auto" defers to because a host
+   * page that is dark has no way to tell us so, and it is the only signal that crosses
+   * the shadow boundary without the host having to cooperate.
+   */
+  function mode(win, slot) {
+    if (slot.theme !== 'auto') return slot.theme;
+    return win.matchMedia && win.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+
+  /** Which half of a campaign's tokens `wanted` names. */
+  function pickTheme(campaign, wanted) {
     var declared = campaign.theme || DEFAULT_THEME;
-    var wanted = slot.theme;
-    if (wanted === 'auto') {
-      var dark = win.matchMedia && win.matchMedia('(prefers-color-scheme: dark)').matches;
-      wanted = dark ? 'dark' : 'light';
-    }
     // A campaign need only declare light; dark falls back to it rather than to a guess,
     // since a brand's own light palette on a dark card is wrong but legible, and an
     // inverted one we invented is neither.
@@ -834,19 +838,78 @@
 
   /** Draw one campaign into one slot, replacing whatever was there. */
   function draw(win, doc, slot, campaign, origin) {
-    var wantDark = slot.theme === 'dark' ||
-      (slot.theme === 'auto' && !!(win.matchMedia && win.matchMedia('(prefers-color-scheme: dark)').matches));
+    var wanted = mode(win, slot);
     var parts = build(
       doc, campaign,
-      pickTheme(win, slot, campaign),
-      pickLogo(campaign, wantDark),
+      pickTheme(campaign, wanted),
+      pickLogo(campaign, wanted === 'dark'),
       origin, slot.format,
       pickTreatment(campaign)
     );
     slot.root.textContent = '';
     slot.root.appendChild(parts.style);
     slot.root.appendChild(parts.link);
+    // What is on the page, so a later theme signal can redraw it: the campaign, because
+    // the redraw must not be a second draw, and the palette it went out in, because most
+    // signals resolve to the one already showing.
+    slot.campaign = campaign;
+    slot.drawnAs = wanted;
     return campaign.id;
+  }
+
+  /**
+   * Keep a drawn banner on the theme the page is actually showing.
+   *
+   * Two signals, because a slot has two ways of being told. `data-ad-theme` is the host
+   * page's own answer, and a site with a light/dark toggle can only give it after the
+   * fact — the loader has drawn long before the reader clicks. `prefers-color-scheme` is
+   * the reader's answer, which is what "auto" defers to and which changes on its own.
+   *
+   * The alternative was to leave the banner as drawn, and it is what made a dark card sit
+   * on a page the reader had just turned light. An advertiser's palette is theirs to
+   * choose; which half of it a page gets is the page's.
+   *
+   * A redraw keeps the campaign the slot already drew. Running the draw again would swap
+   * the product under someone who asked for a colour, and hand the advertiser a second
+   * sighting nobody chose to serve.
+   */
+  function follow(win, doc, slot, origin, view) {
+    var repaint = function () {
+      if (!slot.root || !slot.campaign) return;
+      // Most signals resolve to the palette already on the page — an OS flip while the
+      // slot is pinned to light, or an attribute rewritten to the value it held.
+      if (mode(win, slot) === slot.drawnAs) return;
+      draw(win, doc, slot, slot.campaign, origin);
+    };
+
+    if (win.MutationObserver) {
+      var observer = new win.MutationObserver(function () {
+        var wanted = String(slot.el.getAttribute('data-ad-theme') || '').trim().toLowerCase();
+        // A value the contract does not name leaves the banner where it is. Discovery
+        // falls back to the default because it has nothing else; here the theme the slot
+        // is already drawn in is a better answer than either default, and repainting the
+        // page's own choice away would be the more visible of the two mistakes.
+        if (!wanted || THEMES.indexOf(wanted) === -1) {
+          if (wanted) {
+            warn(win, slot.slot + ': data-ad-theme="' + wanted + '" is not one of ' +
+              THEMES.join(', ') + '; the banner stays on "' + slot.theme + '"');
+          }
+          return;
+        }
+        slot.theme = wanted;
+        // The public view is how a site owner checks that their toggle reached us.
+        if (view) view.theme = wanted;
+        repaint();
+      });
+      observer.observe(slot.el, { attributes: true, attributeFilter: ['data-ad-theme'] });
+    }
+
+    var query = win.matchMedia && win.matchMedia('(prefers-color-scheme: dark)');
+    if (!query) return;
+    if (query.addEventListener) query.addEventListener('change', repaint);
+    // Safari shipped MediaQueryList without EventTarget for years, and a reader on one of
+    // those is exactly the reader whose OS theme changes under a page they left open.
+    else if (query.addListener) query.addListener(repaint);
   }
 
   function start(win, doc, now) {
@@ -951,6 +1014,10 @@
 
           taken.push(campaign.id);
           win.japodeAds.slots[s].showing = draw(win, doc, slot, campaign, origin);
+          // Every argument here is a parameter rather than a closed-over loop variable:
+          // `slot` is declared with var, so a listener that read it would find whatever
+          // the last iteration left behind and repaint the wrong banner.
+          follow(win, doc, slot, origin, win.japodeAds.slots[s]);
         }
 
         // Written once for the page rather than per slot, so the memory holds this
@@ -1010,9 +1077,11 @@
       reserve: reserve,
       collapse: collapse,
       attributed: attributed,
+      mode: mode,
       pickTheme: pickTheme,
       pickLogo: pickLogo,
       draw: draw,
+      follow: follow,
       start: start,
     };
   }

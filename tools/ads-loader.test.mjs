@@ -25,8 +25,21 @@ function el(attrs, { shadow = true } = {}) {
   const node = {
     attrs,
     shadowRoot: null,
+    // What a MutationObserver registered against this element, filled in by run({ live })
+    // and empty everywhere else — which is also the browser with no MutationObserver at
+    // all, so every other test in this file already covers that path.
+    observers: [],
     getAttribute(name) {
       return Object.prototype.hasOwnProperty.call(this.attrs, name) ? this.attrs[name] : null;
+    },
+    /** A host page rewriting an attribute after the loader has drawn. */
+    setAttribute(name, value) {
+      this.attrs[name] = value;
+      // A real observer delivers on a microtask; delivering here keeps the assertion in
+      // the same tick as the act, and the loader cannot tell the difference.
+      for (const o of this.observers) {
+        if (!o.filter || o.filter.includes(name)) o.cb();
+      }
     },
   };
   if (shadow) {
@@ -124,7 +137,7 @@ function fakeStorage({ seed, throwOn } = {}) {
  */
 function run(containers, {
   pageLang, fetch, scriptSrc = 'https://ads.japode.com/v1/ads.js',
-  dark = false, randoms, host = 'example.com', storage = fakeStorage(),
+  dark = false, randoms, host = 'example.com', storage = fakeStorage(), live = false,
 } = {}) {
   const warnings = [];
   const fetchFn = fetch ?? fakeFetch(() => jsonResponse({ version: 1, campaigns: [] }));
@@ -141,15 +154,33 @@ function run(containers, {
       assert.fail('a complete document must not wait for DOMContentLoaded');
     },
   };
+  // The reader's own preference, as one object the loader re-reads rather than a value
+  // it was told once — a browser answers matchMedia with a list that stays live, and the
+  // whole of RK40 is what happens when that answer changes after the banner is drawn.
+  const media = { matches: dark, listeners: [] };
+  if (live) {
+    media.addEventListener = (type, fn) => {
+      assert.equal(type, 'change');
+      media.listeners.push(fn);
+    };
+  }
+
   const context = {
     document,
     console: { warn: m => warnings.push(m) },
     fetch: fetchFn,
     URL,
-    matchMedia: q => ({ matches: dark && q.includes('dark') }),
+    matchMedia: q => (q.includes('dark') ? media : { matches: false }),
     location: { hostname: host },
     localStorage: storage,
   };
+  if (live) {
+    context.MutationObserver = function (cb) {
+      this.observe = (target, opts) => {
+        target.observers.push({ cb, filter: opts && opts.attributeFilter });
+      };
+    };
+  }
   // Shadow the realm's Math so the draw is checkable rather than statistical. Created
   // from Math so floor and the rest still work through the prototype.
   if (randoms) {
@@ -174,7 +205,28 @@ function run(containers, {
     formats: plain(context.__japodeAdsInternals.FORMATS),
     /** Let the one catalogue request settle. */
     settled: () => new Promise(r => setTimeout(r, 0)),
+    /** The reader flipping their OS theme after the banner is already on the page. */
+    flipOsTheme(toDark) {
+      media.matches = toDark;
+      for (const fn of media.listeners) fn();
+    },
   };
+}
+
+/**
+ * Which palette a drawn banner went out in, read off its own stylesheet.
+ *
+ * Detects on `accent` and asserts exactly one half matches. Surface looked like the
+ * obvious token and is not: in the fixture below, light.text and dark.surface are the
+ * same colour, so a substring test on surface reports "dark" for both and every
+ * assertion in this section passes for the wrong reason.
+ */
+function drawnPalette(container, campaign) {
+  const style = container.shadowRoot.children.find(c => c.tagName === 'STYLE').textContent;
+  const hits = ['light', 'dark'].filter(half => style.includes(campaign.theme[half].accent));
+  assert.equal(hits.length, 1,
+    `the fixture's light and dark accents must be distinguishable, matched: ${hits.join(', ') || 'neither'}`);
+  return hits[0];
 }
 
 test('the minimal paste is a working slot', () => {
@@ -997,6 +1049,112 @@ test('the shipped catalogue keeps every Viglet property off its own sites', () =
     }
     assert.ok(kept.length, `${host} would have nothing at all to show`);
   }
+});
+
+// ------------------------------------------------------------------------------------
+// Following the page's theme after the draw
+// ------------------------------------------------------------------------------------
+
+test('a reader flipping their OS theme repaints the banner', async () => {
+  const c = campaign();
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(c), live: true });
+  await h.settled();
+  assert.equal(drawnPalette(container, c), 'light');
+  h.flipOsTheme(true);
+  assert.equal(drawnPalette(container, c), 'dark', 'the banner followed the reader');
+});
+
+test('a repaint keeps the campaign that was already drawn', async () => {
+  // Running the draw again would swap the product under someone who asked for a colour,
+  // and hand an advertiser a second sighting nobody chose to serve.
+  const a = campaign({ id: 'a' });
+  const b = campaign({ id: 'b' });
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(a, b), live: true, randoms: [0] });
+  await h.settled();
+  const drawn = h.exposed.slots[0].showing;
+  h.flipOsTheme(true);
+  assert.equal(h.exposed.slots[0].showing, drawn, 'the same campaign, in the other palette');
+});
+
+test('a host page turning its own toggle repaints too', async () => {
+  // A site with a light/dark switch can only tell us after the fact: the loader drew
+  // long before the reader clicked.
+  const c = campaign();
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(c), live: true });
+  await h.settled();
+  container.setAttribute('data-ad-theme', 'dark');
+  assert.equal(drawnPalette(container, c), 'dark');
+  assert.equal(h.exposed.slots[0].theme, 'dark', 'and the public view says the toggle reached us');
+});
+
+test('a slot pinned to a theme ignores the reader flipping theirs', async () => {
+  const c = campaign();
+  const container = el({ 'data-japode-ads': '', 'data-ad-theme': 'light' });
+  const h = run([container], { fetch: withCampaigns(c), live: true });
+  await h.settled();
+  h.flipOsTheme(true);
+  assert.equal(drawnPalette(container, c), 'light', 'the page asked for light and still gets it');
+});
+
+test('a signal resolving to the palette already showing draws nothing', async () => {
+  // Most signals are this: an OS flip while the slot is pinned, or an attribute rewritten
+  // to the value it already held. A redraw would be work the reader sees for no reason.
+  const c = campaign();
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(c), live: true });
+  await h.settled();
+  const before = container.shadowRoot.children.find(x => x.tagName === 'A');
+  container.setAttribute('data-ad-theme', 'light');
+  assert.equal(container.shadowRoot.children.find(x => x.tagName === 'A'), before,
+    'the same node, so nothing was rebuilt');
+});
+
+test('an unknown theme arriving late leaves the banner where it is', async () => {
+  // Discovery falls back to the default because it has nothing else. Here the theme the
+  // slot is already drawn in is a better answer, and repainting the page's own choice
+  // away would be the more visible mistake.
+  const c = campaign();
+  const container = el({ 'data-japode-ads': '', 'data-ad-theme': 'dark' });
+  const h = run([container], { fetch: withCampaigns(c), live: true });
+  await h.settled();
+  container.setAttribute('data-ad-theme', 'neon');
+  assert.equal(drawnPalette(container, c), 'dark', 'still on the last thing it was told');
+  assert.match(h.warnings.at(-1), /data-ad-theme="neon".*stays on "dark"/);
+});
+
+test('each slot repaints its own banner and not the last one drawn', async () => {
+  // The failure this catches is a listener closing over a var-declared loop variable: it
+  // would find whatever the final iteration left behind and repaint the wrong slot. Two
+  // slots pinned differently is the only arrangement that can tell.
+  const c = campaign();
+  const pinned = el({ 'data-japode-ads': '', 'data-ad-theme': 'light' });
+  const following = el({ 'data-japode-ads': '' });
+  const h = run([pinned, following], { fetch: withCampaigns(c, campaign({ id: 'b' })), live: true });
+  await h.settled();
+
+  h.flipOsTheme(true);
+  assert.equal(drawnPalette(pinned, c), 'light', 'the pinned slot must not have moved');
+
+  // And the reverse direction: rewriting one slot's attribute must not touch the other.
+  following.setAttribute('data-ad-theme', 'light');
+  assert.equal(h.exposed.slots[1].theme, 'light');
+  assert.equal(h.exposed.slots[0].theme, 'light', 'unchanged, because it was already light');
+  pinned.setAttribute('data-ad-theme', 'dark');
+  assert.equal(h.exposed.slots[0].theme, 'dark');
+  assert.equal(h.exposed.slots[1].theme, 'light', 'the other slot was not dragged along');
+});
+
+test('a browser with no MutationObserver still follows the reader', async () => {
+  // Every other test in this file runs without one, so the attribute path is absent and
+  // the media path is all there is. It has to work on its own.
+  const c = campaign();
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(c) });
+  await h.settled();
+  assert.ok(container.shadowRoot.children.find(x => x.tagName === 'A'), 'still a banner');
 });
 
 // ------------------------------------------------------------------------------------

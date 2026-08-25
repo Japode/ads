@@ -28,6 +28,7 @@
 - ✅ **RK13** **Colours, type and dark mode are hardcoded instead of declared** — Gradient, cta treatment and font are declared per entry from named options; theme is now optional with neutral defaults, and the gate refuses any pair below WCAG AA.
 - ✅ **RK31** **The renderer clips any logo whose artwork reaches its corners** — border-radius is gone from the logo in every format, and a test refuses any rule that would clip or crop a mark.
 - ✅ **RK14** **Banners have no accessibility or layout-shift budget** — Each format reserves its height before the request and keeps it as a floor, an empty slot gives the space back, and a page view is budgeted at 40KB with its heaviest logo.
+- ✅ **RK41** **A banner keeps the theme it was drawn on after the page changes its own** — The slot watches prefers-color-scheme and data-ad-theme and repaints the campaign it already drew, so a page that turns light does not keep a dark card.
 
 ## Block E — Random rotation and delivery control
 

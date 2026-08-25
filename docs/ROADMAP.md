@@ -1,5 +1,7 @@
 # Roadmap (active backlog)
 
+## Block D — Banner rendering in HTML
+
 ## Non-goals
 
 - **No ad server or real-time bidding** The whole network is a static JSON file and a
