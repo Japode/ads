@@ -1,7 +1,5 @@
 # Improvements
 
-## Block E — Random rotation and delivery control
-
 ## Block F — Metrics, quality and operations
 
 ### §RK18 Click and impression accounting
@@ -109,3 +107,33 @@ So this is a dependency question rather than an image question: an image toolcha
 devDependencies, run once and committed, versus a static-files project that currently
 installs nothing but a schema validator. Whatever is chosen, the per-logo ceiling the
 tests now enforce is what keeps the answer honest.
+
+### §RK35 Whose storage the memory lives in
+
+The recency memory writes to the host site's own localStorage, which is the right origin
+for privacy and the wrong one for consent: it is their storage, under their policy, and
+a site operating under a consent banner has just acquired a write it never agreed to and
+cannot see. The entry holds two campaign ids and a timestamp and follows nobody
+anywhere, but a site owner auditing their own storage should not have to take that on
+trust from a script they pasted.
+
+So the slot needs to be able to say no, and the default is the argument. Off by default
+makes the network worse at the thing rotation exists for, on almost every site, to
+satisfy a minority of them. On by default with data-ad-memory="off" available puts the
+choice where the obligation already is, with the site, and the documentation page is
+where it stops being a surprise. Whichever way it lands, the loader must treat an absent
+attribute and an unreadable storage identically, because it already does.
+
+### §RK36 Stamp the field or drop it
+
+The catalogue declares `updated` and the schema says it is when the file was assembled.
+It is typed by hand and has not changed since the eight entries were written, so it is a
+field that will be wrong for as long as nobody remembers it, which is the same as
+always.
+
+Either the deploy stamps it or the contract stops claiming it. Stamping is a line in the
+workflow, but it means the published catalogue differs from the committed one, and this
+project has spent every task so far keeping site/ the artifact — the gate validates the
+file that ships, and the tests read the file the domain serves. Dropping the field costs
+nothing anybody currently uses, since the loader never reads it and the cache-busting
+token carries freshness instead.
