@@ -484,8 +484,12 @@
       '.unit.strip .product { font-size: .7rem; flex: 0 0 auto; }',
       '.unit.strip .headline { font-size: .875rem; font-weight: 600;',
       '  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }',
-      '.unit.strip .cta { margin-top: 0; padding: 0; background: none; font-size: .8rem;',
-      '  color: ' + t.accent + '; text-decoration: underline; text-underline-offset: 2px; }',
+      // The strip's call to action is a text link, so it has to undo the whole pill and
+      // not only its fill: the border and the 999px radius survive a background:none and
+      // draw an ellipse hugging the label once the padding is gone.
+      '.unit.strip .cta { margin-top: 0; padding: 0; background: none; border: 0;',
+      '  border-radius: 0; font-size: .8rem; color: ' + t.accent + ';',
+      '  text-decoration: underline; text-underline-offset: 2px; }',
       '.unit.strip .mark { position: static; flex: 0 0 auto; margin-left: .25rem; }',
       '@container (max-width: 26rem) { .unit.strip .product { display: none; } }',
 

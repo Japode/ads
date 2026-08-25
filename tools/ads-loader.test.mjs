@@ -750,6 +750,22 @@ test('every format has a rule of its own in the stylesheet', async () => {
   }
 });
 
+test('a format that restyles the call to action undoes all of it', async () => {
+  // Overriding the fill alone leaves the pill's border and radius behind, which with no
+  // padding draws an ellipse around the label. Any format that opts out of the button
+  // has to opt out of its shape too.
+  for (const treatment of ['solid', 'outline', 'text']) {
+    const c = campaign();
+    c.theme.cta = treatment;
+    const container = el({ 'data-japode-ads': '', 'data-ad-format': 'strip' });
+    const h = run([container], { fetch: withCampaigns(c) });
+    await h.settled();
+    const rule = /\.unit\.strip \.cta \{[^}]*\}/.exec(styleOf(container))[0];
+    assert.match(rule, /border: 0/, `strip + cta:${treatment} keeps a border`);
+    assert.match(rule, /border-radius: 0/, `strip + cta:${treatment} keeps the pill radius`);
+  }
+});
+
 test('the strip drops the supporting line rather than shrink it away', async () => {
   // Compact means carrying less, not rendering the same thing at a size nobody reads.
   const container = el({ 'data-japode-ads': '', 'data-ad-format': 'strip' });
