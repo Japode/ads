@@ -2,13 +2,6 @@
 
 ## Block C — Embed snippet and JavaScript loader
 
-### §RK9 Loader isolation
-
-The script loads async and defers its work until the container is in the document. The
-banner renders inside a shadow root so the host page cannot reach its styles and it
-cannot leak its own. Everything it needs arrives in one catalogue request, reused across
-every slot on the page.
-
 ### §RK10 Snippet documentation
 
 A single page on the domain: what to paste, which formats exist, what each data

@@ -14,15 +14,42 @@ import { fileURLToPath } from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const source = readFileSync(join(root, 'site/v1/ads.js'), 'utf8');
 
-/** A fake element carrying exactly the attributes given. */
-function el(attrs) {
-  return {
+/**
+ * A fake element carrying exactly the attributes given.
+ *
+ * `shadow: false` models a browser with no shadow DOM, which the loader must treat as a
+ * reason to stay empty rather than to draw unprotected.
+ */
+function el(attrs, { shadow = true } = {}) {
+  const node = {
     attrs,
+    shadowRoot: null,
     getAttribute(name) {
       return Object.prototype.hasOwnProperty.call(this.attrs, name) ? this.attrs[name] : null;
     },
   };
+  if (shadow) {
+    node.attachShadow = function (init) {
+      assert.equal(init.mode, 'open', 'the slot root is open so a site owner can inspect it');
+      this.shadowRoot = { mode: init.mode, host: this, children: [] };
+      return this.shadowRoot;
+    };
+  }
+  return node;
 }
+
+/** A fetch that answers the catalogue, or fails, without touching the network. */
+function fakeFetch(answer) {
+  const calls = [];
+  const fn = url => {
+    calls.push(url);
+    return answer(url);
+  };
+  fn.calls = calls;
+  return fn;
+}
+
+const jsonResponse = body => Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve(body) });
 
 /**
  * Evaluate the served loader against a page made of `containers`, and return what it
@@ -31,10 +58,12 @@ function el(attrs) {
  * `pageLang` is what <html lang> says; `containers` are the elements a real
  * querySelectorAll would return for the marker.
  */
-function run(containers, pageLang) {
+function run(containers, { pageLang, fetch, scriptSrc = 'https://ads.japode.com/v1/ads.js' } = {}) {
   const warnings = [];
+  const fetchFn = fetch ?? fakeFetch(() => jsonResponse({ version: 1, campaigns: [] }));
   const document = {
     readyState: 'complete',
+    currentScript: { src: scriptSrc },
     documentElement: el(pageLang === undefined ? {} : { lang: pageLang }),
     querySelectorAll(selector) {
       assert.equal(selector, '[data-japode-ads]', 'the marker selector is part of the contract');
@@ -44,18 +73,24 @@ function run(containers, pageLang) {
       assert.fail('a complete document must not wait for DOMContentLoaded');
     },
   };
-  const context = { document, console: { warn: m => warnings.push(m) } };
+  const context = { document, console: { warn: m => warnings.push(m) }, fetch: fetchFn, URL };
   context.window = context;
   vm.createContext(context);
   vm.runInContext(source, context, { filename: 'ads.js' });
+
   // Values built inside the vm carry that realm's prototypes, which deepStrictEqual
   // compares. Cross the boundary as plain data so the assertions are about the contract
   // and not about which realm made the array.
   const plain = v => (v === undefined ? undefined : JSON.parse(JSON.stringify(v)));
   return {
-    exposed: plain(context.japodeAds),
+    get exposed() { return plain(context.japodeAds); },
     warnings,
+    fetches: fetchFn.calls ?? [],
+    containers,
+    internals: context.__japodeAdsInternals,
     formats: plain(context.__japodeAdsInternals.FORMATS),
+    /** Let the one catalogue request settle. */
+    settled: () => new Promise(r => setTimeout(r, 0)),
   };
 }
 
@@ -72,6 +107,7 @@ test('the minimal paste is a working slot', () => {
     lang: '',
     tags: [],
     exclude: [],
+    isolated: true,
     warnings: [],
   });
   assert.deepEqual(warnings, [], 'a bare paste must not warn');
@@ -96,6 +132,7 @@ test('every documented attribute is read', () => {
     lang: 'pt-BR',
     tags: ['devtools', 'cms'],
     exclude: ['roadkeep', 'shio'],
+    isolated: true,
     warnings: [],
   });
 });
@@ -126,13 +163,13 @@ test('an unknown attribute is ignored, not fatal', () => {
 });
 
 test('a slot with no lang inherits the page language', () => {
-  const { exposed } = run([el({ 'data-japode-ads': '' })], 'pt-BR');
+  const { exposed } = run([el({ 'data-japode-ads': '' })], { pageLang: 'pt-BR' });
   assert.equal(exposed.slots[0].lang, 'pt-BR');
 });
 
 test('an explicitly empty lang opts out of the page language', () => {
   // Absent and empty are different answers: inherit, versus accept any language.
-  const { exposed } = run([el({ 'data-japode-ads': '', 'data-ad-lang': '' })], 'pt-BR');
+  const { exposed } = run([el({ 'data-japode-ads': '', 'data-ad-lang': '' })], { pageLang: 'pt-BR' });
   assert.equal(exposed.slots[0].lang, '');
 });
 
@@ -173,6 +210,96 @@ test('the loader waits when the document is still parsing', () => {
   vm.runInContext(source, context, { filename: 'ads.js' });
   assert.equal(waited, true);
   assert.equal(context.japodeAds, undefined, 'nothing is exposed before the slots are read');
+});
+
+// ------------------------------------------------------------------------------------
+// Isolation and the one request
+// ------------------------------------------------------------------------------------
+
+test('many slots cost one catalogue request', async () => {
+  const h = run([
+    el({ 'data-japode-ads': '' }),
+    el({ 'data-japode-ads': '', 'data-ad-format': 'sidebar' }),
+    el({ 'data-japode-ads': '', 'data-ad-format': 'footer' }),
+  ]);
+  await h.settled();
+  assert.equal(h.fetches.length, 1, 'three slots, one request');
+});
+
+test('a page with the script and no container makes no request', async () => {
+  const h = run([]);
+  await h.settled();
+  assert.deepEqual(h.fetches, [], 'a script on a page with no slot must cost nothing');
+});
+
+test('the catalogue is requested with a bucketed cache-busting token', async () => {
+  const h = run([el({ 'data-japode-ads': '' })]);
+  await h.settled();
+  const url = new URL(h.fetches[0]);
+  assert.equal(url.pathname, '/v1/catalogue.json');
+  const v = Number(url.searchParams.get('v'));
+  const { CACHE_SECONDS } = h.internals;
+  // Bucketed, not unique: every reader inside the window shares one URL, so it still
+  // caches. A per-view token would make every request a full round trip.
+  assert.equal(v, Math.floor(Date.now() / (CACHE_SECONDS * 1000)));
+});
+
+test('the loader fetches from the origin it was served from', async () => {
+  // A local preview copy must read the catalogue beside it, not production.
+  const h = run([el({ 'data-japode-ads': '' })], { scriptSrc: 'http://localhost:8080/v1/ads.js' });
+  await h.settled();
+  assert.match(h.fetches[0], /^http:\/\/localhost:8080\/v1\/catalogue\.json\?v=\d+$/);
+});
+
+test('a failed request collapses to the empty response instead of rejecting', async () => {
+  // An unhandled rejection would land in someone else's page console.
+  const h = run([el({ 'data-japode-ads': '' })], {
+    fetch: fakeFetch(() => Promise.reject(new Error('offline'))),
+  });
+  await h.settled();
+  assert.equal(h.exposed.campaigns, 0);
+});
+
+test('a non-ok response collapses to the empty response', async () => {
+  const h = run([el({ 'data-japode-ads': '' })], {
+    fetch: fakeFetch(() => Promise.resolve({ ok: false, status: 503, json: () => Promise.resolve({}) })),
+  });
+  await h.settled();
+  assert.equal(h.exposed.campaigns, 0);
+});
+
+test('a payload from a version this script cannot read collapses to empty', async () => {
+  // /v1/ is supposed to answer v1 forever; if it ever does not, a v1 loader must not
+  // try to draw a shape it does not understand.
+  const h = run([el({ 'data-japode-ads': '' })], {
+    fetch: fakeFetch(() => jsonResponse({ version: 2, campaigns: [{ id: 'x' }] })),
+  });
+  await h.settled();
+  assert.equal(h.exposed.campaigns, 0);
+});
+
+test('a readable catalogue reports how many campaigns arrived', async () => {
+  const h = run([el({ 'data-japode-ads': '' })], {
+    fetch: fakeFetch(() => jsonResponse({ version: 1, campaigns: [{ id: 'a' }, { id: 'b' }] })),
+  });
+  assert.equal(h.exposed.campaigns, null, 'null until the request settles');
+  await h.settled();
+  assert.equal(h.exposed.campaigns, 2);
+});
+
+test('every slot gets its own open shadow root', () => {
+  const h = run([el({ 'data-japode-ads': '' }), el({ 'data-japode-ads': '' })]);
+  for (const c of h.containers) {
+    assert.ok(c.shadowRoot, 'the banner is drawn inside a root the host stylesheet cannot reach');
+    assert.equal(c.shadowRoot.mode, 'open');
+  }
+  assert.deepEqual(h.exposed.slots.map(s => s.isolated), [true, true]);
+});
+
+test('without shadow DOM the slot stays empty rather than draw unprotected', () => {
+  const h = run([el({ 'data-japode-ads': '' }, { shadow: false })]);
+  assert.equal(h.exposed.slots[0].isolated, false);
+  assert.match(h.warnings[0], /no shadow DOM, so the slot stays empty/);
 });
 
 test('the three formats match the catalogue schema exactly', () => {

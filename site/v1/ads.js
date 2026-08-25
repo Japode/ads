@@ -18,6 +18,11 @@
 (function () {
   'use strict';
 
+  // Captured while this file is still executing, because currentScript is null by the
+  // time any deferred work runs. It is how the loader finds its own origin: a copy
+  // served from a local preview must fetch the catalogue beside it, not production.
+  var SELF = typeof document !== 'undefined' ? document.currentScript : null;
+
   /** Marks a container as an ad slot. Its presence is the only thing required. */
   var MARKER = 'data-japode-ads';
 
@@ -125,7 +130,91 @@
     if (win.console && win.console.warn) win.console.warn('[japode-ads] ' + message);
   }
 
-  function start(win, doc) {
+  // ---------------------------------------------------------------------------------
+  // The catalogue request
+  // ---------------------------------------------------------------------------------
+
+  /** What an unreadable catalogue means. The contract admits it; every slot collapses. */
+  var EMPTY = { version: 1, campaigns: [] };
+
+  /**
+   * How long Pages caches the catalogue. Not ours to set — it is measured, and
+   * `npm run check-origin` fails if it drifts far enough to matter.
+   */
+  var CACHE_SECONDS = 600;
+
+  /** The origin this script was served from, so a preview copy stays self-contained. */
+  function selfOrigin() {
+    try {
+      if (SELF && SELF.src) return new URL(SELF.src).origin;
+    } catch (e) { /* a src we cannot parse is the same as no src */ }
+    return 'https://ads.japode.com';
+  }
+
+  /**
+   * A cache-busting token the loader controls.
+   *
+   * Bucketed to the lifetime Pages already serves rather than made unique per reader:
+   * a unique URL per page view would make every request a cache miss and hand the host
+   * page's readers a full round trip each. Bucketing keeps one URL shared by everyone
+   * inside a window, so it still caches, while giving us the lever §RK6 said we need —
+   * freshness becomes ours to choose instead of Pages'.
+   */
+  function bucket(nowMs) {
+    return Math.floor(nowMs / (CACHE_SECONDS * 1000));
+  }
+
+  var pending = null;
+
+  /**
+   * The one catalogue request a page makes, whatever number of slots it has.
+   *
+   * Never rejects. Every failure — offline, a 404, HTML where JSON was expected, a
+   * payload from a version this script does not speak — resolves to the empty response,
+   * because the alternative is an unhandled rejection in someone else's page.
+   */
+  function loadCatalogue(win, now) {
+    if (pending) return pending;
+    var url = selfOrigin() + '/v1/catalogue.json?v=' + bucket(now);
+    pending = win
+      .fetch(url, { credentials: 'omit', mode: 'cors' })
+      .then(function (res) {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function (data) {
+        var usable = data && data.version === 1 && Object.prototype.toString.call(data.campaigns) === '[object Array]';
+        return usable ? data : EMPTY;
+      })
+      .catch(function () {
+        return EMPTY;
+      });
+    return pending;
+  }
+
+  // ---------------------------------------------------------------------------------
+  // Isolation
+  // ---------------------------------------------------------------------------------
+
+  /**
+   * Give a slot its own root.
+   *
+   * Open rather than closed: shadow DOM scopes CSS in both modes, which is the whole
+   * requirement, and closed only hides the tree from the host page's JavaScript — no
+   * defence against a site that could simply not paste the snippet, and a real cost to
+   * the site owner trying to see why their slot is empty.
+   *
+   * Returns null where attachShadow does not exist. Drawing into the light DOM instead
+   * would let the host stylesheet reach the banner, which is the thing this prevents,
+   * so the slot stays empty rather than becoming a banner we cannot vouch for.
+   */
+  function isolate(slot) {
+    var el = slot.el;
+    if (!el.attachShadow) return null;
+    return el.shadowRoot || el.attachShadow({ mode: 'open' });
+  }
+
+  function start(win, doc, now) {
     var slots = findSlots(doc);
 
     for (var i = 0; i < slots.length; i++) {
@@ -134,11 +223,24 @@
       }
     }
 
+    for (var k = 0; k < slots.length; k++) {
+      slots[k].root = isolate(slots[k]);
+      if (!slots[k].root) {
+        slots[k].warnings.push('this browser has no shadow DOM, so the slot stays empty rather than inherit the page stylesheet');
+        warn(win, slots[k].slot + ': ' + slots[k].warnings[slots[k].warnings.length - 1]);
+      }
+    }
+
+
     // A read-only view of what the loader saw. A site owner asking "why is my slot
     // empty" has no other way to find out, since a slot that cannot render collapses
     // silently by design and leaves nothing to inspect.
     win.japodeAds = {
       version: 1,
+      // null until the one request settles; a number after, 0 included. A site owner
+      // seeing 0 knows the catalogue answered and had nothing, which is a different
+      // problem from null, where it never answered at all.
+      campaigns: null,
       slots: slots.map(function (s) {
         return {
           slot: s.slot,
@@ -147,10 +249,22 @@
           lang: s.lang,
           tags: s.tags.slice(),
           exclude: s.exclude.slice(),
+          isolated: !!s.root,
           warnings: s.warnings.slice(),
         };
       }),
     };
+
+    // One request for the whole page, however many slots asked. Started only when there
+    // is a slot to fill: a page carrying the script and no container must cost nothing.
+    if (slots.length) {
+      loadCatalogue(win, now).then(function (catalogue) {
+        win.japodeAds.campaigns = catalogue.campaigns.length;
+        // Drawing belongs to the renderer and it is not here yet. Until then a slot that
+        // got this far stays empty — which is also exactly what it must do when the
+        // catalogue could not be read.
+      });
+    }
 
     return slots;
   }
@@ -159,9 +273,11 @@
   // an async script can arrive either side of parsing.
   if (typeof document !== 'undefined') {
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function () { start(window, document); });
+      document.addEventListener('DOMContentLoaded', function () {
+        start(window, document, Date.now());
+      });
     } else {
-      start(window, document);
+      start(window, document, Date.now());
     }
   }
 
@@ -172,9 +288,15 @@
       FORMATS: FORMATS,
       THEMES: THEMES,
       DEFAULTS: DEFAULTS,
+      CACHE_SECONDS: CACHE_SECONDS,
+      EMPTY: EMPTY,
       list: list,
       readSlot: readSlot,
       findSlots: findSlots,
+      selfOrigin: selfOrigin,
+      bucket: bucket,
+      loadCatalogue: loadCatalogue,
+      isolate: isolate,
       start: start,
     };
   }

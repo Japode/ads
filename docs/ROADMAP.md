@@ -2,12 +2,11 @@
 
 ## Block C — Embed snippet and JavaScript loader
 
-- 📋 **RK9** (deps: RK8 ✅) **The loader would block rendering and inherit host page CSS** — An ad unit must never delay the page it sits on, nor let a host stylesheet distort the banner it draws. → §RK9
 - 📋 **RK10** (deps: RK8 ✅) **No page documents the snippet or generates one** — Each site owner needs the slot formats, sizes and options without reading the loader source. → §RK10
 
 ## Block D — Banner rendering in HTML
 
-- 📋 **RK11** (deps: RK1 ✅, RK9) **No HTML template turns a catalogue entry into a banner** — Logo, headline, supporting line and call to action all have to be assembled from JSON fields. → §RK11
+- 📋 **RK11** (deps: RK1 ✅, RK9 ✅) **No HTML template turns a catalogue entry into a banner** — Logo, headline, supporting line and call to action all have to be assembled from JSON fields. → §RK11
 - 📋 **RK12** (deps: RK11) **Only one banner size is imagined** — Sidebar, in-content and footer slots on host pages each need their own layout from the same entry. → §RK12
 - 📋 **RK13** (deps: RK11) **Colours, type and dark mode are hardcoded instead of declared** — Each product carries its own brand, so the visual theme has to travel inside the campaign entry. → §RK13
 - 📋 **RK14** (deps: RK11) **Banners have no accessibility or layout-shift budget** — An ad that shifts the page or hides its link text costs the host site more than it earns. → §RK14
