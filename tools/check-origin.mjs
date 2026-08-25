@@ -115,17 +115,44 @@ async function main() {
   ok(missing.status === 404, 'a missing path is a clean 404', `got ${missing.status}`);
 }
 
-try {
-  await main();
-} catch (err) {
-  console.error(`could not reach ${origin}: ${err.message}`);
+/**
+ * Run the checks, and run them again before believing a bad answer.
+ *
+ * This runs unattended on a schedule now, which changes what a single failure means: a
+ * person running it by hand simply runs it again, and a nightly job that cries wolf over
+ * one dropped connection is a job everybody learns to ignore. The failure it exists to
+ * catch — Pages quietly dropping the cross-origin header — will still be there in five
+ * seconds; a flaky socket will not.
+ */
+async function attempt() {
+  failures.length = 0;
+  notes.length = 0;
+  try {
+    await main();
+    return null;
+  } catch (err) {
+    return `could not reach ${origin}: ${err.message}`;
+  }
+}
+
+let unreachable = await attempt();
+
+if (unreachable || failures.length) {
+  const first = unreachable ? [unreachable] : failures.slice();
+  console.log(`\nretrying in 5s before reporting ${first.length} problem(s)…\n`);
+  await new Promise(r => setTimeout(r, 5000));
+  unreachable = await attempt();
+}
+
+if (unreachable) {
+  console.error(unreachable);
   process.exit(1);
 }
 
 if (notes.length) console.log('\n' + notes.map(n => `note  ${n}`).join('\n'));
 
 if (failures.length) {
-  console.error(`\n${origin} no longer behaves as the loader expects:\n` + failures.map(f => `  ${f}`).join('\n'));
+  console.error(`\n${origin} no longer behaves as the loader expects, twice:\n` + failures.map(f => `  ${f}`).join('\n'));
   process.exit(1);
 }
 

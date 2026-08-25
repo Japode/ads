@@ -2,22 +2,6 @@
 
 ## Block F — Metrics, quality and operations
 
-### §RK27 The origin check needs a schedule
-
-The origin check exists and passes, and nothing runs it. What it asserts is not ours to
-set: Pages chooses the cross-origin header, the cache lifetime and the redirect, and the
-product is built entirely on choices another party can change without telling us.
-
-The failure is silent by construction. If Pages stopped sending the cross-origin header,
-every banner on every host site would stop rendering at once, and nothing here would
-record it — the error surfaces in a stranger's browser console, on a page we do not
-control, to a reader with no reason to report it. The design has no monitoring anywhere
-and is not meant to grow any, which is exactly why the one check that can see this must
-run on a schedule instead of when somebody remembers.
-
-It belongs on the same schedule as the destination check: both are network jobs that
-must stay out of the publish path, and one job reporting both is one place to look.
-
 ### §RK29 The generator and the parser must agree
 
 The loader is covered by tests against the file the domain serves. The generator that

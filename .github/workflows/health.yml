@@ -20,6 +20,9 @@ on:
 permissions:
   contents: read
 
+# Two jobs and not two steps: a failing destination and a broken origin are unrelated
+# problems, and a first step that exits stops a second step from ever running. Either one
+# should be able to fail without hiding the other.
 jobs:
   links:
     name: Destinations still answer
@@ -32,3 +35,18 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check-links
+
+  origin:
+    name: The origin still behaves
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      # Pages chooses the cross-origin header, the cache lifetime and the redirect. If it
+      # ever stops sending the first of those, every banner on every host site stops
+      # rendering at once and the error appears only in a stranger's console.
+      - run: npm run check-origin
