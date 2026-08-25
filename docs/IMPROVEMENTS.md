@@ -2,26 +2,6 @@
 
 ## Block F — Metrics, quality and operations
 
-### §RK23 Destination link checking
-
-The publish gate reads the catalogue and the files beside it and never leaves the
-machine. That is what lets it run on every push, but it means the one thing a banner
-exists to do, send a reader somewhere, is the one thing nothing verifies. Eight
-destinations shipped and one was already dead, found by hand rather than by the gate.
-
-A destination rots with no edit to the catalogue: a repository turns private, a domain
-lapses, a path moves. So the check belongs on a schedule and not in the publish path,
-where a flaky network would block a deploy that changed nothing about the links. A job
-that requests every href, follows redirects and reports what stopped answering turns a
-silent 404 into a message, and a redirect that has become permanent into a catalogue
-edit worth making.
-
-What it must not do is trust a status code on its own. cursarei.com.br answers 403 to a
-plain fetcher and 200 to a browser user agent, so a naive checker would have reported
-the one destination that was working. Send a browser user agent, treat 403 and 429 as
-inconclusive rather than dead, and require a failure to repeat on a second run before it
-is reported at all.
-
 ### §RK27 The origin check needs a schedule
 
 The origin check exists and passes, and nothing runs it. What it asserts is not ours to

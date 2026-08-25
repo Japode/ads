@@ -46,3 +46,4 @@
 - ✅ **RK18** **Impressions and clicks are not counted** — Destinations carry utm_source, medium, campaign and content, so the product counts its own clicks with no request here; impressions are now a recorded non-goal.
 - ✅ **RK20** **Nothing tests the renderer against the catalogue** — Every catalogue entry is drawn in all four formats and both themes, asserting a resolving logo, non-empty copy, the destination and the entry's own tokens in the stylesheet.
 - ✅ **RK19** **There is no local preview of the catalogue** — npm run preview serves site/ with Pages' own headers and adds a gallery of every campaign in every format, pinned with data-ad-exclude rather than a preview-only attribute.
+- ✅ **RK23** **The gate never checks that a campaign destination resolves** — A daily workflow requests every destination with a browser user agent, retries once before calling one dead, treats 401/403/405/429 as inconclusive and names redirects worth editing out.

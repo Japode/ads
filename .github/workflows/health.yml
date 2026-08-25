@@ -1,0 +1,34 @@
+name: Health
+
+# The checks that need the network, kept out of the publish path.
+#
+# Nothing here can block a deploy, and that is the point: a destination rots with no edit
+# to the catalogue — a repository turns private, a domain lapses, a path moves — so the
+# question has to be asked on a clock rather than when someone happens to push.
+#
+# A failing run is the report. There is no collector, no dashboard and nothing to
+# maintain: GitHub already mails the owner when a scheduled workflow fails, which is the
+# whole notification system this project needs.
+
+on:
+  schedule:
+    # 06:17 UTC daily. Not on the hour: every cron written by hand lands on :00, and the
+    # runner queue is shorter three minutes either side of it.
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  links:
+    name: Destinations still answer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npm run check-links

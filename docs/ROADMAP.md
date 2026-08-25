@@ -2,7 +2,6 @@
 
 ## Block F — Metrics, quality and operations
 
-- 📋 **RK23** (deps: RK4 ✅) **The gate never checks that a campaign destination resolves** — It validates shape and assets offline, so a dead link passes and keeps passing until a reader reports it. → §RK23
 - 📋 **RK27** (deps: RK6 ✅) **Nothing runs the origin check unless someone remembers to** — Pages could drop the cross-origin header and every banner would stop rendering at once, with no error anyone here can see. → §RK27
 - 📋 **RK29** (deps: RK10 ✅, RK8 ✅) **Nothing checks that the generator emits a snippet the loader reads back** — A generator bug ships to every site that copied its output, onto pages we cannot reach to fix. → §RK29
 - 📋 **RK33** (deps: RK14 ✅) **Half the loader a host page downloads is comments** — ads.js is 9.3KB gzipped and 4.8KB of that is prose no browser reads, paid for on every page view. → §RK33
