@@ -2,13 +2,6 @@
 
 ## Block B — Static API on ads.japode.com
 
-### §RK7 Versioning and fallback
-
-Serve under a version path so an incompatible schema ships alongside the old one instead
-of replacing it. Pair it with a defined empty response: when the catalogue cannot be
-read, the slot must collapse silently rather than leave a broken frame on someone else's
-page.
-
 ## Block C — Embed snippet and JavaScript loader
 
 ### §RK8 The paste-in snippet

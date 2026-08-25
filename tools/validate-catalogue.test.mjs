@@ -103,6 +103,24 @@ test('an unreachable dark asset warns without refusing', () => {
   assert.match(out, /warn.*dark asset is unreachable/);
 });
 
+test('the empty fallback response is valid against the v1 schema', async () => {
+  // The loader's fallback has to be expressible in the contract it is a fallback for,
+  // or the loader is coding against a shape nothing validates.
+  const Ajv2020 = (await import('ajv/dist/2020.js')).default;
+  const addFormats = (await import('ajv-formats')).default;
+  const schema = JSON.parse(readFileSync(join(root, 'schema/v1/catalogue.schema.json'), 'utf8'));
+  const ajv = new Ajv2020({ allErrors: true, strict: true });
+  addFormats(ajv);
+  const valid = ajv.compile(schema)({ version: 1, campaigns: [] });
+  assert.equal(valid, true, 'an empty campaigns array must be a legal v1 response');
+});
+
+test('publishing the empty fallback is refused', () => {
+  const { code, out } = gate('empty-array', broken(c => { c.campaigns = []; }));
+  assert.equal(code, 1, 'legal to answer with, not legal to publish');
+  assert.match(out, /defined fallback response, not something to publish/);
+});
+
 test('every error is reported at once, not one per run', () => {
   const { out } = gate('many', broken(c => {
     c.campaigns[0].tagline = 'x';

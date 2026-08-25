@@ -123,6 +123,13 @@ if (schema && catalogue) {
       warnings.push(`${id}: logo.srcDark is set but theme.dark is not, so the dark asset is unreachable`);
   }
 
+  // An empty array is a legal v1 response — it is the fallback a loader uses when it
+  // cannot read the catalogue at all. It is not a legal thing to publish: shipping the
+  // fallback as the real file is indistinguishable, to every host page, from the origin
+  // being down. The contract has to admit it; the gate is what refuses it.
+  if (!campaigns.length)
+    errors.push('the catalogue is empty: that is the defined fallback response, not something to publish — every slot would collapse as if the origin were down');
+
   const renderable = campaigns.filter(c => c?.enabled !== false && c?.weight !== 0);
   if (campaigns.length && !renderable.length)
     errors.push('every campaign is disabled or weighted 0, so every slot on every host site would collapse empty');

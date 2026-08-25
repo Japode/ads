@@ -11,17 +11,26 @@
 // Exit 0 = the origin still behaves the way the loader is written to expect.
 
 const origin = (process.argv[2] ?? 'https://ads.japode.com').replace(/\/$/, '');
+
+// The one path every pasted snippet points at. Everything else here is derived from it,
+// including the version it is required to answer — writing the version twice would let
+// the check agree with itself while the origin disagreed with both.
+const CATALOGUE_PATH = '/v1/catalogue.json';
+const PATH_VERSION = Number(/\/v(\d+)\//.exec(CATALOGUE_PATH)[1]);
+
 const failures = [];
 const notes = [];
 
 const ok = (cond, what, detail) => {
-  console.log(`${cond ? 'ok  ' : 'FAIL'}  ${what}${detail ? `  ${detail}` : ''}`);
+  const mark = cond ? 'ok  ' : 'FAIL';
+  const suffix = detail ? `  ${detail}` : '';
+  console.log(`${mark}  ${what}${suffix}`);
   if (!cond) failures.push(what);
 };
 
 async function main() {
   // 1. The catalogue itself.
-  const cat = await fetch(`${origin}/v1/catalogue.json`);
+  const cat = await fetch(origin + CATALOGUE_PATH);
   const body = await cat.text();
   ok(cat.status === 200, 'catalogue responds 200', `got ${cat.status}`);
   ok(
@@ -36,7 +45,15 @@ async function main() {
   } catch {
     ok(false, 'catalogue parses as JSON');
   }
-  if (parsed) ok(parsed.version === 1, 'catalogue declares version 1', `got ${parsed.version}`);
+  // The version in the path and the version in the payload are one promise, not two. A
+  // /v1/ URL that starts answering v2 breaks every snippet already pasted into a site we
+  // do not control, and that is the one failure no push from here can repair.
+  if (parsed)
+    ok(
+      parsed.version === PATH_VERSION,
+      'the served version matches its version path',
+      `/v${PATH_VERSION}/ answers version ${parsed.version}`
+    );
 
   // 2. The one header the whole product depends on. A static file on another domain is
   // only readable from a host page because Pages sends this, and nothing we control
@@ -71,7 +88,7 @@ async function main() {
 
   // 5. A snippet lands on an https page, so a plain-http origin would be blocked as mixed
   // content. The redirect is what makes an http URL in someone's copy-paste harmless.
-  const plain = await fetch(`${origin.replace('https://', 'http://')}/v1/catalogue.json`, {
+  const plain = await fetch(origin.replace('https://', 'http://') + CATALOGUE_PATH, {
     redirect: 'manual',
   });
   ok(
@@ -86,17 +103,18 @@ async function main() {
   ok(missing.status === 404, 'a missing path is a clean 404', `got ${missing.status}`);
 }
 
-main().then(
-  () => {
-    if (notes.length) console.log('\n' + notes.map(n => `note  ${n}`).join('\n'));
-    if (failures.length) {
-      console.error(`\n${origin} no longer behaves as the loader expects:\n` + failures.map(f => `  ${f}`).join('\n'));
-      process.exit(1);
-    }
-    console.log(`\n${origin}: every assumption the loader is written against still holds.`);
-  },
-  err => {
-    console.error(`could not reach ${origin}: ${err.message}`);
-    process.exit(1);
-  }
-);
+try {
+  await main();
+} catch (err) {
+  console.error(`could not reach ${origin}: ${err.message}`);
+  process.exit(1);
+}
+
+if (notes.length) console.log('\n' + notes.map(n => `note  ${n}`).join('\n'));
+
+if (failures.length) {
+  console.error(`\n${origin} no longer behaves as the loader expects:\n` + failures.map(f => `  ${f}`).join('\n'));
+  process.exit(1);
+}
+
+console.log(`\n${origin}: every assumption the loader is written against still holds.`);

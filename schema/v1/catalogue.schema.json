@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ads.japode.com/v1/catalogue.schema.json",
   "title": "Japode Ads catalogue, version 1",
-  "description": "One catalogue file holds every campaign the network may render. Each entry carries everything a banner shows, so a renderer never needs a second source.",
+  "description": "One catalogue file holds every campaign the network may render. Each entry carries everything a banner shows, so a renderer never needs a second source. Served under a version path: /v1/catalogue.json answers this schema for as long as any snippet points at it, and an incompatible schema ships beside it at /v2/ rather than replacing it. Snippets are pasted into sites we do not control, so a v1 URL that stops answering v1 is the one failure that cannot be fixed from here.",
   "type": "object",
   "additionalProperties": false,
   "required": ["version", "campaigns"],
@@ -17,9 +17,9 @@
       "format": "date-time"
     },
     "campaigns": {
-      "description": "Every campaign, enabled or not. A disabled entry stays in the file so its id keeps meaning.",
+      "description": "Every campaign, enabled or not. A disabled entry stays in the file so its id keeps meaning. An empty array is the defined fallback response: it is what a loader treats an unreadable catalogue as, and it means collapse the slot silently. A published catalogue may not be empty — that is the gate's rule, not the contract's, because the fallback has to stay expressible.",
       "type": "array",
-      "minItems": 1,
+      "minItems": 0,
       "items": { "$ref": "#/$defs/campaign" }
     }
   },

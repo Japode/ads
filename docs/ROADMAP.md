@@ -2,8 +2,6 @@
 
 ## Block B — Static API on ads.japode.com
 
-- 📋 **RK7** (deps: RK5 ✅, RK1 ✅) **The endpoint has no version path and no fallback payload** — A later schema change would break every snippet already pasted into a site we do not control. → §RK7
-
 ## Block C — Embed snippet and JavaScript loader
 
 - 📋 **RK8** (deps: RK5 ✅) **There is no HTML snippet a site owner can paste** — The whole product is one copy-paste block, the way an ad network ships one. → §RK8
