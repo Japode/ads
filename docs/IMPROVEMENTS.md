@@ -1,7 +1,5 @@
 # Improvements
 
-## Block D — Banner rendering in HTML
-
 ## Block E — Random rotation and delivery control
 
 ### §RK15 Weighted random pick
@@ -98,3 +96,37 @@ two different answers for lang. What the test has to assert is not that the gene
 produces some string, but that the string it produces, fed back through the loader's own
 parser, yields the configuration the site owner selected. The two halves of the contract
 agreeing with each other is the only thing worth checking.
+
+### §RK33 Minifying costs the readable artifact
+
+Measured while setting the page-weight budget: ads.js is 9.3KB gzipped, and 4.8KB of
+that is comments. Stripping them halves the file. Those comments are why the loader is
+maintainable and none of them are worth a browser downloading, on every host page,
+forever.
+
+What this costs is the property that site/ is the artifact. Today the served file is the
+source file, tests run against the bytes the domain hands out, and the deploy workflow
+copies a directory. A minifier makes site/v1/ads.js a source whose output is generated,
+which means the tests have to keep running against the built file or they stop being
+about what a host page receives.
+
+That is the decision to weigh, not the 4.8KB. A build step is worth it if the minifier
+is one dependency the deploy already has an excuse to install, and it is not worth it if
+keeping the artifact readable and directly testable is the thing this project is for.
+
+### §RK34 Quantizing needs a toolchain, not a resize
+
+The budget is set at 40KB for a page view and the shipped worst case is 31KB, of which
+the viglet logo alone is 20KB. Resizing from 256px to the 128px the banner can actually
+use cut it from 35KB, and it is still two thirds of everything a reader downloads.
+
+The remaining win is quantization, and it needs a tool this project does not have. The
+resize went through .NET's encoder, which writes 32-bit RGBA and made claude-tray larger
+than the 256px original it replaced — that file is still unresized for exactly this
+reason. A palette encoder would take viglet to single digits and claude-tray below what
+it is now.
+
+So this is a dependency question rather than an image question: an image toolchain in
+devDependencies, run once and committed, versus a static-files project that currently
+installs nothing but a schema validator. Whatever is chosen, the per-logo ceiling the
+tests now enforce is what keeps the answer honest.
