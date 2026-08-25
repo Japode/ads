@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160" role="img" aria-label="Japode Ads">
+  <title>Japode Ads</title>
+  <desc>A host page whose text sits above one slot: a band running edge to edge through the page, wider than the page itself, because the banner is served from outside it.</desc>
+  <!-- The network's own mark, deliberately not in site/logos/: that directory is the
+       advertisers' and the gate warns about anything there no campaign references.
+
+       Unlike a campaign logo, this one may answer prefers-color-scheme. roadkeep ships
+       roadkeep-dark.svg because a banner's theme comes from the campaign and not from
+       the reader's OS — but this file is only ever drawn as site chrome and as the tab
+       icon, both of which follow the OS the same way index.html does.
+
+       The band crosses both edges rather than only the right one: a single arm leaving
+       a rounded box is the sign-out glyph every toolbar already owns. -->
+  <style>
+    .page { fill: none; stroke: #0f172a; stroke-width: 12; }
+    .line { fill: #94a3b8; }
+    .slot { fill: #0f766e; }
+    @media (prefers-color-scheme: dark) {
+      .page { stroke: #e2e8f0; }
+      .line { fill: #64748b; }
+      .slot { fill: #5eead4; }
+    }
+  </style>
+
+  <!-- the host page -->
+  <rect class="page" x="36" y="24" width="88" height="112" rx="16"/>
+
+  <!-- its own words, which the slot sits between rather than under -->
+  <rect class="line" x="52" y="42" width="56" height="9" rx="4.5"/>
+  <rect class="line" x="52" y="57" width="56" height="9" rx="4.5"/>
+
+  <!-- the slot: placed in the page, served from beyond it -->
+  <rect class="slot" x="14" y="74" width="132" height="26" rx="13"/>
+
+  <rect class="line" x="52" y="110" width="36" height="9" rx="4.5"/>
+</svg>

@@ -19,7 +19,6 @@
 - 📋 **RK20** (deps: RK11 ✅, RK4 ✅) **Nothing tests the renderer against the catalogue** — A field renamed in the JSON would silently blank a banner on every host site. → §RK20
 - 📋 **RK23** (deps: RK4 ✅) **The gate never checks that a campaign destination resolves** — It validates shape and assets offline, so a dead link passes and keeps passing until a reader reports it. → §RK23
 - 📋 **RK27** (deps: RK6 ✅) **Nothing runs the origin check unless someone remembers to** — Pages could drop the cross-origin header and every banner would stop rendering at once, with no error anyone here can see. → §RK27
-- 📋 **RK28** (deps: RK10 ✅) **The network uses an advertiser's logo as its own icon** — ads.japode.com declares roadkeep's mark as its favicon, so every tab carries one campaign's branding on a site that claims to treat eight evenly. → §RK28
 - 📋 **RK29** (deps: RK10 ✅, RK8 ✅) **Nothing checks that the generator emits a snippet the loader reads back** — A generator bug ships to every site that copied its output, onto pages we cannot reach to fix. → §RK29
 
 ## Non-goals
