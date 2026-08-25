@@ -97,20 +97,6 @@ the one destination that was working. Send a browser user agent, treat 403 and 4
 inconclusive rather than dead, and require a failure to repeat on a second run before it
 is reported at all.
 
-### §RK26 Workflow actions are behind
-
-The workflow was written at v4 across the board, and three of the four are further
-behind than that suggests: actions/checkout and actions/setup-node are at v7,
-upload-pages-artifact and deploy-pages at v5. The runner already reports it, forcing all
-four off the Node 20 they declare and onto Node 24 — a warning carrying a date rather
-than a preference.
-
-The bump is not one edit. upload-pages-artifact and deploy-pages are a pair: the
-artifact format and the deployment protocol are one contract, so their majors move
-together or the deploy fails in between. And there is no staging Pages site to try it
-on, the domain being the only place a deploy lands. So it is one bump per run, watched,
-with the origin checked after each, rather than four edits and a push.
-
 ### §RK27 The origin check needs a schedule
 
 The origin check exists and passes, and nothing runs it. What it asserts is not ours to

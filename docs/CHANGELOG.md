@@ -29,3 +29,4 @@
 
 - ✅ **RK24** **Three campaign destinations are not the product's canonical URL** — cursarei points at cursarei.com.br and is back in rotation, turing at turing.viglet.org and viglet at the www host its apex 301s to; all eight now answer 200 on the first hop.
 - ✅ **RK25** **Nothing updates the actions the deploy runs on or the packages the gate validates with** — Dependabot now watches the deploy actions and the gate packages, opening one grouped pull request a month per ecosystem, with an ajv major arriving on its own.
+- ✅ **RK26** **The deploy workflow pins actions three major versions behind** — Dependabot PR #1 bumped checkout and setup-node to v7 and both Pages actions to v5; the deploy went green on all four at once and the Node 20 warnings are gone.
