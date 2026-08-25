@@ -10,7 +10,8 @@
     "check-origin": "node tools/check-origin.mjs",
     "check-links": "node tools/check-links.mjs",
     "preview": "node tools/preview.mjs",
-    "test": "node --test"
+    "test": "node --test",
+    "optimise-logos": "node tools/optimise-logos.mjs"
   },
   "devDependencies": {
     "ajv": "^8.17.1",

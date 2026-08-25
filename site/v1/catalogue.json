@@ -247,8 +247,8 @@
       "logo": {
         "src": "/logos/claude-tray.png",
         "alt": "Claude Code Tray",
-        "width": 256,
-        "height": 256
+        "width": 128,
+        "height": 128
       },
       "headline": "Your Claude Code usage, always in the tray",
       "support": "A native Windows tray icon that draws your rate-limit percentage as a vector, crisp at any DPI.",

@@ -1130,13 +1130,32 @@ test('no single logo can dominate a page view', () => {
   // The failure this catches is one campaign quietly shipping artwork that costs more
   // than everything else on the page combined, which is how freewilly's traced SVG got
   // to 37KB without anyone noticing.
+  //
+  // The ceiling is 10KB because the heaviest shipped logo is 6.6KB. A limit nothing
+  // comes near does not limit anything, so it gets tightened whenever the fleet moves.
   const gz = p => gzipSync(readFileSync(join(root, p))).length;
   const live = JSON.parse(readFileSync(join(root, 'site/v1/catalogue.json'), 'utf8'));
   for (const c of live.campaigns) {
     for (const key of ['src', 'srcDark']) {
       if (!c.logo[key]) continue;
       const bytes = gz('site' + c.logo[key]);
-      assert.ok(bytes < 28 * 1024, `${c.id}.logo.${key} is ${(bytes / 1024).toFixed(1)}KB gzipped`);
+      assert.ok(bytes < 10 * 1024, `${c.id}.logo.${key} is ${(bytes / 1024).toFixed(1)}KB gzipped`);
+    }
+  }
+});
+
+test('every raster logo ships as indexed colour', () => {
+  // A logo re-exported from an editor comes back as 32-bit RGBA and triples in size
+  // while looking identical, which is exactly the change nobody reviews. Colour type 3
+  // is in the file's own header, so the test can see it.
+  const live = JSON.parse(readFileSync(join(root, 'site/v1/catalogue.json'), 'utf8'));
+  for (const c of live.campaigns) {
+    for (const key of ['src', 'srcDark']) {
+      const path = c.logo[key];
+      if (!path?.endsWith('.png')) continue;
+      const buf = readFileSync(join(root, 'site' + path));
+      assert.equal(buf[25], 3, `${c.id}.logo.${key} is colour type ${buf[25]}, not indexed`);
+      assert.equal(buf[24], 8, `${c.id}.logo.${key} is ${buf[24]}-bit`);
     }
   }
 });

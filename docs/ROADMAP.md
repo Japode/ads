@@ -2,8 +2,6 @@
 
 ## Block F — Metrics, quality and operations
 
-- 📋 **RK34** (deps: RK14 ✅) **One logo is two thirds of what a page view downloads** — viglet.png is 20KB of a 31KB worst case, and cutting it further needs a palette encoder this project has no tool for. → §RK34
-
 ## Non-goals
 
 - **No ad server or real-time bidding** The whole network is a static JSON file and a
