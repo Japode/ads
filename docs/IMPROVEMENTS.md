@@ -2,14 +2,6 @@
 
 ## Block D — Banner rendering in HTML
 
-### §RK13 Theme tokens in the JSON
-
-The entry declares its own tokens: background or gradient, text and accent colours, the
-call-to-action treatment, an optional font pairing, and a second set for dark
-surroundings. The renderer only reads tokens, so a product restyles its banner by
-editing data. Defaults cover an entry that declares nothing, and a contrast check keeps
-a badly chosen pair from shipping.
-
 ### §RK14 Accessibility and page weight
 
 The slot reserves its height before the catalogue answers, so nothing jumps. Logos carry

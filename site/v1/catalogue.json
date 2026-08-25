@@ -15,7 +15,7 @@
       "support": "Content as files, MCP tools and blueprints. The curator approves in a React console with preview links.",
       "cta": { "label": "See Shio", "href": "https://shio.viglet.org/" },
       "theme": {
-        "light": { "accent": "#0284c7", "onAccent": "#ffffff", "surface": "#f8fafc", "text": "#0f172a", "muted": "#475569", "border": "#e2e8f0" },
+        "light": { "accent": "#0275b0", "onAccent": "#ffffff", "surface": "#f8fafc", "text": "#0f172a", "muted": "#475569", "border": "#e2e8f0" },
         "dark":  { "accent": "#38bdf8", "onAccent": "#082f49", "surface": "#0f172a", "text": "#e2e8f0", "muted": "#94a3b8", "border": "#1e293b" }
       },
       "weight": 1,
@@ -140,7 +140,7 @@
       "cta": { "label": "Ler a aula", "href": "https://alegauss.github.io/mini-gpt/" },
       "theme": {
         "light": { "accent": "#6d4aff", "onAccent": "#ffffff", "surface": "#f8fafc", "text": "#0f172a", "muted": "#475569", "border": "#e2e8f0" },
-        "dark":  { "accent": "#8b6bff", "onAccent": "#1e1b4b", "surface": "#0f172a", "text": "#e2e8f0", "muted": "#94a3b8", "border": "#1e293b" }
+        "dark":  { "accent": "#8b6bff", "onAccent": "#151334", "surface": "#0f172a", "text": "#e2e8f0", "muted": "#94a3b8", "border": "#1e293b" }
       },
       "weight": 1,
       "tags": ["java", "machine-learning", "educacao", "open-source"],
@@ -160,7 +160,7 @@
       "support": "Graduacao, pos, MBA e cursos livres de varias instituicoes, num agregador independente.",
       "cta": { "label": "Encontrar cursos", "href": "https://cursarei.com.br/" },
       "theme": {
-        "light": { "accent": "#0d9488", "onAccent": "#ffffff", "surface": "#f8fafc", "text": "#0f172a", "muted": "#475569", "border": "#e2e8f0" },
+        "light": { "accent": "#0b7c72", "onAccent": "#ffffff", "surface": "#f8fafc", "text": "#0f172a", "muted": "#475569", "border": "#e2e8f0" },
         "dark":  { "accent": "#2dd4bf", "onAccent": "#042f2e", "surface": "#0f172a", "text": "#e2e8f0", "muted": "#94a3b8", "border": "#1e293b" }
       },
       "weight": 1,

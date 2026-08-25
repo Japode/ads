@@ -508,6 +508,77 @@ test('the formats match the catalogue schema exactly', () => {
 });
 
 // ------------------------------------------------------------------------------------
+// Declared theme
+// ------------------------------------------------------------------------------------
+
+test('a campaign that declares no theme still draws, in the neutral defaults', async () => {
+  const bare = campaign();
+  delete bare.theme;
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(bare) });
+  await h.settled();
+  assert.equal(h.exposed.slots[0].showing, 'roadkeep');
+  // Neutral rather than a guess at the brand: an invented accent would be a claim the
+  // advertiser never made.
+  assert.match(styleOf(container), /#1f2937/);
+});
+
+test('the call to action is drawn three ways from the same accent', async () => {
+  const expected = {
+    solid: /\.cta \{[\s\S]*?background: #b45309/,
+    outline: /\.cta \{[\s\S]*?background: none; color: #b45309/,
+    text: /\.cta \{[\s\S]*?text-decoration: underline/,
+  };
+  for (const treatment of ['solid', 'outline', 'text']) {
+    const c = campaign();
+    c.theme.cta = treatment;
+    const container = el({ 'data-japode-ads': '' });
+    const h = run([container], { fetch: withCampaigns(c) });
+    await h.settled();
+    assert.match(styleOf(container), expected[treatment], `cta: ${treatment}`);
+  }
+});
+
+test('a declared font stack reaches the banner and no webfont is fetched', async () => {
+  const c = campaign();
+  c.theme.font = 'serif';
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(c) });
+  await h.settled();
+  const style = styleOf(container);
+  assert.match(style, /ui-serif, Georgia/);
+  assert.doesNotMatch(style, /@import|@font-face|url\(/, 'the network serves no fonts');
+  assert.equal(h.fetches.length, 1, 'still one request, the catalogue');
+});
+
+test('an unknown font or cta value falls back instead of reaching the stylesheet', async () => {
+  // These come from the catalogue, and a family string written into CSS is a string
+  // that can close the declaration it sits in. Naming the options is what prevents it.
+  const c = campaign();
+  c.theme.font = 'Comic Sans; } :host { display: none } .x {';
+  c.theme.cta = 'exploded';
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(c) });
+  await h.settled();
+  const style = styleOf(container);
+  assert.doesNotMatch(style, /Comic Sans/, 'the string never reaches the stylesheet');
+  assert.doesNotMatch(style, /:host \{ display: none/, 'nor does the rule it tried to smuggle in');
+  // The font declaration is one of the three stacks and nothing else — no stray brace
+  // could have closed it, because the value was never taken from the catalogue.
+  const declaration = /\n  font: 400 15px\/1\.5 ([^;]+);/.exec(style);
+  assert.equal(declaration[1], 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif');
+});
+
+test('a second surface stop becomes a gradient', async () => {
+  const c = campaign();
+  c.theme.light.surfaceTo = '#e2e8f0';
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { fetch: withCampaigns(c) });
+  await h.settled();
+  assert.match(styleOf(container), /linear-gradient\(135deg, #f8fafc 0%, #e2e8f0 100%\)/);
+});
+
+// ------------------------------------------------------------------------------------
 // Formats
 // ------------------------------------------------------------------------------------
 

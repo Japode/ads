@@ -81,23 +81,39 @@
         "surface": { "$ref": "#/$defs/colour" },
         "text": { "$ref": "#/$defs/colour" },
         "muted": { "$ref": "#/$defs/colour" },
-        "border": { "$ref": "#/$defs/colour" }
+        "border": { "$ref": "#/$defs/colour" },
+        "surfaceTo": {
+          "description": "Turns the surface into a gradient running to this colour. Both ends are checked for contrast against the text, so a gradient cannot hide an unreadable pair at one end.",
+          "$ref": "#/$defs/colour"
+        }
       }
     },
     "theme": {
-      "description": "The campaign's own brand, travelling with the entry. A light set is required; a dark set is optional and falls back to light.",
+      "description": "The campaign's own brand, travelling with the entry. Absent altogether means the renderer's neutral defaults, which is legible but says nothing about the product. A dark set is optional and falls back to the light one rather than to an inversion nobody chose.",
       "type": "object",
       "additionalProperties": false,
       "required": ["light"],
       "properties": {
         "light": { "$ref": "#/$defs/themeTokens" },
-        "dark": { "$ref": "#/$defs/themeTokens" }
+        "dark": { "$ref": "#/$defs/themeTokens" },
+        "font": {
+          "description": "Which of the renderer's three stacks to set the banner in. Named rather than free text: the network serves no webfonts, and a family string from the catalogue would reach the stylesheet.",
+          "type": "string",
+          "enum": ["sans", "serif", "mono"],
+          "default": "sans"
+        },
+        "cta": {
+          "description": "How the call to action is drawn. solid fills it with the accent, outline draws it in the accent, text makes it a link.",
+          "type": "string",
+          "enum": ["solid", "outline", "text"],
+          "default": "solid"
+        }
       }
     },
     "campaign": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "product", "logo", "headline", "support", "cta", "theme"],
+      "required": ["id", "product", "logo", "headline", "support", "cta"],
       "properties": {
         "id": {
           "description": "Stable identifier. Used by self-exclusion, by frequency memory and by counting, so it must never be reused for another product.",

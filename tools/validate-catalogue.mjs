@@ -49,6 +49,65 @@ function readJson(path, label) {
   }
 }
 
+// ------------------------------------------------------------------------------------
+// Contrast
+// ------------------------------------------------------------------------------------
+
+/** WCAG relative luminance of a #rgb or #rrggbb literal. */
+function luminance(hex) {
+  const h = hex.slice(1);
+  const full = h.length === 3 ? h.split('').map(c => c + c).join('') : h;
+  const channels = [0, 2, 4].map(i => {
+    const c = Number.parseInt(full.slice(i, i + 2), 16) / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+}
+
+/** WCAG contrast ratio between two colour literals, 1 to 21. */
+function contrast(a, b) {
+  const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (hi + 0.05) / (lo + 0.05);
+}
+
+/**
+ * Every pair a reader has to actually read, checked against WCAG AA for body text.
+ *
+ * 4.5 throughout rather than the 3.0 that large text is allowed: nothing in the banner
+ * is large text. The headline is 16px and the product eyebrow is 12px, so the lenient
+ * threshold would be claiming a size the renderer does not use.
+ *
+ * A gradient is checked at both ends. A pair that passes at one stop and fails at the
+ * other is exactly the case a single check would wave through.
+ */
+function contrastProblems(tokens, treatment) {
+  const problems = [];
+  const surfaces = [tokens.surface, tokens.surfaceTo].filter(Boolean);
+  const onSurface = [
+    ['text', tokens.text],
+    ['muted', tokens.muted],
+    // The product eyebrow, and the CTA label itself unless the accent is a fill.
+    ['accent', tokens.accent],
+  ];
+
+  for (const surface of surfaces) {
+    for (const [name, colour] of onSurface) {
+      if (!colour) continue;
+      const ratio = contrast(colour, surface);
+      if (ratio < 4.5) problems.push(`${name} on ${surface} is ${ratio.toFixed(2)}:1, needs 4.5`);
+    }
+  }
+
+  // Only a filled call to action puts a label on the accent; outline and text draw it
+  // on the surface, which the loop above already covered.
+  if (treatment === 'solid' && tokens.onAccent) {
+    const ratio = contrast(tokens.onAccent, tokens.accent);
+    if (ratio < 4.5) problems.push(`the call to action label is ${ratio.toFixed(2)}:1 on its own fill, needs 4.5`);
+  }
+
+  return problems;
+}
+
 /** Intrinsic size of an asset, or null when the file does not declare one. */
 function intrinsicSize(file) {
   if (file.endsWith('.svg')) {
@@ -121,6 +180,24 @@ if (schema && catalogue) {
     // theme means the renderer has a dark asset it can never be asked for.
     if (c?.logo?.srcDark && !c?.theme?.dark)
       warnings.push(`${id}: logo.srcDark is set but theme.dark is not, so the dark asset is unreachable`);
+
+    // A campaign may decline to declare a theme and be drawn in the neutral defaults,
+    // but then it looks like every other entry that said nothing.
+    if (!c?.theme) {
+      warnings.push(`${id}: declares no theme, so it draws in the neutral defaults and carries none of its own brand`);
+      continue;
+    }
+
+    // Contrast is checked here rather than in the loader because the loader runs on
+    // someone else's page, where the only thing it could do about an unreadable pair is
+    // refuse to draw — and by then the campaign has already shipped.
+    for (const half of ['light', 'dark']) {
+      const tokens = c.theme[half];
+      if (!tokens) continue;
+      for (const problem of contrastProblems(tokens, c.theme.cta ?? 'solid')) {
+        errors.push(`${id}.theme.${half}: ${problem}`);
+      }
+    }
   }
 
   // An empty array is a legal v1 response — it is the fallback a loader uses when it

@@ -225,7 +225,29 @@
    * that is dark has no way to tell us so — and matchMedia is the only signal that
    * crosses the shadow boundary without the host having to cooperate.
    */
+  /**
+   * What a campaign that declares no theme is drawn with.
+   *
+   * Neutral on purpose. A default that guessed at a brand would be wrong in a way the
+   * advertiser never chose, and every undeclared entry looking alike is the honest
+   * signal that none of them said anything.
+   */
+  var DEFAULT_THEME = {
+    light: { accent: '#1f2937', onAccent: '#ffffff', surface: '#ffffff', text: '#111827', muted: '#4b5563', border: '#d1d5db' },
+    dark: { accent: '#e5e7eb', onAccent: '#111827', surface: '#111827', text: '#f3f4f6', muted: '#9ca3af', border: '#374151' },
+  };
+
+  /** The three stacks a campaign may name. No webfont is ever fetched. */
+  var FONTS = {
+    sans: 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+    serif: 'ui-serif, Georgia, "Times New Roman", serif',
+    mono: 'ui-monospace, SFMono-Regular, "Cascadia Code", Consolas, monospace',
+  };
+
+  var CTA_STYLES = ['solid', 'outline', 'text'];
+
   function pickTheme(win, slot, campaign) {
+    var declared = campaign.theme || DEFAULT_THEME;
     var wanted = slot.theme;
     if (wanted === 'auto') {
       var dark = win.matchMedia && win.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -234,7 +256,16 @@
     // A campaign need only declare light; dark falls back to it rather than to a guess,
     // since a brand's own light palette on a dark card is wrong but legible, and an
     // inverted one we invented is neither.
-    return campaign.theme[wanted] || campaign.theme.light;
+    return declared[wanted] || declared.light || DEFAULT_THEME.light;
+  }
+
+  /** The presentation choices that are the same in both themes. */
+  function pickTreatment(campaign) {
+    var declared = campaign.theme || {};
+    return {
+      font: FONTS[declared.font] || FONTS.sans,
+      cta: CTA_STYLES.indexOf(declared.cta) === -1 ? 'solid' : declared.cta,
+    };
   }
 
   /** The logo file for this theme, falling back when the mark needs no dark variant. */
@@ -242,12 +273,19 @@
     return (wantDark && campaign.logo.srcDark) || campaign.logo.src;
   }
 
+  /** A flat surface, or a gradient when the entry declared a second stop. */
+  function surfaceOf(t) {
+    return t.surfaceTo
+      ? 'linear-gradient(135deg, ' + t.surface + ' 0%, ' + t.surfaceTo + ' 100%)'
+      : t.surface;
+  }
+
   /**
    * Every string here comes from the catalogue, and every one of them is set with
    * textContent rather than markup. A campaign is data, and data that can introduce
    * markup into someone else's page is an injection whether or not we wrote it.
    */
-  function build(doc, campaign, tokens, logoSrc, origin, format) {
+  function build(doc, campaign, tokens, logoSrc, origin, format, treatment) {
     var link = doc.createElement('a');
     link.className = 'unit ' + format;
     link.setAttribute('href', campaign.cta.href);
@@ -303,7 +341,7 @@
     link.appendChild(mark);
 
     var style = doc.createElement('style');
-    style.textContent = css(tokens);
+    style.textContent = css(tokens, treatment);
 
     return { style: style, link: link };
   }
@@ -315,10 +353,20 @@
    * arbitrary values: every substitution below is a colour the schema already
    * constrained to a hex literal, so none of it can close the declaration it sits in.
    */
-  function css(t) {
+  function css(t, treatment) {
     var border = t.border || t.accent;
     var muted = t.muted || t.text;
     var onAccent = t.onAccent || t.surface;
+    var look = treatment || { font: FONTS.sans, cta: 'solid' };
+
+    // Three treatments over the same accent. Only the fill changes: the label keeps its
+    // weight and padding, so swapping treatment never changes what the unit measures.
+    var ctaFill = {
+      solid: '  background: ' + t.accent + '; color: ' + onAccent + '; border: 1px solid ' + t.accent + ';',
+      outline: '  background: none; color: ' + t.accent + '; border: 1px solid ' + t.accent + ';',
+      text: '  background: none; color: ' + t.accent + '; border: 1px solid transparent; padding-left: 0; padding-right: 0;' +
+        ' text-decoration: underline; text-underline-offset: 3px;',
+    }[look.cta];
 
     return [
       // Every format is fluid inside the slot it was given. The queries below are on the
@@ -333,8 +381,8 @@
       '  gap: .875rem; align-items: flex-start;',
       '  padding: 1rem; border-radius: 12px;',
       '  border: 1px solid ' + border + ';',
-      '  background: ' + t.surface + '; color: ' + t.text + ';',
-      '  font: 400 15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;',
+      '  background: ' + surfaceOf(t) + '; color: ' + t.text + ';',
+      '  font: 400 15px/1.5 ' + look.font + ';',
       '  transition: border-color .15s ease;',
       '}',
       '.unit:hover { border-color: ' + t.accent + '; }',
@@ -347,7 +395,8 @@
       '.support { font-size: .875rem; color: ' + muted + '; }',
       '.cta { margin-top: .4rem; align-self: flex-start; white-space: nowrap;',
       '  padding: .35rem .75rem; border-radius: 999px; font-size: .8rem; font-weight: 600;',
-      '  background: ' + t.accent + '; color: ' + onAccent + '; }',
+      ctaFill,
+      '}',
       // The disclosure never competes with the content and never disappears.
       '.mark { position: absolute; top: .5rem; right: .625rem;',
       '  font-size: .625rem; letter-spacing: .08em; text-transform: uppercase;',
@@ -405,7 +454,9 @@
     for (var i = 0; i < campaigns.length; i++) {
       var c = campaigns[i];
       if (!c || c.enabled === false || c.weight === 0) continue;
-      if (!c.cta || !c.cta.href || !c.logo || !c.theme || !c.theme.light) continue;
+      // A theme is not required: an entry without one draws in the neutral defaults.
+      // What cannot be defaulted is where the banner sends the reader and what it shows.
+      if (!c.cta || !c.cta.href || !c.logo || !c.logo.src) continue;
       out.push(c);
     }
     return out;
@@ -415,7 +466,13 @@
   function draw(win, doc, slot, campaign, origin) {
     var wantDark = slot.theme === 'dark' ||
       (slot.theme === 'auto' && !!(win.matchMedia && win.matchMedia('(prefers-color-scheme: dark)').matches));
-    var parts = build(doc, campaign, pickTheme(win, slot, campaign), pickLogo(campaign, wantDark), origin, slot.format);
+    var parts = build(
+      doc, campaign,
+      pickTheme(win, slot, campaign),
+      pickLogo(campaign, wantDark),
+      origin, slot.format,
+      pickTreatment(campaign)
+    );
     slot.root.textContent = '';
     slot.root.appendChild(parts.style);
     slot.root.appendChild(parts.link);

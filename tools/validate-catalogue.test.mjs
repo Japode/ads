@@ -121,6 +121,39 @@ test('publishing the empty fallback is refused', () => {
   assert.match(out, /defined fallback response, not something to publish/);
 });
 
+test('an unreadable colour pair is refused', () => {
+  // The loader cannot fix this: it runs on someone else's page, where the only remedy
+  // for an unreadable banner is not drawing one. So the gate is where it has to fail.
+  const { code, out } = gate('contrast', broken(c => {
+    c.campaigns[0].theme.light.text = '#cccccc';
+  }));
+  assert.equal(code, 1);
+  assert.match(out, /theme\.light: text on .* needs 4\.5/);
+});
+
+test('a gradient is checked at both ends', () => {
+  // A pair that passes at one stop and fails at the other is exactly what a single
+  // check waves through.
+  const { code, out } = gate('gradient', broken(c => {
+    c.campaigns[0].theme.light.surfaceTo = '#334155'; // dark end under dark text
+  }));
+  assert.equal(code, 1);
+  assert.match(out, /on #334155/);
+});
+
+test('a campaign may decline a theme, and is told what that costs', () => {
+  const { code, out } = gate('no-theme', broken(c => { delete c.campaigns[0].theme; }));
+  assert.equal(code, 0, 'declaring no theme is legal');
+  assert.match(out, /warn.*declares no theme.*carries none of its own brand/);
+});
+
+test('the shipped catalogue meets AA on every declared pair', () => {
+  // Not a hypothetical: writing these tokens by eye put five failures in the catalogue,
+  // across three campaigns, and this is what found them.
+  const { code } = gate('live', JSON.stringify(good));
+  assert.equal(code, 0);
+});
+
 test('every error is reported at once, not one per run', () => {
   const { out } = gate('many', broken(c => {
     c.campaigns[0].tagline = 'x';

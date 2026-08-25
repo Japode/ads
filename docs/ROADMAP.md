@@ -2,7 +2,6 @@
 
 ## Block D — Banner rendering in HTML
 
-- 📋 **RK13** (deps: RK11 ✅) **Colours, type and dark mode are hardcoded instead of declared** — Each product carries its own brand, so the visual theme has to travel inside the campaign entry. → §RK13
 - 📋 **RK14** (deps: RK11 ✅) **Banners have no accessibility or layout-shift budget** — An ad that shifts the page or hides its link text costs the host site more than it earns. → §RK14
 
 ## Block E — Random rotation and delivery control
