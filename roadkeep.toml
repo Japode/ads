@@ -47,3 +47,8 @@ held = 60
 # with `--have`. Uncomment and name your own; an undeclared word is refused.
 # [requirements]
 # declared = ["hardware"]
+
+[project]
+name = "Japode Ads"
+description = "A static ad network where eight Japode products advertise each other."
+icon = "📣"
