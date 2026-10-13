@@ -185,7 +185,7 @@
           "uniqueItems": true
         },
         "excludeHosts": {
-          "description": "Hostnames that must never render this campaign, so a product does not advertise itself on its own site.",
+          "description": "Hostnames that must never render this campaign, each covering its subdomains and every path. The destination's own host and path are excluded without being listed, so a product sharing a host under a path lists nothing here.",
           "type": "array",
           "items": { "type": "string", "pattern": "^[a-z0-9]([a-z0-9\\-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9\\-]*[a-z0-9])?)+$" },
           "maxItems": 20,

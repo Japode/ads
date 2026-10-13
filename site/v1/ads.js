@@ -607,17 +607,44 @@
     return host === domain || host.slice(-(domain.length + 1)) === '.' + domain;
   }
 
+  /** The path of a URL, lowercased and without its trailing slash: '' for a site's root. */
+  function pathOf(url) {
+    try {
+      return new URL(url).pathname.toLowerCase().replace(/\/+$/, '');
+    } catch (e) {
+      return '';
+    }
+  }
+
+  /**
+   * Does `path` fall under `prefix`?
+   *
+   * Segment matching, the path's counterpart of `under`: /roadkeep covers /roadkeep/ and
+   * /roadkeep/docs, never /roadkeeper. An empty prefix is a whole site and covers it all.
+   */
+  function within(path, prefix) {
+    path = String(path || '/').toLowerCase();
+    return !prefix || path === prefix || path.slice(0, prefix.length + 1) === prefix + '/';
+  }
+
   /**
    * Is this campaign about the page it would be drawn on?
    *
    * Two sources, because they answer different halves. The catalogue's excludeHosts is
-   * what a product uses to name the sites it owns; the destination's own hostname is
+   * what a product uses to name the sites it owns; the destination's own address is
    * the case nobody remembers to list — a page linking to itself is an advertisement
    * for where the reader already is.
+   *
+   * The destination counts with its path. Products that share one host under paths
+   * (alegauss.github.io/roadkeep, /claude-tray) are different sites, and comparing the
+   * hostname alone would hide every one of them on each other's pages. A destination at
+   * a host's root has an empty path, so a product with its own domain is excluded across
+   * that whole domain exactly as before. excludeHosts still names whole hosts.
    */
-  function advertisesHost(campaign, host) {
+  function advertisesHost(campaign, host, path) {
     if (!host) return false;
-    if (under(host, hostOf(campaign.cta.href))) return true;
+    var href = campaign.cta.href;
+    if (under(host, hostOf(href)) && within(path, pathOf(href))) return true;
     var listed = campaign.excludeHosts || [];
     for (var i = 0; i < listed.length; i++) {
       if (under(host, listed[i])) return true;
@@ -638,12 +665,12 @@
    * takes its weight with it, and the remaining shares stay in the proportion the
    * catalogue declared.
    */
-  function eligibleFor(pool, slot, host) {
+  function eligibleFor(pool, slot, host, path) {
     var out = [];
     for (var i = 0; i < pool.length; i++) {
       var c = pool[i];
 
-      if (advertisesHost(c, host)) continue;
+      if (advertisesHost(c, host, path)) continue;
       if (slot.exclude.indexOf(c.id) !== -1) continue;
 
       // A campaign may name the formats it was written for; absent means all of them.
@@ -975,6 +1002,7 @@
         var pool = eligible(catalogue.campaigns);
         var random = (win.Math || Math).random;
         var host = (win.location && win.location.hostname || '').toLowerCase();
+        var path = win.location && win.location.pathname || '/';
         var taken = [];
 
         // One "off" anywhere on the page silences the memory for all of it.
@@ -1003,7 +1031,7 @@
 
           // Per slot, not once for the page: two slots can ask for different topics or
           // languages, and the host exclusion is the only part they share.
-          var campaign = pickFor(eligibleFor(pool, slot, host), taken, random, weigh);
+          var campaign = pickFor(eligibleFor(pool, slot, host, path), taken, random, weigh);
 
           // No campaign is not an error. The slot gives its reserved space back and
           // collapses, exactly as it does when the catalogue could not be read at all.
@@ -1063,6 +1091,7 @@
       eligibleFor: eligibleFor,
       advertisesHost: advertisesHost,
       under: under,
+      within: within,
       weightOf: weightOf,
       drawWeighted: drawWeighted,
       pickFor: pickFor,

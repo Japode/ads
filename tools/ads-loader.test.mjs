@@ -137,7 +137,7 @@ function fakeStorage({ seed, throwOn } = {}) {
  */
 function run(containers, {
   pageLang, fetch, scriptSrc = 'https://ads.japode.com/v1/ads.js',
-  dark = false, randoms, host = 'example.com', storage = fakeStorage(), live = false,
+  dark = false, randoms, host = 'example.com', path = '/', storage = fakeStorage(), live = false,
 } = {}) {
   const warnings = [];
   const fetchFn = fetch ?? fakeFetch(() => jsonResponse({ version: 1, campaigns: [] }));
@@ -171,7 +171,7 @@ function run(containers, {
     fetch: fetchFn,
     URL,
     matchMedia: q => (q.includes('dark') ? media : { matches: false }),
-    location: { hostname: host },
+    location: { hostname: host, pathname: path },
     localStorage: storage,
   };
   if (live) {
@@ -951,6 +951,45 @@ test('domain matching stops at a label boundary', () => {
   assert.equal(internals.under('viglet.org.evil.com', 'viglet.org'), false);
 });
 
+test('two products sharing one host under paths still advertise each other', () => {
+  const { internals } = run([]);
+  const at = (id, href) => campaign({ id, cta: { label: 'See ' + id, href } });
+  const p = [
+    at('roadkeep', 'https://alegauss.github.io/roadkeep'),
+    at('claude-tray', 'https://alegauss.github.io/claude-tray'),
+    at('mini-gpt', 'https://alegauss.github.io/mini-gpt/'),
+  ];
+  const host = 'alegauss.github.io';
+
+  assert.deepEqual(ids(internals.eligibleFor(p, asSlot(), host, '/claude-tray/')), ['roadkeep', 'mini-gpt']);
+  assert.deepEqual(ids(internals.eligibleFor(p, asSlot(), host, '/claude-tray/docs/install.html')),
+    ['roadkeep', 'mini-gpt'], 'a deeper page is still the product\'s own site');
+  assert.deepEqual(ids(internals.eligibleFor(p, asSlot(), host, '/mini-gpt')), ['roadkeep', 'claude-tray'],
+    'a destination\'s trailing slash does not decide the match');
+  assert.deepEqual(ids(internals.eligibleFor(p, asSlot(), host, '/')), ['roadkeep', 'claude-tray', 'mini-gpt'],
+    'the host\'s root belongs to none of them');
+});
+
+test('the page draw reads the path it is on, not only the host', async () => {
+  const tray = campaign({ id: 'claude-tray', cta: { label: 'See it', href: 'https://alegauss.github.io/claude-tray' } });
+  const keep = campaign({ id: 'roadkeep', cta: { label: 'See it', href: 'https://alegauss.github.io/roadkeep' } });
+  // randoms [0] lands on the first eligible entry, so claude-tray would win if it counted.
+  const h = run([el({ 'data-japode-ads': '' })], {
+    fetch: withCampaigns(tray, keep), randoms: [0], host: 'alegauss.github.io', path: '/claude-tray/',
+  });
+  await h.settled();
+  assert.equal(h.exposed.slots[0].showing, 'roadkeep');
+});
+
+test('path matching stops at a segment boundary', () => {
+  const { internals } = run([]);
+  assert.equal(internals.within('/roadkeep', '/roadkeep'), true);
+  assert.equal(internals.within('/roadkeep/', '/roadkeep'), true);
+  assert.equal(internals.within('/RoadKeep/docs', '/roadkeep'), true);
+  assert.equal(internals.within('/roadkeeper', '/roadkeep'), false, 'a prefix is not a path');
+  assert.equal(internals.within('/anything', ''), true, 'a destination at the root covers the whole host');
+});
+
 test('a slot can name campaigns it will never carry', () => {
   const { internals } = run([]);
   const p = [campaign({ id: 'a' }), campaign({ id: 'b' })];
@@ -1048,6 +1087,21 @@ test('the shipped catalogue keeps every Viglet property off its own sites', () =
       assert.ok(!kept.includes(id), `${id} would advertise itself on ${host}`);
     }
     assert.ok(kept.length, `${host} would have nothing at all to show`);
+  }
+});
+
+test('the shipped catalogue lets the alegauss.github.io products advertise each other', () => {
+  const { internals } = run([]);
+  const live = JSON.parse(readFileSync(join(root, 'site/v1/catalogue.json'), 'utf8'));
+  const p = internals.eligible(live.campaigns);
+  const products = ['roadkeep', 'freewilly', 'claude-tray', 'mini-gpt'];
+  for (const own of products) {
+    // No language filter, so a pt-BR entry is not what keeps it off the page.
+    const kept = ids(internals.eligibleFor(p, asSlot(), 'alegauss.github.io', `/${own}/`));
+    assert.ok(!kept.includes(own), `${own} would advertise itself on its own site`);
+    for (const other of products.filter(id => id !== own)) {
+      assert.ok(kept.includes(other), `${other} is hidden on /${own}/`);
+    }
   }
 });
 

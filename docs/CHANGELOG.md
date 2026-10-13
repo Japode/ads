@@ -35,6 +35,7 @@
 - ✅ **RK15** **Every visitor would see the same campaign** — Each slot draws in the browser from the whole catalogue, weighted by the declared field, and slots on one page exclude what the others already took.
 - ✅ **RK16** **A site can advertise itself** — The pick drops any campaign whose destination or excludeHosts covers the host page, plus the slot's own excluded ids, tag filter, language and format, all before the draw.
 - ✅ **RK17** **A returning reader keeps seeing the same pick** — The last four picks are demoted for thirty minutes from the host origin's own localStorage, holding ids and times only; unavailable storage costs the memory, never the banner.
+- ✅ **RK43** **Every product on one shared host hides the others, because self-exclusion compares the hostname alone** — Self-exclusion compares the destination path on a shared host, so alegauss.github.io products advertise each other and only hide themselves; domain-level exclusions are unchanged.
 
 ## Block F — Metrics, quality and operations
 

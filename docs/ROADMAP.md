@@ -1,9 +1,5 @@
 # Roadmap (active backlog)
 
-## Block E — Random rotation and delivery control
-
-- 📋 **RK43** (deps: —) **Every product on one shared host hides the others, because self-exclusion compares the hostname alone** — alegauss.github.io serves claude-tray, roadkeep, freewilly and mini-gpt under paths, so each of their sites can only draw products on other domains. → §RK43
-
 ## Non-goals
 
 - **No ad server or real-time bidding** The whole network is a static JSON file and a
