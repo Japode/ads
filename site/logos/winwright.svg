@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160" role="img" aria-label="winwright">
+  <!-- The product mark: a window, the control tree under it, the one element a locator
+       matched, and the reading that was not taken. The amber disc is the third verdict —
+       the whole reason this tool exists is that it has somewhere to put that. -->
+  <defs>
+    <linearGradient id="ww-body" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8877ff"/>
+      <stop offset="1" stop-color="#4635ad"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="160" height="160" rx="34" fill="url(#ww-body)"/>
+
+  <!-- the title bar -->
+  <rect x="28" y="30" width="104" height="10" rx="5" fill="#ffffff" opacity=".38"/>
+
+  <!-- the tree, one row per depth -->
+  <rect x="28" y="56" width="58" height="14" rx="4" fill="#ffffff" opacity=".92"/>
+  <rect x="38" y="80" width="72" height="14" rx="4" fill="#ffffff" opacity=".6"/>
+
+  <!-- the element the locator matched -->
+  <rect x="40" y="104" width="64" height="20" rx="6" fill="none" stroke="#ffffff" stroke-width="3.4"/>
+
+  <!-- the reading that was not taken -->
+  <circle cx="124" cy="120" r="15" fill="#D29A00" stroke="#2a1f52" stroke-width="6"/>
+</svg>

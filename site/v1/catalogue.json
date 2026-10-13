@@ -191,7 +191,8 @@
         "devtools",
         "cli",
         "roadmap",
-        "open-source"
+        "open-source",
+        "claude-code"
       ],
       "lang": [
         "en"
@@ -278,7 +279,98 @@
       "tags": [
         "windows",
         "devtools",
-        "monitoring"
+        "monitoring",
+        "claude-code"
+      ],
+      "lang": [
+        "en"
+      ]
+    },
+    {
+      "id": "commitclerk",
+      "product": "commitclerk",
+      "logo": {
+        "src": "/logos/commitclerk.svg",
+        "alt": "commitclerk",
+        "width": 128,
+        "height": 128
+      },
+      "headline": "Commit messages written from your staged diff",
+      "support": "One command reads the diff, asks the LLM you choose for a Conventional Commits message, and commits. Zero dependencies.",
+      "cta": {
+        "label": "Get commitclerk",
+        "href": "https://alegauss.github.io/commitclerk/"
+      },
+      "theme": {
+        "light": {
+          "accent": "#a16207",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#e9a33a",
+          "onAccent": "#141b2b",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
+      },
+      "weight": 1,
+      "tags": [
+        "devtools",
+        "cli",
+        "git",
+        "open-source",
+        "claude-code"
+      ],
+      "lang": [
+        "en"
+      ]
+    },
+    {
+      "id": "winwright",
+      "product": "winwright",
+      "logo": {
+        "src": "/logos/winwright.svg",
+        "alt": "winwright",
+        "width": 160,
+        "height": 160
+      },
+      "headline": "Windows UI tests that say what they could not check",
+      "support": "Drive a desktop app through UI Automation from .NET. A check that never ran is named in the result, not counted as a pass.",
+      "cta": {
+        "label": "See winwright",
+        "href": "https://alegauss.github.io/winwright/"
+      },
+      "theme": {
+        "light": {
+          "accent": "#4635ad",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#8877ff",
+          "onAccent": "#0f0a2e",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
+      },
+      "weight": 1,
+      "tags": [
+        "devtools",
+        "testing",
+        "windows",
+        "open-source",
+        "claude-code"
       ],
       "lang": [
         "en"
