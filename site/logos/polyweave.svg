@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 132" role="img" aria-label="polyweave" width="120" height="132">
+  <defs>
+    <!-- One gradient across the whole mark, in user space. Per-path (the objectBoundingBox
+         default) each ribbon gets its own ramp, and three thin diagonal boxes each run the
+         full violet-to-teal in their own few pixels — which reads as three differently
+         coloured threads rather than one weave lit from the corner. -->
+    <linearGradient id="pw-ribbon" gradientUnits="userSpaceOnUse"
+                    x1="8" y1="6" x2="112" y2="126">
+      <stop offset="0" stop-color="#a996ff"/>
+      <stop offset="0.5" stop-color="#7a5af8"/>
+      <stop offset="1" stop-color="#21c1a6"/>
+    </linearGradient>
+    <!-- The one crossing that has to be redrawn: three ribbons cannot be stacked in an
+         order that weaves, because the last one laid down is over both of the others. This
+         puts ribbon 1 back on top of ribbon 3, and only where they meet. -->
+    <clipPath id="pw-over">
+      <circle cx="34.02" cy="51" r="13"/>
+    </clipPath>
+  </defs>
+
+  <!-- the polygon: a point-up hexagon, thin, with its vertices marked -->
+  <path d="M60 6 L111.96 36 L111.96 96 L60 126 L8.04 96 L8.04 36 Z"
+        fill="none" stroke="#7a5af8" stroke-opacity="0.45" stroke-width="2.4"
+        stroke-linejoin="round"/>
+  <g fill="#7a5af8">
+    <circle cx="60" cy="6" r="4.2"/>
+    <circle cx="111.96" cy="36" r="4.2"/>
+    <circle cx="111.96" cy="96" r="4.2"/>
+    <circle cx="60" cy="126" r="4.2"/>
+    <circle cx="8.04" cy="96" r="4.2"/>
+    <circle cx="8.04" cy="36" r="4.2"/>
+  </g>
+
+  <!-- the weave: three chords across the hexagon, each crossing the other two -->
+  <g fill="none" stroke="url(#pw-ribbon)" stroke-width="11" stroke-linecap="round">
+    <path id="pw-r1" d="M8.04 36 L111.96 96"/>
+    <path d="M111.96 36 L60 126"/>
+    <path d="M60 6 L8.04 96"/>
+  </g>
+  <g clip-path="url(#pw-over)">
+    <path d="M8.04 36 L111.96 96" fill="none" stroke="url(#pw-ribbon)"
+          stroke-width="11" stroke-linecap="round"/>
+  </g>
+</svg>

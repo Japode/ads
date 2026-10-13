@@ -377,6 +377,318 @@
       ]
     },
     {
+      "id": "polyweave",
+      "product": "polyweave",
+      "logo": {
+        "src": "/logos/polyweave.svg",
+        "alt": "polyweave",
+        "width": 120,
+        "height": 132
+      },
+      "headline": "Your game's parts, made to a spec in Claude Code",
+      "support": "Each model, sprite or sound starts as a file saying what correct means; Claude Code makes it and measures it before you approve.",
+      "cta": {
+        "label": "See polyweave",
+        "href": "https://alegauss.github.io/polyweave/"
+      },
+      "theme": {
+        "light": {
+          "accent": "#5a3fd6",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#a996ff",
+          "onAccent": "#1a1240",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
+      },
+      "weight": 0.5,
+      "tags": [
+        "gamedev",
+        "devtools",
+        "open-source",
+        "claude-code"
+      ],
+      "lang": [
+        "en"
+      ]
+    },
+    {
+      "id": "quickshell",
+      "product": "Quickshell",
+      "logo": {
+        "src": "/logos/quickshell.svg",
+        "alt": "Quickshell",
+        "width": 128,
+        "height": 128
+      },
+      "headline": "SSH on Windows, without the suite around it",
+      "support": "A native SSH client with a GPU-drawn terminal: sessions, keys, SFTP and port forwards, and nothing bolted on beside them.",
+      "cta": {
+        "label": "See Quickshell",
+        "href": "https://alegauss.github.io/quickshell/"
+      },
+      "theme": {
+        "light": {
+          "accent": "#5b3fd6",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#9b87fc",
+          "onAccent": "#1a1240",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
+      },
+      "weight": 0.5,
+      "tags": [
+        "ssh",
+        "windows",
+        "devtools",
+        "open-source"
+      ],
+      "lang": [
+        "en"
+      ]
+    },
+    {
+      "id": "piano",
+      "product": "Piano",
+      "logo": {
+        "src": "/logos/piano.svg",
+        "alt": "Piano",
+        "width": 128,
+        "height": 128
+      },
+      "headline": "A piano Claude Code writes for, plays and teaches",
+      "support": "A free desktop piano that plays scores as notes falling onto the keys and teaches them bar by bar, with a Claude Code plugin.",
+      "cta": {
+        "label": "Get Piano",
+        "href": "https://alegauss.github.io/piano/"
+      },
+      "theme": {
+        "light": {
+          "accent": "#0075b2",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#35b6f0",
+          "onAccent": "#0e1217",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
+      },
+      "weight": 0.5,
+      "tags": [
+        "music",
+        "education",
+        "open-source",
+        "claude-code"
+      ],
+      "lang": [
+        "en"
+      ]
+    },
+    {
+      "id": "pportal",
+      "product": "PPortal",
+      "logo": {
+        "src": "/logos/pportal.svg",
+        "alt": "PPortal",
+        "width": 64,
+        "height": 72
+      },
+      "headline": "PlayStation Remote Play, rebuilt for Windows",
+      "support": "A free Remote Play client on .NET 10: ten-bit video, hardware decode on the card you own, and no bundled browser.",
+      "cta": {
+        "label": "Get PPortal",
+        "href": "https://alegauss.github.io/pportal/"
+      },
+      "theme": {
+        "light": {
+          "accent": "#3b47c4",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#8f9dff",
+          "onAccent": "#12153d",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
+      },
+      "weight": 0.5,
+      "tags": [
+        "gaming",
+        "windows",
+        "open-source"
+      ],
+      "lang": [
+        "en"
+      ]
+    },
+    {
+      "id": "spinhold",
+      "product": "Spinhold",
+      "logo": {
+        "src": "/logos/spinhold.svg",
+        "alt": "Spinhold",
+        "width": 128,
+        "height": 128
+      },
+      "headline": "An arcade shooter around a spinning space colony",
+      "support": "Fly the outside of a rotating station and hold it. From Viglet Games, in development for Steam.",
+      "cta": {
+        "label": "See Spinhold",
+        "href": "https://spinhold.viglet.com/"
+      },
+      "theme": {
+        "light": {
+          "accent": "#a3127a",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#ff3dcb",
+          "onAccent": "#0b0b1a",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
+      },
+      "weight": 0.5,
+      "tags": [
+        "games",
+        "arcade"
+      ],
+      "lang": [
+        "en"
+      ],
+      "excludeHosts": [
+        "spinhold.viglet.com"
+      ]
+    },
+    {
+      "id": "cottony",
+      "product": "Cottony",
+      "logo": {
+        "src": "/logos/cottony.png",
+        "alt": "Cottony",
+        "width": 96,
+        "height": 96
+      },
+      "headline": "A match-3 made of felt and stuffing",
+      "support": "Plush hearts, drops and stars squash when they land and puff when they pop. From Viglet Games, in development for Steam.",
+      "cta": {
+        "label": "See Cottony",
+        "href": "https://cottony.viglet.com/"
+      },
+      "theme": {
+        "light": {
+          "accent": "#b8322b",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#ff7fac",
+          "onAccent": "#2a0a14",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
+      },
+      "weight": 0.5,
+      "tags": [
+        "games",
+        "puzzle"
+      ],
+      "lang": [
+        "en"
+      ],
+      "excludeHosts": [
+        "cottony.viglet.com"
+      ]
+    },
+    {
+      "id": "skillgist",
+      "product": "skillgist",
+      "logo": {
+        "src": "/logos/skillgist.svg",
+        "alt": "skillgist",
+        "width": 64,
+        "height": 64
+      },
+      "headline": "Share Claude Code skills by URL",
+      "support": "Publish a skill as a .md or .zip and get a link; anyone installs it into a project with a single command.",
+      "cta": {
+        "label": "Try skillgist",
+        "href": "https://skillgist.com/"
+      },
+      "theme": {
+        "light": {
+          "accent": "#0969da",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#58a6ff",
+          "onAccent": "#0d1117",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
+      },
+      "weight": 0.5,
+      "tags": [
+        "devtools",
+        "skills",
+        "claude-code"
+      ],
+      "lang": [
+        "en"
+      ],
+      "excludeHosts": [
+        "skillgist.com",
+        "www.skillgist.com"
+      ]
+    },
+    {
       "id": "mini-gpt",
       "product": "Mini GPT",
       "logo": {
