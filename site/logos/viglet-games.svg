@@ -1,0 +1,29 @@
+<svg width="128" height="128" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="t">
+  <title id="t">Viglet Games</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#EF5A4C"/>
+      <stop offset="1" stop-color="#F7915E"/>
+    </linearGradient>
+  </defs>
+  <circle cx="256" cy="256" r="256" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="228" fill="none" stroke="#D9472F" stroke-width="7" stroke-linecap="round" stroke-dasharray="16 14"/>
+  <polyline points="170,172 256,352 342,172" fill="none" stroke="#F6E9D2" stroke-width="112" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="170,172 256,352 342,172" fill="none" stroke="#3B3B42" stroke-width="76" stroke-linecap="round" stroke-linejoin="round"/>
+  <g fill="#111114">
+    <circle cx="160" cy="180" r="6"/>
+    <circle cx="190" cy="172" r="6"/>
+    <circle cx="322" cy="172" r="6"/>
+    <circle cx="352" cy="180" r="6"/>
+  </g>
+  <g fill="none" stroke="#111114" stroke-width="4" stroke-linecap="round">
+    <path d="M167 192 q10 9 20 -3"/>
+    <path d="M325 189 q10 12 20 3"/>
+  </g>
+  <g fill="#F08A7E" opacity=".9">
+    <ellipse cx="150" cy="196" rx="8" ry="5"/>
+    <ellipse cx="200" cy="184" rx="8" ry="5"/>
+    <ellipse cx="312" cy="184" rx="8" ry="5"/>
+    <ellipse cx="362" cy="196" rx="8" ry="5"/>
+  </g>
+</svg>

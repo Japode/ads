@@ -9,7 +9,7 @@
 
 </div>
 
-Seventeen of our own products advertise each other. There is no ad server, no bidding, no
+Nineteen of our own products advertise each other. There is no ad server, no bidding, no
 third-party advertisers and no billing — the whole network is a JSON catalogue, a loader
 script and a folder of logos, and every decision about which banner to draw happens in
 the reader's browser.

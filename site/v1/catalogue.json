@@ -3,22 +3,22 @@
   "campaigns": [
     {
       "id": "shio",
-      "product": "Viglet Shio CMS",
+      "product": "Viglet Shio",
       "logo": {
-        "src": "/logos/shio.png",
-        "alt": "Viglet Shio CMS",
+        "src": "/logos/shio.svg",
+        "alt": "Viglet Shio",
         "width": 128,
         "height": 128
       },
       "headline": "Headless, and your coding agent can drive it",
       "support": "Content as files, MCP tools and blueprints. The curator approves in a React console with preview links.",
       "cta": {
-        "label": "See Shio CMS",
+        "label": "See Shio",
         "href": "https://shio.viglet.org/"
       },
       "theme": {
         "light": {
-          "accent": "#0275b0",
+          "accent": "#6d28d9",
           "onAccent": "#ffffff",
           "surface": "#f8fafc",
           "text": "#0f172a",
@@ -26,8 +26,8 @@
           "border": "#e2e8f0"
         },
         "dark": {
-          "accent": "#38bdf8",
-          "onAccent": "#082f49",
+          "accent": "#b497f9",
+          "onAccent": "#1e0b4b",
           "surface": "#0f172a",
           "text": "#e2e8f0",
           "muted": "#94a3b8",
@@ -53,22 +53,22 @@
     },
     {
       "id": "turing",
-      "product": "Viglet Turing ES",
+      "product": "Viglet Turing",
       "logo": {
-        "src": "/logos/turing.png",
-        "alt": "Viglet Turing ES",
+        "src": "/logos/turing.svg",
+        "alt": "Viglet Turing",
         "width": 128,
         "height": 128
       },
       "headline": "Enterprise search you host yourself",
       "support": "Index AEM, WordPress, databases and files, then answer over them with RAG. Apache-2.0, on your own infrastructure.",
       "cta": {
-        "label": "Explore Turing ES",
+        "label": "Explore Turing",
         "href": "https://turing.viglet.org/"
       },
       "theme": {
         "light": {
-          "accent": "#1d4ed8",
+          "accent": "#2c4bb8",
           "onAccent": "#ffffff",
           "surface": "#f8fafc",
           "text": "#0f172a",
@@ -76,7 +76,7 @@
           "border": "#e2e8f0"
         },
         "dark": {
-          "accent": "#60a5fa",
+          "accent": "#86a2f7",
           "onAccent": "#0b1220",
           "surface": "#0f172a",
           "text": "#e2e8f0",
@@ -105,20 +105,20 @@
       "id": "viglet",
       "product": "Viglet",
       "logo": {
-        "src": "/logos/viglet.png",
+        "src": "/logos/viglet.svg",
         "alt": "Viglet",
         "width": 128,
         "height": 128
       },
-      "headline": "Open source content and search, self-hosted",
-      "support": "The home of Shio CMS and Turing ES: two Apache-2.0 platforms that keep your content on your own servers.",
+      "headline": "Open source search, content and data, self-hosted",
+      "support": "The home of Viglet Turing, Shio and Dumont: Apache-2.0 platforms that keep your content on your own servers.",
       "cta": {
         "label": "Visit Viglet",
         "href": "https://www.viglet.org/"
       },
       "theme": {
         "light": {
-          "accent": "#4f46e5",
+          "accent": "#c2410c",
           "onAccent": "#ffffff",
           "surface": "#f8fafc",
           "text": "#0f172a",
@@ -126,8 +126,8 @@
           "border": "#e2e8f0"
         },
         "dark": {
-          "accent": "#a5b4fc",
-          "onAccent": "#1e1b4b",
+          "accent": "#f7915e",
+          "onAccent": "#2a0f05",
           "surface": "#0f172a",
           "text": "#e2e8f0",
           "muted": "#94a3b8",
@@ -149,7 +149,58 @@
         "www.viglet.org",
         "docs.viglet.org",
         "shio.viglet.org",
-        "turing.viglet.org"
+        "turing.viglet.org",
+        "dumont.viglet.org"
+      ]
+    },
+    {
+      "id": "dumont",
+      "product": "Viglet Dumont",
+      "logo": {
+        "src": "/logos/dumont.svg",
+        "alt": "Viglet Dumont",
+        "width": 128,
+        "height": 128
+      },
+      "headline": "Connect your sources, deliver them to search",
+      "support": "A data exchange platform that takes content from your sources to Viglet Turing or any other search engine. Apache-2.0.",
+      "cta": {
+        "label": "See Dumont",
+        "href": "https://dumont.viglet.org/"
+      },
+      "theme": {
+        "light": {
+          "accent": "#0f766e",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#33ae9f",
+          "onAccent": "#04201d",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
+      },
+      "weight": 0.5,
+      "tags": [
+        "data",
+        "search",
+        "open-source",
+        "self-hosted"
+      ],
+      "lang": [
+        "en"
+      ],
+      "excludeHosts": [
+        "viglet.org",
+        "www.viglet.org",
+        "docs.viglet.org",
+        "dumont.viglet.org"
       ]
     },
     {
@@ -639,6 +690,52 @@
       ],
       "excludeHosts": [
         "cottony.viglet.com"
+      ]
+    },
+    {
+      "id": "viglet-games",
+      "product": "Viglet Games",
+      "logo": {
+        "src": "/logos/viglet-games.svg",
+        "alt": "Viglet Games",
+        "width": 128,
+        "height": 128
+      },
+      "headline": "A plush match-3 and a neon shooter",
+      "support": "Viglet Games is making Cottony and Spinhold, both in development for Steam.",
+      "cta": {
+        "label": "Meet the games",
+        "href": "https://games.viglet.com/"
+      },
+      "theme": {
+        "light": {
+          "accent": "#c2410c",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#f7915e",
+          "onAccent": "#2a0f05",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
+      },
+      "weight": 0.5,
+      "tags": [
+        "games"
+      ],
+      "lang": [
+        "en"
+      ],
+      "excludeHosts": [
+        "games.viglet.com",
+        "cottony.viglet.com",
+        "spinhold.viglet.com"
       ]
     },
     {
