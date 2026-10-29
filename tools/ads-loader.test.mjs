@@ -1081,12 +1081,19 @@ test('the shipped catalogue keeps every Viglet property off its own sites', () =
   const { internals } = run([]);
   const live = JSON.parse(readFileSync(join(root, 'site/v1/catalogue.json'), 'utf8'));
   const p = internals.eligible(live.campaigns);
-  for (const host of ['shio.viglet.org', 'turing.viglet.org', 'www.viglet.org', 'docs.viglet.org']) {
-    const kept = ids(internals.eligibleFor(p, asSlot(), host));
-    for (const id of ['shio', 'turing', 'viglet']) {
-      assert.ok(!kept.includes(id), `${id} would advertise itself on ${host}`);
+  const sites = [
+    ['www.viglet.org', '/'],
+    ['docs.viglet.org', '/'],
+    ['openviglet.github.io', '/shio/'],
+    ['openviglet.github.io', '/turing/'],
+    ['openviglet.github.io', '/dumont/'],
+  ];
+  for (const [host, path] of sites) {
+    const kept = ids(internals.eligibleFor(p, asSlot(), host, path));
+    for (const id of ['shio', 'turing', 'viglet', 'dumont']) {
+      assert.ok(!kept.includes(id), `${id} would advertise itself on ${host}${path}`);
     }
-    assert.ok(kept.length, `${host} would have nothing at all to show`);
+    assert.ok(kept.length, `${host}${path} would have nothing at all to show`);
   }
 });
 
