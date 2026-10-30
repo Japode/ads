@@ -248,19 +248,19 @@
       ]
     },
     {
-      "id": "freewilly",
-      "product": "FreeWilly",
+      "id": "freeharbor",
+      "product": "FreeHarbor",
       "logo": {
-        "src": "/logos/freewilly.png",
-        "alt": "FreeWilly",
-        "width": 110,
+        "src": "/logos/freeharbor.svg",
+        "alt": "FreeHarbor",
+        "width": 128,
         "height": 128
       },
       "headline": "Docker on Windows, under Apache-2.0",
       "support": "A Docker Desktop alternative with no headcount threshold, no revenue threshold and no licence to buy.",
       "cta": {
-        "label": "Download FreeWilly",
-        "href": "https://alegauss.github.io/freewilly"
+        "label": "Download FreeHarbor",
+        "href": "https://alegauss.github.io/freeharbor/"
       },
       "theme": {
         "light": {

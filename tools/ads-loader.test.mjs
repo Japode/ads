@@ -1101,7 +1101,7 @@ test('the shipped catalogue lets the alegauss.github.io products advertise each 
   const { internals } = run([]);
   const live = JSON.parse(readFileSync(join(root, 'site/v1/catalogue.json'), 'utf8'));
   const p = internals.eligible(live.campaigns);
-  const products = ['roadkeep', 'freewilly', 'claude-tray', 'mini-gpt'];
+  const products = ['roadkeep', 'freeharbor','claude-tray', 'mini-gpt'];
   for (const own of products) {
     // No language filter, so a pt-BR entry is not what keeps it off the page.
     const kept = ids(internals.eligibleFor(p, asSlot(), 'alegauss.github.io', `/${own}/`));

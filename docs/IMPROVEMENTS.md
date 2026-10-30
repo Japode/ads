@@ -11,7 +11,7 @@ owner decided on 30/10/2026 that it enters with weight 1, like the others (visib
 `produtos/japode-ads.md`); the weight-1 campaigns stay at 1 on purpose, so nothing else
 moves.
 
-The entry, in the shape the Windows apps already use (freewilly):
+The entry, in the shape the Windows apps already use (freeharbor):
 
 - `id` `revelei`, `product` "Revelei", the icon copied to `site/logos/revelei.svg` with its
   intrinsic size;

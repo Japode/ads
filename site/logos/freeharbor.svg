@@ -1,0 +1,29 @@
+<svg width="128" height="128" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1254 1254" role="img" aria-label="FreeHarbor">
+  <!-- Copied from alegauss/freeharbor site/public/logo.svg. -->
+  <defs>
+    <linearGradient id="fh-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#073b9c"/>
+      <stop offset="1" stop-color="#002d83"/>
+    </linearGradient>
+    <linearGradient id="fh-cyan" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#149ff0"/>
+      <stop offset="1" stop-color="#21b8f5"/>
+    </linearGradient>
+  </defs>
+  <rect width="1254" height="1254" rx="225" fill="url(#fh-bg)"/>
+  <g transform="translate(627 627) scale(1.45) translate(-626 -565)">
+    <!-- containers -->
+    <g fill="url(#fh-cyan)">
+      <path d="M559 366 Q559 359 567 357 L694 324 Q700 322 706 325 L748 343 Q756 346 756 355 L756 438 L699 423 L559 455 Z"/>
+      <path d="M423 474 Q423 470 429 468 L531 448 Q537 447 537 453 L537 540 L423 560 Z"/>
+      <path d="M559 475 L678 452 L678 537 Q678 543 672 544 L559 554 Z"/>
+      <path d="M699 443 L802 468 Q809 470 809 477 L809 490 L699 516 Z"/>
+    </g>
+    <!-- hull -->
+    <path fill="#fff" d="M392 580 L665 571 Q686 570 703 555 L897 484 Q915 477 924 491 Q929 500 923 512 L857 663 Q848 685 823 691 Q785 700 746 684 L623 630 Q548 597 478 604 L392 620 Z"/>
+    <circle cx="833" cy="561" r="21" fill="#073b9c"/>
+    <!-- waves -->
+    <path fill="url(#fh-cyan)" d="M328 714 Q405 620 497 630 Q571 636 644 671 Q755 724 860 696 Q827 739 765 750 Q696 765 615 730 Q504 681 430 681 Q371 681 328 714 Z"/>
+    <path fill="url(#fh-cyan)" d="M388 758 Q443 710 499 715 Q558 718 622 749 Q700 787 766 778 Q720 808 658 808 Q594 808 531 778 Q454 742 420 751 Z"/>
+  </g>
+</svg>
