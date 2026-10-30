@@ -1,5 +1,10 @@
 # Roadmap (active backlog)
 
+## Block A — Ad catalogue in JSON
+
+- 📋 **RK44** (deps: —) **Revelei is not in the catalogue, so no site of the house ever shows it** — Revelei left Japode for its own page on 26/10/2026, and the owner put it in the rotation with weight 1 on 30/10/2026. → §RK44
+- 📋 **RK45** (deps: —) **Modelado is not in the catalogue, though it has its own page and icon** — A product with a public page and its own logo goes in the catalogue, and Modelado pairs with Revelei as one line of offline AI apps. → §RK45
+
 ## Non-goals
 
 - **No ad server or real-time bidding** The whole network is a static JSON file and a
