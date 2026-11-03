@@ -470,19 +470,19 @@
       ]
     },
     {
-      "id": "quickshell",
-      "product": "Quickshell",
+      "id": "aduzi",
+      "product": "Aduzi",
       "logo": {
-        "src": "/logos/quickshell.svg",
-        "alt": "Quickshell",
+        "src": "/logos/aduzi.svg",
+        "alt": "Aduzi",
         "width": 128,
         "height": 128
       },
       "headline": "SSH on Windows, without the suite around it",
       "support": "A native SSH client with a GPU-drawn terminal: sessions, keys, SFTP and port forwards, and nothing bolted on beside them.",
       "cta": {
-        "label": "See Quickshell",
-        "href": "https://alegauss.github.io/quickshell/"
+        "label": "See Aduzi",
+        "href": "https://alegauss.github.io/aduzi/"
       },
       "theme": {
         "light": {
