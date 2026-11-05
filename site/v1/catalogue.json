@@ -14,7 +14,7 @@
       "support": "Content as files, MCP tools and blueprints. The curator approves in a React console with preview links.",
       "cta": {
         "label": "See Shio",
-        "href": "https://openviglet.github.io/shio/"
+        "href": "https://shio.viglet.org/"
       },
       "theme": {
         "light": {
@@ -45,7 +45,6 @@
         "en"
       ],
       "excludeHosts": [
-        "openviglet.github.io",
         "viglet.org",
         "www.viglet.org",
         "docs.viglet.org"
@@ -64,7 +63,7 @@
       "support": "Index AEM, WordPress, databases and files, then answer over them with RAG. Apache-2.0, on your own infrastructure.",
       "cta": {
         "label": "Explore Turing",
-        "href": "https://openviglet.github.io/turing/"
+        "href": "https://turing.viglet.org/"
       },
       "theme": {
         "light": {
@@ -97,7 +96,6 @@
       "excludeHosts": [
         "viglet.org",
         "www.viglet.org",
-        "openviglet.github.io",
         "docs.viglet.org"
       ]
     },
@@ -147,8 +145,7 @@
       "excludeHosts": [
         "viglet.org",
         "www.viglet.org",
-        "docs.viglet.org",
-        "openviglet.github.io"
+        "docs.viglet.org"
       ]
     },
     {
@@ -164,7 +161,7 @@
       "support": "A data exchange platform that takes content from your sources to Viglet Turing or any other search engine. Apache-2.0.",
       "cta": {
         "label": "See Dumont",
-        "href": "https://openviglet.github.io/dumont/"
+        "href": "https://dumont.viglet.org/"
       },
       "theme": {
         "light": {
@@ -197,8 +194,7 @@
       "excludeHosts": [
         "viglet.org",
         "www.viglet.org",
-        "docs.viglet.org",
-        "openviglet.github.io"
+        "docs.viglet.org"
       ]
     },
     {

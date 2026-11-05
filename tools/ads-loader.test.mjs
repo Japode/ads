@@ -1084,9 +1084,10 @@ test('the shipped catalogue keeps every Viglet property off its own sites', () =
   const sites = [
     ['www.viglet.org', '/'],
     ['docs.viglet.org', '/'],
-    ['openviglet.github.io', '/shio/'],
-    ['openviglet.github.io', '/turing/'],
-    ['openviglet.github.io', '/dumont/'],
+    ['shio.viglet.org', '/'],
+    ['turing.viglet.org', '/'],
+    ['dumont.viglet.org', '/'],
+    ['models.viglet.org', '/'],
   ];
   for (const [host, path] of sites) {
     const kept = ids(internals.eligibleFor(p, asSlot(), host, path));
