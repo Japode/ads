@@ -1091,7 +1091,7 @@ test('the shipped catalogue keeps every Viglet property off its own sites', () =
   ];
   for (const [host, path] of sites) {
     const kept = ids(internals.eligibleFor(p, asSlot(), host, path));
-    for (const id of ['shio', 'turing', 'viglet', 'dumont']) {
+    for (const id of ['shio', 'turing', 'viglet', 'dumont', 'models']) {
       assert.ok(!kept.includes(id), `${id} would advertise itself on ${host}${path}`);
     }
     assert.ok(kept.length, `${host}${path} would have nothing at all to show`);

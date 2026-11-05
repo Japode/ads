@@ -198,6 +198,55 @@
       ]
     },
     {
+      "id": "models",
+      "product": "Viglet Model Catalog",
+      "logo": {
+        "src": "/logos/models.svg",
+        "alt": "Viglet Model Catalog",
+        "width": 128,
+        "height": 128
+      },
+      "headline": "Every model id, by vendor and by kind",
+      "support": "Context windows, embedding dimensions and capabilities for chat, embedding and rerank models. Free, versioned JSON, no key.",
+      "cta": {
+        "label": "Browse the catalog",
+        "href": "https://models.viglet.org/"
+      },
+      "theme": {
+        "light": {
+          "accent": "#c2410c",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#f7915e",
+          "onAccent": "#2a0f05",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
+      },
+      "weight": 0.5,
+      "tags": [
+        "ai",
+        "llm",
+        "open-data",
+        "api"
+      ],
+      "lang": [
+        "en"
+      ],
+      "excludeHosts": [
+        "viglet.org",
+        "www.viglet.org",
+        "docs.viglet.org"
+      ]
+    },
+    {
       "id": "roadkeep",
       "product": "roadkeep",
       "logo": {
