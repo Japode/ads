@@ -918,6 +918,52 @@
         "cursarei.com.br",
         "www.cursarei.com.br"
       ]
+    },
+    {
+      "id": "jcloud",
+      "product": "jcloud",
+      "logo": {
+        "src": "/logos/jcloud.svg",
+        "alt": "jcloud",
+        "width": 128,
+        "height": 128
+      },
+      "headline": "Your deploy files, held to one manifest",
+      "support": "Checks the Dockerfile, compose file, Caddy or nginx route and .env against a service manifest, and the server against the tree.",
+      "cta": {
+        "label": "Get jcloud",
+        "href": "https://japode.com/jcloud/"
+      },
+      "theme": {
+        "light": {
+          "accent": "#c2410c",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#fb923c",
+          "onAccent": "#2a0f05",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
+      },
+      "weight": 1,
+      "tags": [
+        "devtools",
+        "cli",
+        "devops",
+        "self-hosted",
+        "docker",
+        "open-source"
+      ],
+      "lang": [
+        "en"
+      ]
     }
   ]
 }
