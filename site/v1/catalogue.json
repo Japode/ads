@@ -181,7 +181,7 @@
           "border": "#1e293b"
         }
       },
-      "weight": 0.5,
+      "weight": 1,
       "tags": [
         "data",
         "search",
@@ -230,7 +230,7 @@
           "border": "#1e293b"
         }
       },
-      "weight": 0.5,
+      "weight": 1,
       "tags": [
         "ai",
         "llm",
@@ -503,7 +503,7 @@
           "border": "#1e293b"
         }
       },
-      "weight": 0.5,
+      "weight": 1,
       "tags": [
         "gamedev",
         "devtools",
@@ -547,7 +547,7 @@
           "border": "#1e293b"
         }
       },
-      "weight": 0.5,
+      "weight": 1,
       "tags": [
         "ssh",
         "windows",
@@ -591,7 +591,7 @@
           "border": "#1e293b"
         }
       },
-      "weight": 0.5,
+      "weight": 1,
       "tags": [
         "music",
         "education",
@@ -635,7 +635,7 @@
           "border": "#1e293b"
         }
       },
-      "weight": 0.5,
+      "weight": 1,
       "tags": [
         "gaming",
         "windows",
@@ -678,7 +678,7 @@
           "border": "#1e293b"
         }
       },
-      "weight": 0.5,
+      "weight": 1,
       "tags": [
         "games",
         "arcade"
@@ -723,7 +723,7 @@
           "border": "#1e293b"
         }
       },
-      "weight": 0.5,
+      "weight": 1,
       "tags": [
         "games",
         "puzzle"
@@ -768,7 +768,7 @@
           "border": "#1e293b"
         }
       },
-      "weight": 0.5,
+      "weight": 1,
       "tags": [
         "games"
       ],
@@ -814,7 +814,7 @@
           "border": "#1e293b"
         }
       },
-      "weight": 0.5,
+      "weight": 1,
       "tags": [
         "devtools",
         "skills",
@@ -959,6 +959,97 @@
         "devops",
         "self-hosted",
         "docker",
+        "open-source"
+      ],
+      "lang": [
+        "en"
+      ]
+    },
+    {
+      "id": "revelei",
+      "product": "Revelei",
+      "logo": {
+        "src": "/logos/revelei.svg",
+        "alt": "Revelei",
+        "width": 128,
+        "height": 128
+      },
+      "headline": "Better photos, right on your PC",
+      "support": "Upscale, denoise, restore faces and remove backgrounds with AI on your own Windows computer. Nothing is uploaded.",
+      "cta": {
+        "label": "Get Revelei",
+        "href": "https://alegauss.github.io/revelei/"
+      },
+      "theme": {
+        "light": {
+          "accent": "#a64b2e",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#e89070",
+          "onAccent": "#2a0f05",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
+      },
+      "weight": 1,
+      "tags": [
+        "windows",
+        "photos",
+        "ai",
+        "offline",
+        "open-source"
+      ],
+      "lang": [
+        "en"
+      ]
+    },
+    {
+      "id": "modelado",
+      "product": "Modelado",
+      "logo": {
+        "src": "/logos/modelado.svg",
+        "alt": "Modelado",
+        "width": 128,
+        "height": 128
+      },
+      "headline": "A photo becomes a 3D model, on your PC",
+      "support": "Turn a photo into a 3D object or a relief, clean the mesh and export it for printing, games or Blender. Nothing is uploaded.",
+      "cta": {
+        "label": "Get Modelado",
+        "href": "https://alegauss.github.io/modelado/"
+      },
+      "theme": {
+        "light": {
+          "accent": "#234f9c",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#5b9be6",
+          "onAccent": "#0b1a33",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
+      },
+      "weight": 1,
+      "tags": [
+        "windows",
+        "3d",
+        "ai",
+        "3d-printing",
+        "blender",
         "open-source"
       ],
       "lang": [
