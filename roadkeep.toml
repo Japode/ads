@@ -52,3 +52,6 @@ held = 60
 name = "Japode Ads"
 description = "A static ad network where twenty-three Japode products advertise each other."
 icon = "📣"
+
+[install]
+wired = "0.2.576"
