@@ -636,7 +636,7 @@
    * for where the reader already is.
    *
    * The destination counts with its path. Products that share one host under paths
-   * (alegauss.github.io/roadkeep, /claude-tray) are different sites, and comparing the
+   * (alegauss.com/roadkeep, /claude-tray) are different sites, and comparing the
    * hostname alone would hide every one of them on each other's pages. A destination at
    * a host's root has an empty path, so a product with its own domain is excluded across
    * that whole domain exactly as before. excludeHosts still names whole hosts.

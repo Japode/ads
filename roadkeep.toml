@@ -50,7 +50,7 @@ held = 60
 
 [project]
 name = "Japode Ads"
-description = "A static ad network where twenty-three Japode products advertise each other."
+description = "A static ad network where twenty-four Japode products advertise each other."
 icon = "📣"
 
 [install]

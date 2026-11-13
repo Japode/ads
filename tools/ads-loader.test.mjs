@@ -1098,14 +1098,14 @@ test('the shipped catalogue keeps every Viglet property off its own sites', () =
   }
 });
 
-test('the shipped catalogue lets the alegauss.github.io products advertise each other', () => {
+test('the shipped catalogue lets the alegauss.com products advertise each other', () => {
   const { internals } = run([]);
   const live = JSON.parse(readFileSync(join(root, 'site/v1/catalogue.json'), 'utf8'));
   const p = internals.eligible(live.campaigns);
   const products = ['roadkeep', 'freeharbor','claude-tray', 'mini-gpt'];
   for (const own of products) {
     // No language filter, so a pt-BR entry is not what keeps it off the page.
-    const kept = ids(internals.eligibleFor(p, asSlot(), 'alegauss.github.io', `/${own}/`));
+    const kept = ids(internals.eligibleFor(p, asSlot(), 'alegauss.com', `/${own}/`));
     assert.ok(!kept.includes(own), `${own} would advertise itself on its own site`);
     for (const other of products.filter(id => id !== own)) {
       assert.ok(kept.includes(other), `${other} is hidden on /${own}/`);

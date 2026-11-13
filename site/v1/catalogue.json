@@ -260,7 +260,7 @@
       "support": "A CLI owns the roadmap, the changelog and the rationale, so shipping a task updates all three or none of them.",
       "cta": {
         "label": "Get roadkeep",
-        "href": "https://alegauss.github.io/roadkeep"
+        "href": "https://alegauss.com/roadkeep"
       },
       "theme": {
         "light": {
@@ -305,7 +305,7 @@
       "support": "A Docker Desktop alternative with no headcount threshold, no revenue threshold and no licence to buy.",
       "cta": {
         "label": "Download FreeHarbor",
-        "href": "https://alegauss.github.io/freeharbor/"
+        "href": "https://alegauss.com/freeharbor/"
       },
       "theme": {
         "light": {
@@ -349,7 +349,7 @@
       "support": "A native Windows tray icon that draws your rate-limit percentage as a vector, crisp at any DPI.",
       "cta": {
         "label": "Install for Windows",
-        "href": "https://alegauss.github.io/claude-tray"
+        "href": "https://alegauss.com/claude-tray"
       },
       "theme": {
         "light": {
@@ -393,7 +393,7 @@
       "support": "One command reads the diff, asks the LLM you choose for a Conventional Commits message, and commits. Zero dependencies.",
       "cta": {
         "label": "Get commitclerk",
-        "href": "https://alegauss.github.io/commitclerk/"
+        "href": "https://alegauss.com/commitclerk/"
       },
       "theme": {
         "light": {
@@ -438,7 +438,7 @@
       "support": "Drive a desktop app through UI Automation from .NET. A check that never ran is named in the result, not counted as a pass.",
       "cta": {
         "label": "See winwright",
-        "href": "https://alegauss.github.io/winwright/"
+        "href": "https://alegauss.com/winwright/"
       },
       "theme": {
         "light": {
@@ -483,7 +483,7 @@
       "support": "Each model, sprite or sound starts as a file saying what correct means; Claude Code makes it and measures it before you approve.",
       "cta": {
         "label": "See polyweave",
-        "href": "https://alegauss.github.io/polyweave/"
+        "href": "https://alegauss.com/polyweave/"
       },
       "theme": {
         "light": {
@@ -527,7 +527,7 @@
       "support": "A native SSH client with a GPU-drawn terminal: sessions, keys, SFTP and port forwards, and nothing bolted on beside them.",
       "cta": {
         "label": "See Aduzi",
-        "href": "https://alegauss.github.io/aduzi/"
+        "href": "https://alegauss.com/aduzi/"
       },
       "theme": {
         "light": {
@@ -571,7 +571,7 @@
       "support": "A free desktop piano that plays scores as notes falling onto the keys and teaches them bar by bar, with a Claude Code plugin.",
       "cta": {
         "label": "Get Piano",
-        "href": "https://alegauss.github.io/piano/"
+        "href": "https://alegauss.com/piano/"
       },
       "theme": {
         "light": {
@@ -615,7 +615,7 @@
       "support": "A free Remote Play client on .NET 10: ten-bit video, hardware decode on the card you own, and no bundled browser.",
       "cta": {
         "label": "Get PPortal",
-        "href": "https://alegauss.github.io/pportal/"
+        "href": "https://alegauss.com/pportal/"
       },
       "theme": {
         "light": {
@@ -841,7 +841,7 @@
       "support": "Modelo de linguagem em nível de caractere escrito do zero, com a matemática de cada classe explicada.",
       "cta": {
         "label": "Ler a aula",
-        "href": "https://alegauss.github.io/mini-gpt/"
+        "href": "https://alegauss.com/mini-gpt/"
       },
       "theme": {
         "light": {
@@ -978,7 +978,7 @@
       "support": "Upscale, denoise, restore faces and remove backgrounds with AI on your own Windows computer. Nothing is uploaded.",
       "cta": {
         "label": "Get Revelei",
-        "href": "https://alegauss.github.io/revelei/"
+        "href": "https://alegauss.com/revelei/"
       },
       "theme": {
         "light": {
@@ -1023,7 +1023,7 @@
       "support": "Turn a photo into a 3D object or a relief, clean the mesh and export it for printing, games or Blender. Nothing is uploaded.",
       "cta": {
         "label": "Get Modelado",
-        "href": "https://alegauss.github.io/modelado/"
+        "href": "https://alegauss.com/modelado/"
       },
       "theme": {
         "light": {
@@ -1050,6 +1050,52 @@
         "ai",
         "3d-printing",
         "blender",
+        "open-source"
+      ],
+      "lang": [
+        "en"
+      ]
+    },
+    {
+      "id": "askround",
+      "product": "askround",
+      "logo": {
+        "src": "/logos/askround.svg",
+        "alt": "askround",
+        "width": 128,
+        "height": 128
+      },
+      "headline": "See what ChatGPT says about your product",
+      "support": "Ask ChatGPT, Gemini, Claude and Perplexity the same question with web search, and read whether your app is named. CLI and MCP.",
+      "cta": {
+        "label": "Get askround",
+        "href": "https://alegauss.com/askround/"
+      },
+      "theme": {
+        "light": {
+          "accent": "#c2410c",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#fb923c",
+          "onAccent": "#2a0f05",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
+      },
+      "weight": 1,
+      "tags": [
+        "devtools",
+        "cli",
+        "mcp",
+        "claude-code",
+        "ai",
         "open-source"
       ],
       "lang": [
