@@ -1101,6 +1101,54 @@
       "lang": [
         "en"
       ]
+    },
+    {
+      "id": "jogarei",
+      "product": "Jogarei",
+      "logo": {
+        "src": "/logos/jogarei.svg",
+        "alt": "Jogarei",
+        "width": 64,
+        "height": 64
+      },
+      "headline": "Jogos indies brasileiros num lugar só",
+      "support": "Onde jogar, quanto custa e quem fez, da Steam ao itch.io e às lojas de celular, com a origem de cada jogo conferida.",
+      "cta": {
+        "label": "Descobrir jogos",
+        "href": "https://jogarei.com.br/"
+      },
+      "theme": {
+        "light": {
+          "accent": "#c2391b",
+          "onAccent": "#ffffff",
+          "surface": "#f8fafc",
+          "text": "#0f172a",
+          "muted": "#475569",
+          "border": "#e2e8f0"
+        },
+        "dark": {
+          "accent": "#ff6a4a",
+          "onAccent": "#211d1a",
+          "surface": "#0f172a",
+          "text": "#e2e8f0",
+          "muted": "#94a3b8",
+          "border": "#1e293b"
+        }
+      },
+      "weight": 1,
+      "tags": [
+        "gaming",
+        "brasil",
+        "jogos",
+        "indie"
+      ],
+      "lang": [
+        "pt-BR"
+      ],
+      "excludeHosts": [
+        "jogarei.com.br",
+        "www.jogarei.com.br"
+      ]
     }
   ]
 }
