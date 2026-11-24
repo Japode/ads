@@ -8,6 +8,7 @@
 - ✅ **RK4** **Nothing rejects a malformed catalogue before it is published** — npm run validate refuses the file: ajv against the v1 schema plus the rules it cannot state, and 12 tests prove each way a catalogue breaks actually stops the publish.
 - ✅ **RK22** **The cursarei campaign points at a repository that returns 404** — cursarei is enabled:false in the catalogue, keeping its id, and the gate now reports campaigns in rotation and withdrawn instead of a bare total.
 - ✅ **RK46** **Uma pagina pt-BR so recebe as campanhas escritas em portugues, e quase todas sao so em ingles** — As 25 campanhas tem copia pt-BR e en via translations; o loader desenha a copia do idioma da pagina, com selo Anuncio em portugues, e o gate recusa lang e translations em desacordo.
+- ✅ **RK48** **O banner do PPortal leva a alegauss.com/pportal/, que responde 404 desde que o produto virou Transmiti** — A campanha agora e transmiti: nome, logo site/logos/transmiti.svg, destino alegauss.com/transmiti/ e copia sem PlayStation Remote Play, em en e pt-BR.
 
 ## Block B — Static API on ads.japode.com
 

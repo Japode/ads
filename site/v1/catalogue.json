@@ -733,19 +733,19 @@
       }
     },
     {
-      "id": "pportal",
-      "product": "PPortal",
+      "id": "transmiti",
+      "product": "Transmiti",
       "logo": {
-        "src": "/logos/pportal.svg",
-        "alt": "PPortal",
+        "src": "/logos/transmiti.svg",
+        "alt": "Transmiti",
         "width": 64,
         "height": 72
       },
-      "headline": "PlayStation Remote Play, rebuilt for Windows",
-      "support": "A free Remote Play client on .NET 10: ten-bit video, hardware decode on the card you own, and no bundled browser.",
+      "headline": "Console remote play, rebuilt for Windows",
+      "support": "A free remote play client for PS5 and PS4 on .NET 10: ten-bit video, hardware decode on the card you own, and no bundled browser.",
       "cta": {
-        "label": "Get PPortal",
-        "href": "https://alegauss.com/pportal/"
+        "label": "Get Transmiti",
+        "href": "https://alegauss.com/transmiti/"
       },
       "theme": {
         "light": {
@@ -777,10 +777,10 @@
       ],
       "translations": {
         "pt-BR": {
-          "headline": "PlayStation Remote Play, refeito para Windows",
-          "support": "Um cliente Remote Play gratuito em .NET 10: vídeo de dez bits, decodificação na sua própria placa e nenhum navegador embutido.",
+          "headline": "Remote play de console, refeito para Windows",
+          "support": "Um cliente de remote play gratuito para PS5 e PS4 em .NET 10: vídeo de dez bits, decodificação na sua placa e nenhum navegador embutido.",
           "cta": {
-            "label": "Baixar o PPortal"
+            "label": "Baixar o Transmiti"
           }
         }
       }
