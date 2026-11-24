@@ -40,6 +40,38 @@ test('the real catalogue passes', () => {
   assert.equal(code, 0, 'the committed catalogue must be publishable');
 });
 
+test('a language with no copy is refused', () => {
+  const { code, out } = gate('lang-no-copy', broken(c => { c.campaigns[0].lang.push('es'); }));
+  assert.equal(code, 1);
+  assert.match(out, /lang lists es but translations has no es copy/);
+});
+
+test('a translation the lang list does not name is refused', () => {
+  const { code, out } = gate('copy-no-lang', broken(c => {
+    c.campaigns[0].translations.es = { headline: 'h', support: 's', cta: { label: 'c' } };
+  }));
+  assert.equal(code, 1);
+  assert.match(out, /translations\.es is not in lang/);
+});
+
+test('a translation of the entry\'s own language is refused', () => {
+  const { code, out } = gate('copy-of-base', broken(c => {
+    const base = c.campaigns[0].lang[0];
+    c.campaigns[0].translations[base] = { headline: 'h', support: 's', cta: { label: 'c' } };
+  }));
+  assert.equal(code, 1);
+  assert.match(out, /repeats the entry's own language/);
+});
+
+test('a translated headline over the limit is refused', () => {
+  const { code, out } = gate('long-copy', broken(c => {
+    const t = Object.values(c.campaigns[0].translations)[0];
+    t.headline = 'x'.repeat(61);
+  }));
+  assert.equal(code, 1);
+  assert.match(out, /translations\/.*headline must NOT have more than 60 characters/);
+});
+
 test('malformed JSON is refused with a line number', () => {
   const { code, out } = gate('syntax', JSON.stringify(good, null, 2).replace('{', '{\n  ,'));
   assert.equal(code, 1);

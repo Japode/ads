@@ -40,8 +40,11 @@ const escape = s =>
  * slot uses only the contract a host site has: data-ad-exclude naming everyone else.
  * Inventing a preview-only attribute would mean the thing being reviewed is not the
  * thing that ships.
+ *
+ * `lang` is the language every cell asks for, through the same data-ad-lang a host site
+ * writes: empty draws each entry's own copy, /preview?lang=pt-BR draws the translations.
  */
-export function gallery() {
+export function gallery(lang = '') {
   const catalogue = JSON.parse(readFileSync(join(site, 'v1/catalogue.json'), 'utf8'));
   const ids = catalogue.campaigns.map(c => c.id);
 
@@ -56,7 +59,7 @@ export function gallery() {
           <div data-japode-ads
                data-ad-format="${escape(format)}"
                data-ad-slot="${escape(campaign.id)}-${escape(format)}"
-               data-ad-lang=""
+               data-ad-lang="${escape(lang)}"
                data-ad-exclude="${escape(others)}"></div>
         </figure>`
       ).join('');
@@ -110,6 +113,9 @@ export function gallery() {
     ${catalogue.campaigns.length} campaigns × ${FORMATS.length} formats, drawn by the
     published loader against <code>site/v1/catalogue.json</code> on disk. Edit it and
     reload. Switch your OS theme to see the dark half.
+    ${lang
+      ? `Drawn in <code>${escape(lang)}</code>; <a href="/preview">each entry's own language</a>.`
+      : 'Drawn in each entry\'s own language; <a href="/preview?lang=pt-BR">pt-BR</a>, <a href="/preview?lang=en">en</a>.'}
   </p>
   ${rows}
 </div>
@@ -127,7 +133,8 @@ const server = createServer((req, res) => {
 
   if (path === '/preview' || path === '/preview/') {
     res.writeHead(200, { 'content-type': TYPES['.html'], 'cache-control': 'no-store' });
-    res.end(gallery());
+    const lang = new URLSearchParams(req.url.split('?')[1] ?? '').get('lang') ?? '';
+    res.end(gallery(lang));
     return;
   }
 

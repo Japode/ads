@@ -384,6 +384,64 @@
   }
 
   /**
+   * The disclosure in the language the banner's copy is in.
+   *
+   * Keyed by primary subtag and falling back to English: a Portuguese banner labelled
+   * "Ad" is a banner that half-speaks the reader's language, and the label is the one
+   * piece of text the advertiser never writes, so it is ours to translate.
+   */
+  var MARKS = { en: 'Ad', pt: 'Anúncio' };
+
+  function markFor(lang) {
+    return MARKS[primary(lang)] || MARKS.en;
+  }
+
+  /**
+   * The campaign as this slot should read it: its copy in the slot's language.
+   *
+   * The entry's own headline, support and call to action are written in the first
+   * language it declares; `translations` carries the others, keyed by tag. An exact tag
+   * wins over a primary-subtag match, so an entry with both pt-PT and pt-BR copy gives a
+   * pt-BR page its own, and a page that only says "pt" still gets one of them.
+   *
+   * Returns a copy rather than editing the entry: the catalogue object is shared by every
+   * slot on the page, and two slots in two languages must not overwrite each other.
+   * A slot that accepts any language, or matches no translation, reads the entry as is.
+   */
+  function localise(campaign, lang) {
+    var langs = campaign.lang || [];
+    var base = langs.length ? langs[0] : '';
+    var out = {};
+    for (var key in campaign) {
+      if (Object.prototype.hasOwnProperty.call(campaign, key)) out[key] = campaign[key];
+    }
+    out.copyLang = base;
+
+    var table = campaign.translations;
+    if (!lang || !table) return out;
+
+    var wanted = String(lang).toLowerCase();
+    var exact = null;
+    var loose = null;
+    for (var tag in table) {
+      if (!Object.prototype.hasOwnProperty.call(table, tag)) continue;
+      if (tag.toLowerCase() === wanted) exact = tag;
+      else if (!loose && primary(tag) === primary(wanted)) loose = tag;
+    }
+    // The entry's own copy already speaks this language: prefer it over a sibling
+    // variant, so an en entry with a pt-BR translation stays English on an en-GB page.
+    var chosen = exact || (primary(base) === primary(wanted) ? null : loose);
+    if (!chosen) return out;
+
+    var t = table[chosen];
+    out.headline = t.headline;
+    out.support = t.support;
+    out.cta = { label: t.cta.label, href: campaign.cta.href };
+    out.copyLang = chosen;
+    return out;
+  }
+
+  /**
    * Every string here comes from the catalogue, and every one of them is set with
    * textContent rather than markup. A campaign is data, and data that can introduce
    * markup into someone else's page is an injection whether or not we wrote it.
@@ -449,7 +507,7 @@
     // entitled to know a banner is a banner without having to infer it.
     var mark = doc.createElement('span');
     mark.className = 'mark';
-    mark.textContent = 'Ad';
+    mark.textContent = markFor(campaign.copyLang);
 
     body.appendChild(product);
     body.appendChild(headline);
@@ -985,6 +1043,8 @@
           isolated: !!s.root,
           // The campaign id this slot ended up drawing, or null if it drew nothing.
           showing: null,
+          // The language tag of the copy drawn, or null when the entry declares none.
+          copy: null,
           warnings: s.warnings.slice(),
         };
       }),
@@ -1041,7 +1101,13 @@
           }
 
           taken.push(campaign.id);
-          win.japodeAds.slots[s].showing = draw(win, doc, slot, campaign, origin);
+          // Localised once, here: the theme redraw in follow() reuses what was drawn, so
+          // a reader who flips to dark keeps reading the same language.
+          var shown = localise(campaign, slot.lang);
+          win.japodeAds.slots[s].showing = draw(win, doc, slot, shown, origin);
+          // Which copy the slot got, so a site owner can tell "no Portuguese copy" from
+          // "no Portuguese campaign" without reading the catalogue.
+          win.japodeAds.slots[s].copy = shown.copyLang || null;
           // Every argument here is a parameter rather than a closed-over loop variable:
           // `slot` is declared with var, so a listener that read it would find whatever
           // the last iteration left behind and repaint the wrong banner.
@@ -1095,6 +1161,8 @@
       weightOf: weightOf,
       drawWeighted: drawWeighted,
       pickFor: pickFor,
+      localise: localise,
+      MARKS: MARKS,
       MEMORY_KEY: MEMORY_KEY,
       MEMORY_MINUTES: MEMORY_MINUTES,
       MEMORY_SIZE: MEMORY_SIZE,

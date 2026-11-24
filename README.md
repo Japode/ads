@@ -75,6 +75,13 @@ schema cannot: that the asset resolves, that its declared size matches the file 
 host page does not jump, that no id repeats, and that the colours you chose clear WCAG AA
 against each other.
 
+Every campaign is written in Portuguese and English, because the network runs on both
+Brazilian and international sites and the loader filters by the page's language. The
+entry's own copy is in the first tag of `lang`; `translations` holds the other one, and
+the gate refuses an entry whose `lang` and `translations` disagree.
+`npm run preview` draws each entry's own copy, and `/preview?lang=pt-BR` draws the
+translations.
+
 ## The roadmap is not edited by hand
 
 [`docs/ROADMAP.md`](docs/ROADMAP.md), [`docs/CHANGELOG.md`](docs/CHANGELOG.md) and

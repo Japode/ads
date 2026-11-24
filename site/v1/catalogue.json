@@ -42,8 +42,18 @@
         "coding-agents"
       ],
       "lang": [
-        "en"
+        "en",
+        "pt-BR"
       ],
+      "translations": {
+        "pt-BR": {
+          "headline": "Headless, e seu agente de código consegue operá-lo",
+          "support": "Conteúdo como arquivos, ferramentas MCP e blueprints. O curador aprova num console React com links de pré-visualização.",
+          "cta": {
+            "label": "Conhecer o Shio"
+          }
+        }
+      },
       "excludeHosts": [
         "viglet.org",
         "www.viglet.org",
@@ -91,8 +101,18 @@
         "self-hosted"
       ],
       "lang": [
-        "en"
+        "en",
+        "pt-BR"
       ],
+      "translations": {
+        "pt-BR": {
+          "headline": "Busca corporativa hospedada por você",
+          "support": "Indexe AEM, WordPress, bancos de dados e arquivos, e responda sobre eles com RAG. Apache-2.0, na sua própria infraestrutura.",
+          "cta": {
+            "label": "Explorar o Turing"
+          }
+        }
+      },
       "excludeHosts": [
         "viglet.org",
         "www.viglet.org",
@@ -140,8 +160,18 @@
         "platform"
       ],
       "lang": [
-        "en"
+        "en",
+        "pt-BR"
       ],
+      "translations": {
+        "pt-BR": {
+          "headline": "Busca, conteúdo e dados open source, auto-hospedados",
+          "support": "A casa do Viglet Turing, Shio e Dumont: plataformas Apache-2.0 que mantêm seu conteúdo nos seus próprios servidores.",
+          "cta": {
+            "label": "Visitar a Viglet"
+          }
+        }
+      },
       "excludeHosts": [
         "viglet.org",
         "www.viglet.org",
@@ -189,8 +219,18 @@
         "self-hosted"
       ],
       "lang": [
-        "en"
+        "en",
+        "pt-BR"
       ],
+      "translations": {
+        "pt-BR": {
+          "headline": "Conecte suas fontes e entregue-as à busca",
+          "support": "Uma plataforma de troca de dados que leva o conteúdo das suas fontes ao Viglet Turing ou a outro buscador. Apache-2.0.",
+          "cta": {
+            "label": "Conhecer o Dumont"
+          }
+        }
+      },
       "excludeHosts": [
         "viglet.org",
         "www.viglet.org",
@@ -238,8 +278,18 @@
         "api"
       ],
       "lang": [
-        "en"
+        "en",
+        "pt-BR"
       ],
+      "translations": {
+        "pt-BR": {
+          "headline": "Todo id de modelo, por fornecedor e por tipo",
+          "support": "Janelas de contexto, dimensões de embedding e capacidades de modelos de chat, embedding e rerank. JSON versionado e grátis, sem chave.",
+          "cta": {
+            "label": "Ver o catálogo"
+          }
+        }
+      },
       "excludeHosts": [
         "viglet.org",
         "www.viglet.org",
@@ -289,8 +339,18 @@
         "claude-code"
       ],
       "lang": [
-        "en"
-      ]
+        "en",
+        "pt-BR"
+      ],
+      "translations": {
+        "pt-BR": {
+          "headline": "Seu roadmap para de se descolar do código",
+          "support": "Uma CLI cuida do roadmap, do changelog e da justificativa, então entregar uma tarefa atualiza os três ou nenhum.",
+          "cta": {
+            "label": "Baixar o roadkeep"
+          }
+        }
+      }
     },
     {
       "id": "freeharbor",
@@ -333,8 +393,18 @@
         "open-source"
       ],
       "lang": [
-        "en"
-      ]
+        "en",
+        "pt-BR"
+      ],
+      "translations": {
+        "pt-BR": {
+          "headline": "Docker no Windows, sob Apache-2.0",
+          "support": "Uma alternativa ao Docker Desktop sem limite de funcionários, sem limite de faturamento e sem licença para comprar.",
+          "cta": {
+            "label": "Baixar o FreeHarbor"
+          }
+        }
+      }
     },
     {
       "id": "claude-tray",
@@ -377,8 +447,18 @@
         "claude-code"
       ],
       "lang": [
-        "en"
-      ]
+        "en",
+        "pt-BR"
+      ],
+      "translations": {
+        "pt-BR": {
+          "headline": "Seu uso do Claude Code, sempre na bandeja",
+          "support": "Um ícone nativo na bandeja do Windows que desenha seu percentual de limite de uso como vetor, nítido em qualquer DPI.",
+          "cta": {
+            "label": "Instalar no Windows"
+          }
+        }
+      }
     },
     {
       "id": "commitclerk",
@@ -422,8 +502,18 @@
         "claude-code"
       ],
       "lang": [
-        "en"
-      ]
+        "en",
+        "pt-BR"
+      ],
+      "translations": {
+        "pt-BR": {
+          "headline": "Mensagens de commit escritas a partir do seu diff",
+          "support": "Um comando lê o diff em stage, pede ao LLM que você escolher uma mensagem Conventional Commits e faz o commit. Sem dependências.",
+          "cta": {
+            "label": "Baixar o commitclerk"
+          }
+        }
+      }
     },
     {
       "id": "winwright",
@@ -467,8 +557,18 @@
         "claude-code"
       ],
       "lang": [
-        "en"
-      ]
+        "en",
+        "pt-BR"
+      ],
+      "translations": {
+        "pt-BR": {
+          "headline": "Testes de UI no Windows que dizem o que não conferiram",
+          "support": "Conduza um app desktop via UI Automation a partir do .NET. Uma verificação que não rodou aparece no resultado, não como aprovada.",
+          "cta": {
+            "label": "Conhecer o winwright"
+          }
+        }
+      }
     },
     {
       "id": "polyweave",
@@ -511,8 +611,18 @@
         "claude-code"
       ],
       "lang": [
-        "en"
-      ]
+        "en",
+        "pt-BR"
+      ],
+      "translations": {
+        "pt-BR": {
+          "headline": "As peças do seu jogo, feitas sob medida no Claude Code",
+          "support": "Cada modelo, sprite ou som começa como um arquivo que diz o que é correto; o Claude Code o faz e o mede antes da sua aprovação.",
+          "cta": {
+            "label": "Conhecer o polyweave"
+          }
+        }
+      }
     },
     {
       "id": "aduzi",
@@ -555,8 +665,18 @@
         "open-source"
       ],
       "lang": [
-        "en"
-      ]
+        "en",
+        "pt-BR"
+      ],
+      "translations": {
+        "pt-BR": {
+          "headline": "SSH no Windows, sem a suíte em volta",
+          "support": "Um cliente SSH nativo com terminal desenhado pela GPU: sessões, chaves, SFTP e túneis de porta, e nada pendurado ao lado.",
+          "cta": {
+            "label": "Conhecer o Aduzi"
+          }
+        }
+      }
     },
     {
       "id": "piano",
@@ -599,8 +719,18 @@
         "claude-code"
       ],
       "lang": [
-        "en"
-      ]
+        "en",
+        "pt-BR"
+      ],
+      "translations": {
+        "pt-BR": {
+          "headline": "Um piano que o Claude Code compõe, toca e ensina",
+          "support": "Piano de desktop gratuito: toca partituras como notas caindo nas teclas e ensina compasso a compasso, com plugin para Claude Code.",
+          "cta": {
+            "label": "Baixar o Piano"
+          }
+        }
+      }
     },
     {
       "id": "pportal",
@@ -642,8 +772,18 @@
         "open-source"
       ],
       "lang": [
-        "en"
-      ]
+        "en",
+        "pt-BR"
+      ],
+      "translations": {
+        "pt-BR": {
+          "headline": "PlayStation Remote Play, refeito para Windows",
+          "support": "Um cliente Remote Play gratuito em .NET 10: vídeo de dez bits, decodificação na sua própria placa e nenhum navegador embutido.",
+          "cta": {
+            "label": "Baixar o PPortal"
+          }
+        }
+      }
     },
     {
       "id": "spinhold",
@@ -684,8 +824,18 @@
         "arcade"
       ],
       "lang": [
-        "en"
+        "en",
+        "pt-BR"
       ],
+      "translations": {
+        "pt-BR": {
+          "headline": "Um shooter arcade em volta de uma colônia espacial que gira",
+          "support": "Voe pelo lado de fora de uma estação em rotação e defenda-a. Da Viglet Games, em desenvolvimento para a Steam.",
+          "cta": {
+            "label": "Conhecer o Spinhold"
+          }
+        }
+      },
       "excludeHosts": [
         "spinhold.viglet.com"
       ]
@@ -729,8 +879,18 @@
         "puzzle"
       ],
       "lang": [
-        "en"
+        "en",
+        "pt-BR"
       ],
+      "translations": {
+        "pt-BR": {
+          "headline": "Um match-3 feito de feltro e enchimento",
+          "support": "Corações, gotas e estrelas de pelúcia amassam ao cair e estufam ao estourar. Da Viglet Games, em desenvolvimento para a Steam.",
+          "cta": {
+            "label": "Conhecer o Cottony"
+          }
+        }
+      },
       "excludeHosts": [
         "cottony.viglet.com"
       ]
@@ -773,8 +933,18 @@
         "games"
       ],
       "lang": [
-        "en"
+        "en",
+        "pt-BR"
       ],
+      "translations": {
+        "pt-BR": {
+          "headline": "Um match-3 de pelúcia e um shooter neon",
+          "support": "A Viglet Games está fazendo Cottony e Spinhold, os dois em desenvolvimento para a Steam.",
+          "cta": {
+            "label": "Conhecer os jogos"
+          }
+        }
+      },
       "excludeHosts": [
         "games.viglet.com",
         "cottony.viglet.com",
@@ -821,8 +991,18 @@
         "claude-code"
       ],
       "lang": [
-        "en"
+        "en",
+        "pt-BR"
       ],
+      "translations": {
+        "pt-BR": {
+          "headline": "Compartilhe skills do Claude Code por URL",
+          "support": "Publique uma skill como .md ou .zip e receba um link; qualquer pessoa a instala num projeto com um único comando.",
+          "cta": {
+            "label": "Testar o skillgist"
+          }
+        }
+      },
       "excludeHosts": [
         "skillgist.com",
         "www.skillgist.com"
@@ -869,8 +1049,18 @@
         "open-source"
       ],
       "lang": [
-        "pt-BR"
-      ]
+        "pt-BR",
+        "en"
+      ],
+      "translations": {
+        "en": {
+          "headline": "A GPT in pure Java, with no ML library",
+          "support": "A character-level language model written from scratch, with the maths of every class explained. In Portuguese.",
+          "cta": {
+            "label": "Read the lesson"
+          }
+        }
+      }
     },
     {
       "id": "cursarei",
@@ -912,8 +1102,18 @@
         "cursos"
       ],
       "lang": [
-        "pt-BR"
+        "pt-BR",
+        "en"
       ],
+      "translations": {
+        "en": {
+          "headline": "Brazilian courses in one place",
+          "support": "Undergraduate, postgraduate, MBA and short courses from many institutions, in one independent aggregator.",
+          "cta": {
+            "label": "Find courses"
+          }
+        }
+      },
       "excludeHosts": [
         "cursarei.com.br",
         "www.cursarei.com.br"
@@ -962,8 +1162,18 @@
         "open-source"
       ],
       "lang": [
-        "en"
-      ]
+        "en",
+        "pt-BR"
+      ],
+      "translations": {
+        "pt-BR": {
+          "headline": "Seus arquivos de deploy fiéis a um manifesto",
+          "support": "Confere Dockerfile, compose, rota do Caddy ou nginx e .env contra um manifesto de serviço, e o servidor contra a árvore.",
+          "cta": {
+            "label": "Baixar o jcloud"
+          }
+        }
+      }
     },
     {
       "id": "revelei",
@@ -1007,8 +1217,18 @@
         "open-source"
       ],
       "lang": [
-        "en"
-      ]
+        "en",
+        "pt-BR"
+      ],
+      "translations": {
+        "pt-BR": {
+          "headline": "Fotos melhores, direto no seu PC",
+          "support": "Amplie, tire o ruído, restaure rostos e remova fundos com IA no seu próprio computador Windows. Nada é enviado.",
+          "cta": {
+            "label": "Baixar o Revelei"
+          }
+        }
+      }
     },
     {
       "id": "modelado",
@@ -1053,8 +1273,18 @@
         "open-source"
       ],
       "lang": [
-        "en"
-      ]
+        "en",
+        "pt-BR"
+      ],
+      "translations": {
+        "pt-BR": {
+          "headline": "Uma foto vira um modelo 3D, no seu PC",
+          "support": "Transforme uma foto em objeto 3D ou relevo, limpe a malha e exporte para impressão, jogos ou Blender. Nada é enviado.",
+          "cta": {
+            "label": "Baixar o Modelado"
+          }
+        }
+      }
     },
     {
       "id": "askround",
@@ -1099,8 +1329,18 @@
         "open-source"
       ],
       "lang": [
-        "en"
-      ]
+        "en",
+        "pt-BR"
+      ],
+      "translations": {
+        "pt-BR": {
+          "headline": "Veja o que o ChatGPT diz do seu produto",
+          "support": "Faça a mesma pergunta ao ChatGPT, Gemini, Claude e Perplexity com busca na web e veja se seu app é citado. CLI e MCP.",
+          "cta": {
+            "label": "Baixar o askround"
+          }
+        }
+      }
     },
     {
       "id": "jogarei",
@@ -1143,8 +1383,18 @@
         "indie"
       ],
       "lang": [
-        "pt-BR"
+        "pt-BR",
+        "en"
       ],
+      "translations": {
+        "en": {
+          "headline": "Brazilian indie games in one place",
+          "support": "Where to play, what it costs and who made it, from Steam to itch.io and the mobile stores, with each game's origin checked.",
+          "cta": {
+            "label": "Discover games"
+          }
+        }
+      },
       "excludeHosts": [
         "jogarei.com.br",
         "www.jogarei.com.br"

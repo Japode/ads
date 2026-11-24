@@ -176,6 +176,25 @@ if (schema && catalogue) {
       }
     }
 
+    // lang and translations have to name the same languages. A tag in lang with no copy
+    // lets the entry pass the language filter and then draw in its first language, which
+    // is the English banner on a Portuguese page this field exists to prevent; a
+    // translation lang does not list is copy the filter never lets a slot ask for.
+    const langs = Array.isArray(c?.lang) ? c.lang : [];
+    const translated = c?.translations && typeof c.translations === 'object' ? Object.keys(c.translations) : [];
+    if (translated.length && !langs.length)
+      errors.push(`${id}: has translations but no lang, so nothing says what language its own copy is in`);
+    for (const tag of langs.slice(1)) {
+      if (!translated.includes(tag))
+        errors.push(`${id}: lang lists ${tag} but translations has no ${tag} copy, so a ${tag} page would get the ${langs[0]} text`);
+    }
+    for (const tag of translated) {
+      if (tag === langs[0])
+        errors.push(`${id}: translations.${tag} repeats the entry's own language, ${langs[0]}, whose copy is the entry itself`);
+      else if (langs.length && !langs.includes(tag))
+        errors.push(`${id}: translations.${tag} is not in lang, so no slot can ever be filtered to it`);
+    }
+
     // A theme with no dark half is legal, but a logo with a dark variant and no dark
     // theme means the renderer has a dark asset it can never be asked for.
     if (c?.logo?.srcDark && !c?.theme?.dark)

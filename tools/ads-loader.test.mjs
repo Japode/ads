@@ -245,6 +245,7 @@ test('the minimal paste is a working slot', () => {
     memory: 'on',
     isolated: true,
     showing: null,
+    copy: null,
     warnings: [],
   });
   assert.deepEqual(warnings, [], 'a bare paste must not warn');
@@ -273,6 +274,7 @@ test('every documented attribute is read', () => {
     memory: 'off',
     isolated: true,
     showing: null,
+    copy: null,
     warnings: [],
   });
 });
@@ -553,6 +555,109 @@ test('the banner discloses that it is one', async () => {
   const h = run([container], { fetch: withCampaigns(campaign()) });
   await h.settled();
   assert.equal(container.shadowRoot.find('mark').textContent, 'Ad');
+});
+
+// ------------------------------------------------------------------------------------
+// Translations
+// ------------------------------------------------------------------------------------
+
+/** A campaign written in English with a Brazilian Portuguese copy beside it. */
+const bilingual = (over = {}) => campaign({
+  lang: ['en', 'pt-BR'],
+  translations: {
+    'pt-BR': {
+      headline: 'Seu roadmap para de se descolar',
+      support: 'Uma CLI cuida do roadmap, do changelog e da justificativa.',
+      cta: { label: 'Baixar o roadkeep' },
+    },
+  },
+  ...over,
+});
+
+test('a Portuguese page draws the Portuguese copy', async () => {
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { pageLang: 'pt-BR', fetch: withCampaigns(bilingual()) });
+  await h.settled();
+  const root = container.shadowRoot;
+  assert.equal(root.find('headline').textContent, 'Seu roadmap para de se descolar');
+  assert.equal(root.find('support').textContent, 'Uma CLI cuida do roadmap, do changelog e da justificativa.');
+  assert.equal(root.find('cta').textContent, 'Baixar o roadkeep');
+  assert.equal(root.find('mark').textContent, 'Anúncio', 'the disclosure follows the copy');
+  assert.match(root.find('unit').getAttribute('aria-label'), /^Baixar o roadkeep — roadkeep: Seu roadmap/);
+  // The destination and the brand do not change with the language.
+  assert.match(root.find('unit').getAttribute('href'), /^https:\/\/github\.com\/alegauss\/roadkeep\?/);
+  assert.equal(root.find('product').textContent, 'roadkeep');
+  assert.equal(h.exposed.slots[0].copy, 'pt-BR');
+});
+
+test('an English page draws the entry\'s own copy', async () => {
+  const container = el({ 'data-japode-ads': '' });
+  const h = run([container], { pageLang: 'en-GB', fetch: withCampaigns(bilingual()) });
+  await h.settled();
+  assert.equal(container.shadowRoot.find('headline').textContent, 'Your roadmap stops drifting');
+  assert.equal(container.shadowRoot.find('mark').textContent, 'Ad');
+  assert.equal(h.exposed.slots[0].copy, 'en');
+});
+
+test('a bare "pt" page still reaches the pt-BR copy', () => {
+  const { internals } = run([]);
+  assert.equal(internals.localise(bilingual(), 'pt').headline, 'Seu roadmap para de se descolar');
+  assert.equal(internals.localise(bilingual(), 'PT-br').copyLang, 'pt-BR');
+});
+
+test('an exact tag wins over a sibling variant', () => {
+  const { internals } = run([]);
+  const c = bilingual({
+    lang: ['en', 'pt-PT', 'pt-BR'],
+    translations: {
+      'pt-PT': { headline: 'europeu', support: 's', cta: { label: 'c' } },
+      'pt-BR': { headline: 'brasileiro', support: 's', cta: { label: 'c' } },
+    },
+  });
+  assert.equal(internals.localise(c, 'pt-BR').headline, 'brasileiro');
+  assert.equal(internals.localise(c, 'pt-PT').headline, 'europeu');
+});
+
+test('a slot that accepts any language reads the entry as written', () => {
+  const { internals } = run([]);
+  const shown = internals.localise(bilingual(), '');
+  assert.equal(shown.headline, 'Your roadmap stops drifting');
+  assert.equal(shown.copyLang, 'en');
+});
+
+test('localising never edits the shared catalogue entry', async () => {
+  // Two slots in two languages on one page read the same object. If the first rewrote
+  // it, the second would draw the first one's language.
+  const shared = bilingual();
+  const pt = el({ 'data-japode-ads': '', 'data-ad-lang': 'pt-BR' });
+  const en = el({ 'data-japode-ads': '', 'data-ad-lang': 'en' });
+  const h = run([pt, en], { fetch: withCampaigns(shared) });
+  await h.settled();
+  assert.equal(pt.shadowRoot.find('headline').textContent, 'Seu roadmap para de se descolar');
+  assert.equal(en.shadowRoot.find('headline').textContent, 'Your roadmap stops drifting');
+  assert.equal(shared.headline, 'Your roadmap stops drifting');
+});
+
+test('a theme flip keeps the language the banner was drawn in', async () => {
+  const container = el({ 'data-japode-ads': '', 'data-ad-theme': 'light' });
+  const h = run([container], { pageLang: 'pt-BR', fetch: withCampaigns(bilingual()), live: true });
+  await h.settled();
+  container.setAttribute('data-ad-theme', 'dark');
+  assert.equal(container.shadowRoot.find('headline').textContent, 'Seu roadmap para de se descolar');
+  assert.equal(container.shadowRoot.find('mark').textContent, 'Anúncio');
+});
+
+test('every shipped campaign can be read in Portuguese and in English', () => {
+  // The network's sites are Brazilian and international both; a campaign in one language
+  // only is invisible on half of them, which is how jogarei.com.br ended up with two.
+  const { internals } = run([]);
+  for (const c of live.campaigns) {
+    for (const lang of ['pt-BR', 'en']) {
+      assert.ok(internals.eligibleFor([c], asSlot({ lang }), 'example.com').length, `${c.id} is filtered out of ${lang}`);
+      const shown = internals.localise(c, lang);
+      assert.equal(shown.copyLang, lang, `${c.id} draws ${shown.copyLang} copy on a ${lang} page`);
+    }
+  }
 });
 
 test('catalogue text is set as text, never as markup', async () => {
