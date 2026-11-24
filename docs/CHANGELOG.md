@@ -30,6 +30,7 @@
 - ✅ **RK31** **The renderer clips any logo whose artwork reaches its corners** — border-radius is gone from the logo in every format, and a test refuses any rule that would clip or crop a mark.
 - ✅ **RK14** **Banners have no accessibility or layout-shift budget** — Each format reserves its height before the request and keeps it as a floor, an empty slot gives the space back, and a page view is budgeted at 40KB with its heaviest logo.
 - ✅ **RK41** **A banner keeps the theme it was drawn on after the page changes its own** — The slot watches prefers-color-scheme and data-ad-theme and repaints the campaign it already drew, so a page that turns light does not keep a dark card.
+- ✅ **RK47** **No formato footer o selo Ad fica no meio da altura, ao lado do botao, e nao no canto superior direito** — O override do footer foi removido e o selo volta ao canto superior direito; um teste garante que so o strip pode deixar o selo em linha.
 
 ## Block E — Random rotation and delivery control
 
