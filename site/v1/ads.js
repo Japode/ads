@@ -604,7 +604,9 @@
       '.unit.footer { align-items: center; gap: 1rem; padding: .875rem 1.25rem; }',
       '.unit.footer .body { flex: 1 1 auto; }',
       '.unit.footer .cta { margin-top: 0; margin-left: auto; align-self: center; }',
-      '.unit.footer .mark { position: static; margin-left: .5rem; align-self: center; }',
+      // The disclosure stays in the top-right corner, as in the other tall formats. Set
+      // inline at the end of the row it landed mid-height beside the call to action, where
+      // it read as part of the offer rather than a label on the whole unit.
       '@container (max-width: 34rem) { .unit.footer .support { display: none; } }',
 
       // ---- strip: one compact line --------------------------------------------------

@@ -1645,6 +1645,19 @@ test('each format reaches the markup as its own class', async () => {
   }
 });
 
+test('the disclosure sits in the corner of every format but the strip', async () => {
+  // The base rule pins .mark to the top-right corner; only the one-line strip, too short
+  // for a corner label to clear its text, may set it inline. The footer once did too,
+  // and on jogarei.com.br the label floated mid-height beside the call to action.
+  const container = el({ 'data-japode-ads': '', 'data-ad-format': 'footer' });
+  const h = run([container], { fetch: withCampaigns(campaign()) });
+  await h.settled();
+  const style = styleOf(container);
+  assert.match(style, /\.mark \{ position: absolute; top: \.5rem; right: \.625rem;/);
+  const inline = [...style.matchAll(/\.unit\.([a-z-]+) \.mark \{[^}]*position: static/g)].map(m => m[1]);
+  assert.deepEqual(inline, ['strip']);
+});
+
 test('every format carries the same fields from the same entry', async () => {
   // §RK12's constraint: a format rearranges the entry, it never asks for a new field.
   // What each one chooses to show is CSS; what the renderer builds is identical.
